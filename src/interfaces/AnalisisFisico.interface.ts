@@ -1,0 +1,33 @@
+export interface IAnalisisFisico {
+    id_analisis: string;
+    id_lote?: string;
+    fecha_registro?: Date;
+    matriz_lote: string;
+    nombre_cliente: string;
+    proveedor: string;
+    nombre_muestra: string;
+    variedad: string;
+    peso_muestra: number;
+    peso_pergamino: number;
+    WA: number;
+    temperatura_WA: number;
+    humedad: number;
+    temperatura_humedad: number;
+    densidad: number;
+    color_grano_verde: string;
+    olor: string;
+    superior_malla_18: number;
+    superior_malla_16: number;
+    superior_malla_14: number;
+    menor_malla_14: number;
+    peso_defectos: number;
+    defectos_primarios: number;
+    defectos_secundarios: number;
+    quaquers: number;
+    peso_muestra_tostada: number;
+    desarrollo: number;
+    porcentaje_caramelizacion: number;
+    c_desarrollo: number;
+    grado: string;
+    comentario?: string;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "fortunatoroaster",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsnd --respawn --clear src/app.ts",
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/app.js"
+  },
+  "keywords": [],
+  "author": "Renzo Nicolas Vilchez Astete",
+  "license": "ISC",
+  "description": "El sistema está diseñado para gestionar la trazabilidad y los procesos de producción, cata y distribución de café, abarcando desde el grano verde hasta el café tostado.",
+  "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/jsonwebtoken": "^9.0.8",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "prisma": "^6.3.1",
+    "uuid": "^11.0.5"
+  }
+}
