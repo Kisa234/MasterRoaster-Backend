@@ -1,14 +1,221 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id_user         String    @id(map: "user_pk") @db.Char(36)
+  nombre          String    @db.Char(20)
+  email           String    @db.Char(20)
+  numero_telefono Int
+  rol             String    @db.Char(20)
+  password        String    @db.Char(64)
+  fecha_registro  DateTime  @db.Date
+  fecha_editado   DateTime  @db.Date
+  eliminado       Boolean
+  lote            lote[]
+  muestra         muestra[]
+  pedido          pedido[]
+}
+
+model analisis {
+  id_analisis                              String             @id(map: "analisis_pk") @db.Char(36)
+  analisis_fisico_id_analisis_fisico       String             @db.Char(36)
+  analisis_sensorial_id_analisis_sensorial String             @db.Char(36)
+  muestra_id_muestra                       String             @db.Char(36)
+  lote_id_lote                             String             @db.Char(36)
+  lote                                     lote               @relation(fields: [lote_id_lote], references: [id_lote], onDelete: NoAction, onUpdate: NoAction, map: "analisis_lote")
+  analisis_fisico                          analisis_fisico    @relation(fields: [analisis_fisico_id_analisis_fisico], references: [id_analisis_fisico], onDelete: NoAction, onUpdate: NoAction, map: "analisis_muestra_analisis_fisico")
+  analisis_sensorial                       analisis_sensorial @relation(fields: [analisis_sensorial_id_analisis_sensorial], references: [id_analisis_sensorial], onDelete: NoAction, onUpdate: NoAction, map: "analisis_muestra_analisis_sensorial")
+  muestra                                  muestra            @relation(fields: [muestra_id_muestra], references: [id_muestra], onDelete: NoAction, onUpdate: NoAction, map: "analisis_muestra_muestra")
+}
+
+model analisis_defectos {
+  id_analisis_defectos                         String               @id(map: "analisis_defectos_pk") @db.Char(36)
+  cantidad                                     Int
+  defectos_primarios_id_defectos_primarios     String               @db.Char(36)
+  defectos_secundarios_id_defectos_secundarios String               @db.Char(36)
+  analisis_fisico_id_analisis_fisico           String               @db.Char(36)
+  analisis_fisico                              analisis_fisico      @relation(fields: [analisis_fisico_id_analisis_fisico], references: [id_analisis_fisico], onDelete: NoAction, onUpdate: NoAction, map: "analisis_defectos_analisis_fisico")
+  defectos_primarios                           defectos_primarios   @relation(fields: [defectos_primarios_id_defectos_primarios], references: [id_defectos_primarios], onDelete: NoAction, onUpdate: NoAction, map: "analisis_defectos_defectos_primarios")
+  defectos_secundarios                         defectos_secundarios @relation(fields: [defectos_secundarios_id_defectos_secundarios], references: [id_defectos_secundarios], onDelete: NoAction, onUpdate: NoAction, map: "analisis_defectos_defectos_secundarios")
+}
+
+enum OLOR{
+    Olor_Extrano
+    Olor_a_Humedad
+    limpio
+}
+
+enum GRADO{
+  Especial
+  Grado_1
+  Grado_2
+  Grado_3
+  Convencional
+}
+
+enum COLOR{
+  Azul_verde
+  Azulado_Verde
+  Verde
+  Verdoso
+  Amarillo_verde
+  Amarillo_Pálido
+  Amarillento
+  Marrón
+}
+
+model analisis_fisico {
+  id_analisis_fisico        String              @id(map: "analisis_fisico_pk") @db.Char(36)
+  fecha_registro            DateTime            @db.Date
+  peso_muestra              Int
+  peso_pergamino            Int
+  wa                        Int
+  temperatura_wa            Int
+  humedad                   Int
+  temperatura_humedad       Int
+  densidad                  Int
+  color_grano_verde         COLOR
+  olor                      OLOR
+  superior_malla_18         Int
+  superior_malla_16         Int
+  superior_malla_14         Int
+  menor_malla_16            Int
+  peso_defectos             Int
+  quaquers                  Int
+  peso_muestra_tostada      Int
+  desarrollo                Int
+  pocentaje_caramelizcacion Int
+  c_desarrollo              Int
+  grado                     GRADO
+  comentario                String
+  analisis                  analisis[]
+  analisis_defectos         analisis_defectos[]
+}
+
+model analisis_sensorial {
+  id_analisis_sensorial String     @id(map: "analisis_sensorial_pk") @db.Char(36)
+  fecha_registro        DateTime   @db.Date
+  fragancia_aroma       Int
+  sabor                 Int
+  sabor_residual        Int
+  acidez                Int
+  cuerpo                Int
+  uniformidad           Int
+  balance               Int
+  taza_limpia           Int
+  dulzor                Int
+  puntaje_catador       Int
+  taza_defecto_ligero   Int
+  tazas_defecto_rechazo Int
+  analisis              analisis[]
+}
+
+model analisis_sensorial_rapido {
+  id_analisis_rapido String   @id(map: "analisis_sensorial_rapido_pk") @db.Char(36)
+  fecha              DateTime @db.Date
+  horneado           Boolean
+  humo               Boolean
+  uniforme           Boolean
+  verde              Boolean
+  arrebatado         Boolean
+  oscuro             Boolean
+  comentario         String?
+  tueste_id_tueste   String   @db.Char(36)
+  tueste             tueste   @relation(fields: [tueste_id_tueste], references: [id_tueste], onDelete: NoAction, onUpdate: NoAction, map: "analisis_sensorial_rapido_tueste")
+}
+
+model defectos_primarios {
+  id_defectos_primarios String              @id(map: "defectos_primarios_pk") @db.Char(36)
+  nombre                String              @db.Char(20)
+  analisis_defectos     analisis_defectos[]
+}
+
+model defectos_secundarios {
+  id_defectos_secundarios String              @id(map: "defectos_secundarios_pk") @db.Char(36)
+  nombre                  String              @db.Char(20)
+  analisis_defectos       analisis_defectos[]
+}
+
+model lote {
+  id_lote                String     @id(map: "lote_pk") @db.Char(36)
+  productor              String     @db.Char(20)
+  finca                  String     @db.Char(20)
+  region                 String     @db.Char(20)
+  departamento           String     @db.Char(20)
+  fecha_compra           DateTime   @db.Date
+  peso                   Int
+  estado                 String     @db.Char(20)
+  variedades_id_variedad String     @db.Char(36)
+  user_id_user           String     @db.Char(36)
+  pedido_id_pedido       String     @db.Char(36)
+  analisis               analisis[]
+  pedido                 pedido     @relation(fields: [pedido_id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction, map: "lote_pedido")
+  User                   User       @relation(fields: [user_id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "lote_user")
+  variedades             variedades @relation(fields: [variedades_id_variedad], references: [id_variedad], onDelete: NoAction, onUpdate: NoAction, map: "lote_variedades")
+}
+
+model muestra {
+  id_muestra             String     @id(map: "muestra_pk") @db.Char(36)
+  nombre                 Int
+  fecha_registro         DateTime   @db.Date
+  peso                   Int
+  variedades_id_variedad String     @db.Char(36)
+  user_id_user           String     @db.Char(36)
+  pedido_id_pedido       String     @db.Char(36)
+  analisis               analisis[]
+  pedido                 pedido     @relation(fields: [pedido_id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction, map: "muestra_pedido")
+  User                   User       @relation(fields: [user_id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "muestra_user")
+  variedades             variedades @relation(fields: [variedades_id_variedad], references: [id_variedad], onDelete: NoAction, onUpdate: NoAction, map: "muestra_variedades")
+}
+
+model pedido {
+  id_pedido        String    @id(map: "pedido_pk") @db.Char(36)
+  fecha_pedido     DateTime  @db.Date
+  tipo_tueste      String    @db.Char(20)
+  cantidad_tostado Int
+  estado_pedido    String    @db.Char(20)
+  observaciones    String
+  user_id_user     String    @db.Char(36)
+  lote             lote[]
+  muestra          muestra[]
+  User             User      @relation(fields: [user_id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "pedido_user")
+  tueste           tueste[]
+}
+
+model tueste {
+  id_tueste                 String                      @id(map: "tueste_pk") @db.Char(36)
+  fecha_tueste              DateTime                    @db.Date
+  tostadora                 String                      @db.Char(20)
+  peso_entrada              Int
+  temperatura_entrada       Int
+  llama_inicial             Int
+  aire_inicial              Int
+  punto_no_retorno          Int
+  tiempo_despues_crack      Int
+  temperatura_crack         Int
+  temperatura_salida        Int
+  tiempo_total              Int
+  porcentaje_caramelizacion Int
+  desarrollo                Int
+  grados_desarrollo         Int
+  peso_salida               Int
+  merma                     Int
+  agtrom_comercial          Int
+  agtrom_gourmet            Int
+  pedido_id_pedido          String                      @db.Char(36)
+  analisis_sensorial_rapido analisis_sensorial_rapido[]
+  pedido                    pedido                      @relation(fields: [pedido_id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction, map: "tueste_pedido")
+}
+
+model variedades {
+  id_variedad String    @id(map: "variedades_pk") @db.Char(36)
+  nombre      String    @db.Char(20)
+  lote        lote[]
+  muestra     muestra[]
 }
