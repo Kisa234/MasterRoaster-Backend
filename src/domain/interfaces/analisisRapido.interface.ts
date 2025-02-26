@@ -1,4 +1,3 @@
-import { tueste } from "@prisma/client";
 import { Tueste } from "./tueste.interface";
 
 export interface AnalisisSensorialRapido {
@@ -11,5 +10,5 @@ export interface AnalisisSensorialRapido {
     arrebatado: boolean;
     oscuro: boolean;
     comentario?: string;
-    tueste:tueste;
+    tueste:Tueste;
 }
