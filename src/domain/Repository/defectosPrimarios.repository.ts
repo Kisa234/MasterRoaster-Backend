@@ -1,4 +1,4 @@
-import { DefectosPrimarios } from "../interfaces/defectosPrimarios.interface";
+import { DefectosPrimarios } from "../entities/defectosPrimarios.interface";
 
 export interface IDefectosPrimariosRepository {
     getById(id: string): Promise<DefectosPrimarios | null>;

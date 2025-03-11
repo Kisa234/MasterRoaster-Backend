@@ -1,4 +1,4 @@
-import { Tueste } from "../interfaces/tueste.interface";
+import { Tueste } from "../entities/tueste.interface";
 
 export interface ITuesteRepository {
     getById(id: string): Promise<Tueste | null>;

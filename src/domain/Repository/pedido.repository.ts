@@ -1,4 +1,4 @@
-import { Pedido } from "../interfaces/pedido.interface";
+import { Pedido } from "../entities/pedido.interface";
 
 export interface IPedidoRepository {
     getById(id: string): Promise<Pedido | null>;

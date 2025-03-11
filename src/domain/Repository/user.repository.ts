@@ -1,4 +1,4 @@
-import { User } from "../interfaces/user.interface";
+import { User } from "../entities/user.interface";
 
 export interface IUserRepository {
     getById(id: string): Promise<User | null>;

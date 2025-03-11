@@ -1,4 +1,4 @@
-import { AnalisisSensorial } from "../interfaces/analisisSensorial.interface";
+import { AnalisisSensorial } from "../entities/analisisSensorial.interface";
 
 export interface IAnalisisSensorialRepository {
     getById(id: string): Promise<AnalisisSensorial | null>;
