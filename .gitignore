@@ -1,4 +1,5 @@
 node_modules/
+/postgres/
 *.log
 .DS_Store
 coverage/
