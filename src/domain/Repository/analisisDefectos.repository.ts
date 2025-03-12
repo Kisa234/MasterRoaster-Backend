@@ -1,4 +1,4 @@
-import { AnalisisDefectos } from "../entities/analisisDefectos.interface";
+
 
 export interface IAnalisisDefectosRepository {
     getById(id: string): Promise<AnalisisDefectos | null>;

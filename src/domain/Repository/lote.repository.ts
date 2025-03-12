@@ -1,4 +1,4 @@
-import { Lote } from "../entities/lote.interface";
+
 
 export interface ILoteRepository {
     getById(id: string): Promise<Lote | null>;

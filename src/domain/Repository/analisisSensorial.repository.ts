@@ -1,4 +1,3 @@
-import { AnalisisSensorial } from "../entities/analisisSensorial.interface";
 
 export interface IAnalisisSensorialRepository {
     getById(id: string): Promise<AnalisisSensorial | null>;

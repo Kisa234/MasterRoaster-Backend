@@ -1,4 +1,3 @@
-import { Analisis } from "../entities/analisis.interface";
 
 export interface IAnalisisRepository {
     getById(id: string): Promise<Analisis | null>;

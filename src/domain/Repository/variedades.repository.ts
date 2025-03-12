@@ -1,4 +1,4 @@
-import { Variedades } from "../entities/variedades.interface";
+
 
 export interface IVariedadesRepository {
     getById(id: string): Promise<Variedades | null>;
