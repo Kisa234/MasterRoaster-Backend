@@ -1,0 +1,11 @@
+import { CreateUserDto } from "../dtos/user/create";
+import { UpdateUserDto } from "../dtos/user/update";
+import { UserEntity } from "../entities/user.entity";
+
+export abstract class UserDataSource {
+    abstract createUser(createUserDto : CreateUserDto): Promise<UserEntity>;
+    abstract getUserById(id: string): Promise<UserEntity | null>;
+    abstract updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity>;
+    abstract deleteUser(id: string): Promise<UserEntity>;
+    abstract getUsersByRole(role: string): Promise<UserEntity[]>;
+  }

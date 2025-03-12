@@ -1,9 +1,10 @@
+import { LoteEntity } from "../entities/lote.entity";
 
-
-export interface ILoteRepository {
-    getById(id: string): Promise<Lote | null>;
-    getAll(): Promise<Lote[]>;
-    create(lote: Lote): Promise<Lote>;
-    update(id: string, lote: Partial<Lote>): Promise<Lote | null>;
-    delete(id: string): Promise<boolean>;
-}
+export abstract class LoteRepository {
+    abstract createLote(lote: LoteEntity): Promise<LoteEntity>;
+    abstract getLoteById(id: string): Promise<LoteEntity | null>;
+    abstract updateLote(id: string, data: Partial<LoteEntity>): Promise<LoteEntity>;
+    abstract deleteLote(id: string): Promise<void>;
+    abstract getLotesByEstado(estado: string): Promise<LoteEntity[]>;
+    
+  }

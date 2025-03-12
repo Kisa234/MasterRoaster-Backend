@@ -1,12 +1,11 @@
+import { CreateUserDto } from "../dtos/user/create";
+import { UpdateUserDto } from "../dtos/user/update";
+import { UserEntity } from "../entities/user.entity";
 
-
-export interface IUserRepository {
-    getById(id: string): Promise<User | null>;
-    getAll(): Promise<User[]>;
-    create(user: User): Promise<User>;
-    update(id: string, user: Partial<User>): Promise<User | null>;
-    delete(id: string): Promise<boolean>;
-    
-    register(user: User): Promise<User>; 
-    login(email: string, password: string): Promise<string | null>;  
-}
+export abstract class UserRepository {
+    abstract createUser(createUserDto : CreateUserDto): Promise<UserEntity>;
+    abstract getUserById(id: string): Promise<UserEntity | null>;
+    abstract updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity>;
+    abstract deleteUser(id: string): Promise<UserEntity>;
+    abstract getUsersByRole(role: string): Promise<UserEntity[]>;
+  }

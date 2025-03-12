@@ -1,9 +1,9 @@
+import { TuesteEntity } from "../entities/tueste.entity";
 
-
-export interface ITuesteRepository {
-    getById(id: string): Promise<Tueste | null>;
-    getAll(): Promise<Tueste[]>;
-    create(tueste: Tueste): Promise<Tueste>;
-    update(id: string, tueste: Partial<Tueste>): Promise<Tueste | null>;
-    delete(id: string): Promise<boolean>;
-}
+export abstract class TuesteRepository {
+    abstract createTueste(tueste: TuesteEntity): Promise<TuesteEntity>;
+    abstract getTuesteById(id: string): Promise<TuesteEntity | null>;
+    abstract updateTueste(id: string, data: Partial<TuesteEntity>): Promise<TuesteEntity>;
+    abstract deleteTueste(id: string): Promise<void>;
+    abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
+  }

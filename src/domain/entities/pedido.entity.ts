@@ -7,8 +7,7 @@ export class PedidoEntity {
         public estado_pedido   : string,
         public observaciones   : string,
         public cliente_id      : string,  
-        public admin_id?       : string, 
-        public laboratorista_id?: string, 
+        public asignado_a_id?  : string,
         public fecha_asignacion?: Date,  
     ){}
 }

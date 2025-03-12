@@ -1,9 +1,7 @@
+import { AnalisisFisicoEntity } from "../entities/analisisFisico.entity";
 
-
-export interface IAnalisisFisicoRepository {
-    getById(id: string): Promise<AnalisisFisico | null>;
-    getAll(): Promise<AnalisisFisico[]>;
-    create(analisis: AnalisisFisico): Promise<AnalisisFisico>;
-    update(id: string, analisis: Partial<AnalisisFisico>): Promise<AnalisisFisico | null>;
-    delete(id: string): Promise<boolean>;
-}
+export abstract class AnalisisFisicoRepository {
+    abstract createAnalisisFisico(analisis: AnalisisFisicoEntity): Promise<AnalisisFisicoEntity>;
+    abstract getAnalisisFisicoById(id: string): Promise<AnalisisFisicoEntity | null>;
+    abstract updateAnalisisFisico(id: string, data: Partial<AnalisisFisicoEntity>): Promise<AnalisisFisicoEntity>;
+  }

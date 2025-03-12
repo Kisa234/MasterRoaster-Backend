@@ -1,8 +1,7 @@
+import { AnalisisEntity } from "../entities/analisis.entity";
 
-export interface IAnalisisRepository {
-    getById(id: string): Promise<Analisis | null>;
-    getAll(): Promise<Analisis[]>;
-    create(analisis: Analisis): Promise<Analisis>;
-    update(id: string, analisis: Partial<Analisis>): Promise<Analisis | null>;
-    delete(id: string): Promise<boolean>;
+export abstract class AnalisisRepository {
+    abstract createAnalisis(analisis: AnalisisEntity): Promise<AnalisisEntity>;
+    abstract getAnalisisByLote(id_lote: string): Promise<AnalisisEntity | null>;
+    abstract updateAnalisis(id: string, data: Partial<AnalisisEntity>): Promise<AnalisisEntity>;
 }

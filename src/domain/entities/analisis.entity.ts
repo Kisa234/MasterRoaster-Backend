@@ -11,4 +11,6 @@ export class AnalisisEntity {
         public fecha_registro: Date,
     ){}
 
+    
+
 }

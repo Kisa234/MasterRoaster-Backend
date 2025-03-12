@@ -1,9 +1,13 @@
+import { PedidoEntity } from "../entities/pedido.entity";
 
-
-export interface IPedidoRepository {
-    getById(id: string): Promise<Pedido | null>;
-    getAll(): Promise<Pedido[]>;
-    create(pedido: Pedido): Promise<Pedido>;
-    update(id: string, pedido: Partial<Pedido>): Promise<Pedido | null>;
-    delete(id: string): Promise<boolean>;
-}
+export abstract class PedidoRepository {
+    abstract createPedido(pedido: PedidoEntity): Promise<PedidoEntity>;
+    abstract getPedidoById(id: string): Promise<PedidoEntity | null>;
+    abstract updatePedido(id: string, data: Partial<PedidoEntity>): Promise<PedidoEntity>;
+    abstract deletePedido(id: string): Promise<void>;
+    abstract getPedidosByEstado(estado: string): Promise<PedidoEntity[]>;
+    abstract getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]>;
+    abstract asignarPedido(id_pedido: string, asignado_a_id: string): Promise<PedidoEntity>;
+    abstract aceptarPedido(id_pedido: string): Promise<PedidoEntity>;
+    abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
+  }
