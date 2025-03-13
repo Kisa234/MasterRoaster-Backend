@@ -10,16 +10,13 @@ export class CreateLoteDto {
         public readonly fecha_compra: Date,
         public readonly peso: number,
         public readonly estado: string,
-        public readonly variedades_id_variedad: string,
-        public readonly user_id_user: string,
-        public readonly pedido_id_pedido: string,
-        public readonly analisis: AnalisisEntity,
-        public readonly variedades: string
+        public readonly variedades: string,
+        public readonly user_id: string,
+        public readonly analisis_id: string
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateLoteDto?] {
-        const { productor, finca, region, departamento, fecha_compra, peso, estado, 
-                variedades_id_variedad, user_id_user, pedido_id_pedido, analisis, variedades } = props;
+        const { productor, finca, region, departamento, fecha_compra, peso, estado, user_id, analisis_id, variedades } = props;
 
         if (!productor) return ['El productor es requerido', undefined];
         if (!finca) return ['La finca es requerida', undefined];
@@ -27,17 +24,16 @@ export class CreateLoteDto {
         if (!departamento) return ['El departamento es requerido', undefined];
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!estado) return ['El estado es requerido', undefined];
-        if (!variedades_id_variedad) return ['El ID de la variedad es requerido', undefined];
-        if (!user_id_user) return ['El ID del usuario es requerido', undefined];
-        if (!pedido_id_pedido) return ['El ID del pedido es requerido', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
+        if (!user_id) return ['El ID del usuario es requerido', undefined];
+        if (!analisis_id) return ['El ID del análisis es requerido', undefined];
 
         let fechaParsed = new Date(fecha_compra);
         if (isNaN(fechaParsed.getTime())) return ['La fecha de compra es inválida', undefined];
 
         return [undefined, new CreateLoteDto(
             productor, finca, region, departamento, fechaParsed, peso, estado, 
-            variedades_id_variedad, user_id_user, pedido_id_pedido, analisis, variedades
+            user_id, analisis_id, variedades
         )];
     }
 }

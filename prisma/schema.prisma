@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id_user        String    @id @default(uuid())
-  nombre         String
-  email          String    @unique
-  rol            String
-  password       String
+  id_user         String    @id @default(uuid())
+  nombre          String
+  email           String    @unique
+  rol             String
+  password        String
   numero_telefono String
-  eliminado      Boolean   @default(false)
-  fecha_registro DateTime  @default(now())
-  fecha_editado  DateTime?
+  eliminado       Boolean   @default(false)
+  fecha_registro  DateTime  @default(now())
+  fecha_editado   DateTime?
 
   // Relación con lote
   lotes             Lote[]
@@ -34,11 +34,12 @@ model Muestra {
   peso           Float
   fecha_registro DateTime
   user_id        String
+  analisis_id    String   @unique
 
   // Relación con Usuario
   user     User      @relation(fields: [user_id], references: [id_user])
   // Relación con Analisis
-  analisis Analisis?
+  analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
 }
 
 model Lote {
@@ -52,13 +53,13 @@ model Lote {
   estado       String
   variedades   String
   user_id      String
-  pedido_id    String?
-
+  analisis_id  String   @unique
+  eliminado    Boolean  @default(false)
+  
   // Relación con Usuario
-  user User @relation(fields: [user_id], references: [id_user])
-
+  user User? @relation(fields: [user_id], references: [id_user])
   // Relación con Analisis
-  analisis Analisis?
+  analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
 }
 
 model Pedido {
@@ -99,24 +100,25 @@ model Tueste {
   merma                     Float
   agtrom_comercial          Float
   agtrom_gourmet            Float
+  id_analisis_rapido        String   @unique
 
   // Relación con Analisis Rapido
-  analisisRapido AnalisisRapido?
+  analisisRapido AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
 }
 
 model Analisis {
-  id_analisis       String             @id @default(uuid())
-  fecha_registro    DateTime           @default(now())
-  muestra_id        String             @unique
-  lote_id           String             @unique
+  id_analisis          String   @id @default(uuid())
+  fecha_registro       DateTime @default(now())
+  analisisFisico_id    String?  @unique
+  analisisSensorial_id String?  @unique
+
   // Relación con Analisis Fisico
-  analisisFisico    AnalisisFisico?
+  analisisFisico    AnalisisFisico?    @relation(fields: [analisisFisico_id], references: [id_analisis_fisico])
   //  Relación con Analisis Sensorial
-  analisisSensorial AnalisisSensorial?
-  // Relación con Lote
-  lote              Lote               @relation(fields: [lote_id], references: [id_lote])
-  // Relación con Muestra
-  muestra           Muestra            @relation(fields: [muestra_id], references: [id_muestra])
+  analisisSensorial AnalisisSensorial? @relation(fields: [analisisSensorial_id], references: [id_analisis_sensorial])
+
+  Muestra Muestra?
+  Lote    Lote?
 }
 
 model AnalisisFisico {
@@ -145,10 +147,8 @@ model AnalisisFisico {
   comentario                String
   defectos_primarios        String[]
   defectos_secundarios      String[]
-  analisis_id               String   @unique
 
-  // Relación con Analisis
-  analisis Analisis @relation(fields: [analisis_id], references: [id_analisis])
+  Analisis Analisis?
 }
 
 model AnalisisSensorial {
@@ -168,10 +168,8 @@ model AnalisisSensorial {
   puntaje_taza          Float
   comentario            String
   fecha_registro        DateTime @default(now())
-  analisis_id           String   @unique
 
-  // Relación con Analisis
-  analisis Analisis @relation(fields: [analisis_id], references: [id_analisis])
+  Analisis Analisis?
 }
 
 model AnalisisRapido {
@@ -184,8 +182,6 @@ model AnalisisRapido {
   arrebatado         Boolean
   oscuro             Boolean
   comentario         String?
-  tueste_id          String   @unique
 
-  // Relación con Tueste
-  tueste Tueste @relation(fields: [tueste_id], references: [id_tueste])
+  Tueste Tueste?
 }

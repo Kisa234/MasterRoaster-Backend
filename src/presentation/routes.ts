@@ -9,7 +9,7 @@ export class AppRoutes{
         const router = Router();
 
         router.use('/user', UserRoutes.routes);
-
+        router.use('/lote', UserRoutes.routes);
 
         return router;
     }

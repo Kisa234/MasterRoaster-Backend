@@ -1,10 +1,11 @@
+import { CreateLoteDto } from "../dtos/lote/create";
 import { LoteEntity } from "../entities/lote.entity";
+import { UpdateLoteDto } from '../dtos/lote/update';
 
 export abstract class LoteDataSource {
-    abstract createLote(lote: LoteEntity): Promise<LoteEntity>;
+    abstract createLote(createLoteDto : CreateLoteDto): Promise<LoteEntity>;
     abstract getLoteById(id: string): Promise<LoteEntity | null>;
-    abstract updateLote(id: string, data: Partial<LoteEntity>): Promise<LoteEntity>;
-    abstract deleteLote(id: string): Promise<void>;
+    abstract updateLote(id: string, updateLoteDto:UpdateLoteDto): Promise<LoteEntity>;
+    abstract deleteLote(id: string): Promise<LoteEntity>;
     abstract getLotesByEstado(estado: string): Promise<LoteEntity[]>;
-    
   }
