@@ -16,7 +16,8 @@ export  class UserDataSourceImpl implements UserDataSource {
   async getUserById(id: string): Promise<UserEntity | null> {
     const user = await prisma.user.findFirst({
       where: {
-        id_user: id
+        id_user: id,
+        eliminado: false
       }
     });
     if (!user) return null;
@@ -32,16 +33,18 @@ export  class UserDataSourceImpl implements UserDataSource {
     return UserEntity.fromObject(updatedUser);
   }
   async deleteUser(id: string): Promise<UserEntity> {
-    const user = await prisma.user.update({
+    const user = this.getUserById(id);
+    const newUser = await prisma.user.update({
       where: {id_user: id},
       data: {eliminado: true}
     });
-    return UserEntity.fromObject(user);
+    return UserEntity.fromObject(newUser);
   }
   async getUsersByRole(role: string): Promise<UserEntity[]> {
     const user = await prisma.user.findMany({
       where: {
-        rol: role
+        rol: role,
+        eliminado: false
       } 
     });
     return user.map(UserEntity.fromObject); 

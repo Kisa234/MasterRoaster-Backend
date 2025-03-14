@@ -1,8 +1,17 @@
-import { AnalisisRapidoEntity } from "../entities/analisisRapido.entity";
+import { AnalisisRapidoDataSource } from "../../domain/datasources/analisisRapido.datasource";
+import { AnalisisRapidoEntity } from "../../domain/entities/analisisRapido.entity";
 
-export abstract class AnalisisRapidoDataSource {
-    abstract createAnalisisRapido(analisis: AnalisisRapidoEntity): Promise<AnalisisRapidoEntity>;
-    abstract getAnalisisRapidoById(id: string): Promise<AnalisisRapidoEntity | null>;
-    abstract updateAnalisisRapido(id: string, data: Partial<AnalisisRapidoEntity>): Promise<AnalisisRapidoEntity>;
+
+export abstract class AnalisisRapidoDataSourceImpl implements AnalisisRapidoDataSource {
+  createAnalisisRapido(analisis: AnalisisRapidoEntity): Promise<AnalisisRapidoEntity> {
+    throw new Error("Method not implemented.");
   }
+  getAnalisisRapidoById(id: string): Promise<AnalisisRapidoEntity | null> {
+    throw new Error("Method not implemented.");
+  }
+  updateAnalisisRapido(id: string, data: Partial<AnalisisRapidoEntity>): Promise<AnalisisRapidoEntity> {
+    throw new Error("Method not implemented.");
+  }
+    
+}
   

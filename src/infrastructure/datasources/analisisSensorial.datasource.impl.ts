@@ -1,7 +1,16 @@
-import { AnalisisSensorialEntity } from "../entities/analisisSensorial.entity";
+import { AnalisisSensorialDataSource } from "../../domain/datasources/analisisSensorial.datasource";
+import { AnalisisSensorialEntity } from "../../domain/entities/analisisSensorial.entity";
 
-export abstract class AnalisisSensorialDataSource {
-    abstract createAnalisisSensorial(analisis: AnalisisSensorialEntity): Promise<AnalisisSensorialEntity>;
-    abstract getAnalisisSensorialById(id: string): Promise<AnalisisSensorialEntity | null>;
-    abstract updateAnalisisSensorial(id: string, data: Partial<AnalisisSensorialEntity>): Promise<AnalisisSensorialEntity>;
+
+export abstract class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSource {
+  createAnalisisSensorial(analisis: AnalisisSensorialEntity): Promise<AnalisisSensorialEntity> {
+    throw new Error("Method not implemented.");
+  }
+  getAnalisisSensorialById(id: string): Promise<AnalisisSensorialEntity | null> {
+    throw new Error("Method not implemented.");
+  }
+  updateAnalisisSensorial(id: string, data: Partial<AnalisisSensorialEntity>): Promise<AnalisisSensorialEntity> {
+    throw new Error("Method not implemented.");
+  }
+    
 }

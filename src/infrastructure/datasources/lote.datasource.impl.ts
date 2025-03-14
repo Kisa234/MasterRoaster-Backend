@@ -18,7 +18,8 @@ export class LoteDataSourceImpl implements LoteDataSource {
   async getLoteById(id: string): Promise<LoteEntity | null> {
     const lote = await prisma.lote.findUnique({
       where: {
-        id_lote: id
+        id_lote: id,
+        eliminado: false
       }
     });
     if (!lote) return null;
@@ -46,6 +47,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
   async getLotesByEstado(estado: string): Promise<LoteEntity[]> {
     const lotes = await prisma.lote.findMany({
       where: {
+        eliminado: false,
         estado: estado
       }
     });

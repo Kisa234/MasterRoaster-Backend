@@ -35,6 +35,7 @@ model Muestra {
   fecha_registro DateTime
   user_id        String
   analisis_id    String   @unique
+  eliminado      Boolean  @default(false)
 
   // Relación con Usuario
   user     User      @relation(fields: [user_id], references: [id_user])
@@ -72,6 +73,7 @@ model Pedido {
   cliente_id       String
   asignado_a_id    String?
   fecha_asignacion DateTime?
+  eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
   cliente User @relation(fields: [cliente_id], references: [id_user], name: "ClientePedido")
@@ -101,6 +103,7 @@ model Tueste {
   agtrom_comercial          Float
   agtrom_gourmet            Float
   id_analisis_rapido        String   @unique
+  eliminado                 Boolean  @default(false)
 
   // Relación con Analisis Rapido
   analisisRapido AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
