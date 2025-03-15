@@ -16,7 +16,7 @@ export class UpdateAnalisisDto {
         return returnObj;
     }
 
-    static create(props: { [key: string]: any }): [string?, UpdateAnalisisDto?] {
+    static update(props: { [key: string]: any }): [string?, UpdateAnalisisDto?] {
         const { id_analisis,fecha_registro, analisisFisico_id, analisisSensorial_id } = props;
 
        

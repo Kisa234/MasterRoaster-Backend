@@ -1,7 +1,8 @@
 import { prisma } from "../../data/postgres";
-import { CreateUserDto, UserEntity } from "../../domain";
 import { UserDataSource } from "../../domain/datasources/user.datasource";
+import { CreateUserDto } from "../../domain/dtos/user/create";
 import { UpdateUserDto } from '../../domain/dtos/user/update';
+import { UserEntity } from "../../domain/entities/user.entity";
 
 
 

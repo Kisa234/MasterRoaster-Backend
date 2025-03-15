@@ -5,7 +5,7 @@ import { UpdateAnalisisSensorialDTO } from "../../domain/dtos/analisis/sensorial
 import { AnalisisSensorialEntity } from "../../domain/entities/analisisSensorial.entity";
 
 
-export abstract class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSource {
+export  class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSource {
   
   async createAnalisisSensorial(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO): Promise<AnalisisSensorialEntity> {
     const newAnalisisSensorial = await prisma.analisisSensorial.create({

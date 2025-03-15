@@ -1,11 +1,11 @@
 import { TuesteEntity } from "../../entities/tueste.entity";
 import { TuesteRepository } from "../../repository/tueste.repository";
 
-export interface GetTuesteUseCase {
+export interface DeleteTuesteUseCase {
     execute(id: string): Promise<TuesteEntity | null>;
 }
 
-export class GetTueste implements GetTuesteUseCase {
+export class DeleteTueste implements DeleteTuesteUseCase {
     constructor(
         private readonly tuesteRepository: TuesteRepository
     ){}

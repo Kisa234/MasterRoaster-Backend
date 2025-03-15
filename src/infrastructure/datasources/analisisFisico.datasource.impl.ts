@@ -5,7 +5,7 @@ import { UpdateAnalisisFisicoDto } from "../../domain/dtos/analisis/fisico/updat
 import { AnalisisFisicoEntity } from "../../domain/entities/analisisFisico.entity";
 
 
-export abstract class AnalisisFisicoDataSourceImpl implements AnalisisFisicoDataSource {
+export  class AnalisisFisicoDataSourceImpl implements AnalisisFisicoDataSource {
     async createAnalisisFisico(createAnalisisFisicoDto: CreateAnalisisFisicoDto): Promise<AnalisisFisicoEntity> {
         const newAnalisisFisico = await prisma.analisisFisico.create({
             data: createAnalisisFisicoDto!

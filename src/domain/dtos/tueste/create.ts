@@ -23,7 +23,7 @@ export class CreateTuesteDto {
         public readonly agtrom_comercial         :number,
         public readonly agtrom_gourmet           :number,
         public readonly id_analisis_rapido       :string,
-        public readonly eliminado                :string
+        public readonly eliminado                :boolean
 
     ) {}
 
