@@ -2,26 +2,27 @@ import { AnalisisRapidoEntity } from "../../entities/analisisRapido.entity";
 
 export class UpdateTuesteDto {
     private constructor(
-        public readonly id_tueste: string,
-        public readonly fecha_tueste?: Date,
-        public readonly tostadora?: string,
-        public readonly peso_entrada?: number,
-        public readonly temperatura_entrada?: number,
-        public readonly llama_inicial?: number,
-        public readonly aire_inicial?: number,
-        public readonly punto_no_retorno?: number,
-        public readonly tiempo_despues_crack?: number,
-        public readonly temperatura_crack?: number,
-        public readonly temperatura_salida?: number,
-        public readonly tiempo_total?: number,
-        public readonly porcentaje_caramelizacion?: number,
-        public readonly desarrollo?: number,
-        public readonly grados_desarrollo?: number,
-        public readonly peso_salida?: number,
-        public readonly merma?: number,
-        public readonly agtrom_comercial?: number,
-        public readonly agtrom_gourmet?: number,
-        public readonly analisis_sensorial_rapido?: AnalisisRapidoEntity
+        public readonly id_tueste                :string,
+        public readonly fecha_tueste             :Date,
+        public readonly tostadora                :string,
+        public readonly peso_entrada             :number,
+        public readonly temperatura_entrada      :number,
+        public readonly llama_inicial            :number,
+        public readonly aire_inicial             :number,
+        public readonly punto_no_retorno         :number,
+        public readonly tiempo_despues_crack     :number,
+        public readonly temperatura_crack        :number,
+        public readonly temperatura_salida       :number,
+        public readonly tiempo_total             :number,
+        public readonly porcentaje_caramelizacion:number,
+        public readonly desarrollo               :number,
+        public readonly grados_desarrollo        :number,
+        public readonly peso_salida              :number,
+        public readonly merma                    :number,
+        public readonly agtrom_comercial         :number,
+        public readonly agtrom_gourmet           :number,
+        public readonly id_analisis_rapido       :string,
+        public readonly eliminado                :string
     ) {}
 
     get values() {
@@ -44,6 +45,7 @@ export class UpdateTuesteDto {
         if (this.merma !== undefined) returnObj.merma = this.merma;
         if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;
         if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;
+        if (this.id_analisis_rapido) returnObj.id_analisis_rapido = this.id_analisis_rapido;
         return returnObj;
     }
 
@@ -51,21 +53,17 @@ export class UpdateTuesteDto {
         const { id_tueste, fecha_tueste, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
             punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
             porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido } = props;
+            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido,eliminado } = props;
 
         if (!id_tueste) return ['ID de tueste es requerido', undefined];
 
-        let fechaParsed: Date | undefined;
-        if (fecha_tueste) {
-            fechaParsed = new Date(fecha_tueste);
-            if (fechaParsed.toString() === 'Invalid Date') return ['Fecha de tueste no es válida', undefined];
-        }
+        
 
         return [undefined, new UpdateTuesteDto(
-            id_tueste, fechaParsed, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
+            id_tueste, fecha_tueste, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
             punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
             porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido
+            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido, eliminado
         )];
     }
 }

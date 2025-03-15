@@ -1,28 +1,28 @@
 
-export enum OLOR{
-    Olor_Extrano,
-    Olor_a_Humedad,
-    limpio,
-}
+// export enum OLOR{
+//     "Olor_Extrano",
+//     "Olor_a_Humedad",
+//     "limpio",
+// }
 
-export enum GRADO{
-  Especial,
-  Grado_1,
-  Grado_2,
-  Grado_3,
-  Convencional,
-}
+// export enum GRADO{
+//   "Especial",
+//   "Grado_1",
+//   "Grado_2",
+//   "Grado_3",
+//   "Convencional",
+// }
 
-export enum COLOR{
-  Azul_verde,
-  Azulado_Verde,
-  Verde,
-  Verdoso,
-  Amarillo_verde,
-  Amarillo_Pálido,
-  Amarillento,
-  Marrón
-}
+// export enum COLOR{
+//   "Azul_verde",
+//   "Azulado_Verde",
+//   "Verde",
+//   "Verdoso",
+//   "Amarillo_verde",
+//   "Amarillo_Pálido",
+//   "Amarillento",
+//   'Marrón'
+// }
 
 export class AnalisisFisicoEntity {
   constructor(
@@ -35,8 +35,8 @@ export class AnalisisFisicoEntity {
       public humedad: number,
       public temperatura_humedad: number,
       public densidad: number,
-      public color_grano_verde: COLOR,
-      public olor: OLOR,
+      public color_grano_verde: string,
+      public olor: string,
       public superior_malla_18: number,
       public superior_malla_16: number,
       public superior_malla_14: number,
@@ -47,7 +47,7 @@ export class AnalisisFisicoEntity {
       public desarrollo: number,
       public pocentaje_caramelizcacion: number,
       public c_desarrollo: number,
-      public grado: GRADO,
+      public grado: string,
       public comentario: string,
       public defectos_primarios: string[],
       public defectos_secundarios: string[],

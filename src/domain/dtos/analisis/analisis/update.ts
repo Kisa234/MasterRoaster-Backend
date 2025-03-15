@@ -4,24 +4,25 @@ export class UpdateAnalisisDto {
 
     constructor(
         public readonly id_analisis: string,
-        public readonly analisis_fisico: string,
-        public readonly analisis_sensorial: string,
+        public readonly fecha_registro: Date,
+        public readonly analisisFisico_id: string,
+        public readonly analisisSensorial_id: string,
     ){}
 
     get values() {
         const returnObj: { [key: string]: any } = {};
-        if(this.analisis_fisico) returnObj.analisis_fisico = this.analisis_fisico;
-        if(this.analisis_sensorial) returnObj.analisis_sensorial = this.analisis_sensorial;
+        if(this.analisisFisico_id) returnObj.analisis_fisico = this.analisisFisico_id;
+        if(this.analisisSensorial_id) returnObj.analisis_sensorial = this.analisisSensorial_id;
         return returnObj;
     }
 
     static create(props: { [key: string]: any }): [string?, UpdateAnalisisDto?] {
-        const { id_analisis,fecha_registro, analisis_fisico, analisis_sensorial } = props;
+        const { id_analisis,fecha_registro, analisisFisico_id, analisisSensorial_id } = props;
 
        
 
         return [undefined, new UpdateAnalisisDto(
-            id_analisis,analisis_fisico, analisis_sensorial
+            id_analisis,fecha_registro,analisisFisico_id, analisisSensorial_id
         )];
     }
     

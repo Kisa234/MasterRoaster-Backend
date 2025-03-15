@@ -9,8 +9,6 @@ export class CreateUserDto {
         public readonly rol: string,
         public readonly password: string,
         public readonly numero_telefono: string,
-        public readonly eliminado: boolean = false,
-        public readonly fecha_registro: Date = new Date(),
         public readonly fecha_editado?: Date | null,
     ) {}
 

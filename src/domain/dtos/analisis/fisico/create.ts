@@ -1,8 +1,6 @@
-import { COLOR, GRADO, OLOR } from '../../../entities/analisisFisico.entity';
 
 export class CreateAnalisisFisicoDto {
     private constructor(
-        public readonly fecha_registro: Date = new Date(),
         public readonly peso_muestra: number,
         public readonly peso_pergamino: number,
         public readonly wa: number,
@@ -10,8 +8,8 @@ export class CreateAnalisisFisicoDto {
         public readonly humedad: number,
         public readonly temperatura_humedad: number,
         public readonly densidad: number,
-        public readonly color_grano_verde: COLOR,
-        public readonly olor: OLOR,
+        public readonly color_grano_verde: string,
+        public readonly olor: string,
         public readonly superior_malla_18: number,
         public readonly superior_malla_16: number,
         public readonly superior_malla_14: number,
@@ -22,7 +20,7 @@ export class CreateAnalisisFisicoDto {
         public readonly desarrollo: number,
         public readonly pocentaje_caramelizcacion: number,
         public readonly c_desarrollo: number,
-        public readonly grado: GRADO,
+        public readonly grado: string,
         public readonly comentario: string,
         public readonly defectos_primarios: string[],
         public readonly defectos_secundarios: string[],
@@ -65,7 +63,6 @@ export class CreateAnalisisFisicoDto {
 
 
         return [undefined, new CreateAnalisisFisicoDto(
-            props.fecha_registro ?? new Date(),
             props.peso_muestra, props.peso_pergamino, props.wa, props.temperatura_wa,
             props.humedad, props.temperatura_humedad, props.densidad, props.color_grano_verde,
             props.olor, props.superior_malla_18, props.superior_malla_16, props.superior_malla_14,

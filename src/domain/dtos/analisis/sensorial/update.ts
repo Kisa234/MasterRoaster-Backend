@@ -19,7 +19,7 @@ export class UpdateAnalisisSensorialDTO {
         public readonly taza_defecto_ligero   :number,
         public readonly tazas_defecto_rechazo :number,
         public readonly puntaje_taza          :number,
-        public readonly comentario            :number,
+        public readonly comentario            :string,
         public readonly fecha_registro        :Date,
     ){}
 
@@ -39,7 +39,6 @@ export class UpdateAnalisisSensorialDTO {
         if (this.tazas_defecto_rechazo) returnObj.tazas_defecto_rechazo = this.tazas_defecto_rechazo;
         if (this.puntaje_taza) returnObj.puntaje_taza = this.puntaje_taza;
         if (this.comentario) returnObj.comentario = this.comentario;
-        if (this.fecha_registro) returnObj.fecha_registro = this.fecha_registro;
 
         return returnObj;
     }

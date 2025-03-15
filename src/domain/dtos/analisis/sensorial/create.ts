@@ -18,7 +18,7 @@ export class CreateAnalisisSensorialDTO {
         public readonly taza_defecto_ligero   :number,
         public readonly tazas_defecto_rechazo :number,
         public readonly puntaje_taza          :number,
-        public readonly comentario            :number,
+        public readonly comentario            :string,
     ){}
 
     static create(props: { [key: string]: any }): [string?, CreateAnalisisSensorialDTO?] {

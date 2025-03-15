@@ -1,4 +1,4 @@
-import { COLOR, GRADO, OLOR } from "../../../entities/analisisFisico.entity";
+
 
 export class UpdateAnalisisFisicoDto {
     private constructor(
@@ -11,8 +11,8 @@ export class UpdateAnalisisFisicoDto {
         public readonly humedad?: number,
         public readonly temperatura_humedad?: number,
         public readonly densidad?: number,
-        public readonly color_grano_verde?: COLOR,
-        public readonly olor?: OLOR,
+        public readonly color_grano_verde?: string,
+        public readonly olor?: string,
         public readonly superior_malla_18?: number,
         public readonly superior_malla_16?: number,
         public readonly superior_malla_14?: number,
@@ -23,7 +23,7 @@ export class UpdateAnalisisFisicoDto {
         public readonly desarrollo?: number,
         public readonly pocentaje_caramelizcacion?: number,
         public readonly c_desarrollo?: number,
-        public readonly grado?: GRADO,
+        public readonly grado?: string,
         public readonly comentario?: string,
         public readonly defectos_primarios?: string[],
         public readonly defectos_secundarios?: string[],

@@ -1,9 +1,11 @@
+import { CreateTuesteDto } from "../dtos/tueste/create";
+import { UpdateTuesteDto } from "../dtos/tueste/update";
 import { TuesteEntity } from "../entities/tueste.entity";
 
 export abstract class TuesteRepository {
-    abstract createTueste(tueste: TuesteEntity): Promise<TuesteEntity>;
-    abstract getTuesteById(id: string): Promise<TuesteEntity | null>;
-    abstract updateTueste(id: string, data: Partial<TuesteEntity>): Promise<TuesteEntity>;
-    abstract deleteTueste(id: string): Promise<void>;
-    abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
+    abstract createTueste(createTuesteDto:CreateTuesteDto): Promise<TuesteEntity>;
+        abstract getTuesteById(id: string): Promise<TuesteEntity | null>;
+        abstract updateTueste(id: string, updateTuesteDto:UpdateTuesteDto): Promise<TuesteEntity>;
+        abstract deleteTueste(id: string): Promise<TuesteEntity>;
+        abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
   }
