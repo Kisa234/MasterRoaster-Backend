@@ -53,8 +53,8 @@ model Lote {
   peso         Float
   estado       String
   variedades   String
-  user_id      String
-  analisis_id  String   @unique
+  user_id      String?
+  analisis_id  String?  @unique
   eliminado    Boolean  @default(false)
   
   // Relación con Usuario

@@ -12,9 +12,9 @@ export class LoteEntity {
         public peso                  : number,
         public estado                : string,
         public variedades            : string,
-        public user_id_user          : string,
-        public analisis_id           : string,
-        public eliminado             : boolean = false
+        public eliminado             : boolean,
+        public user_id_user?          : string,
+        public analisis_id?         : string,
     ){}
 
     public static fromObject(obj: { [key: string]: any }): LoteEntity {

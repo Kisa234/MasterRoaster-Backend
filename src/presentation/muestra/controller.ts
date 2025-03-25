@@ -10,7 +10,7 @@ import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
 
 export class MuestraController {
     
-    constructor(private muestraRepository: MuestraRepository) {}
+    constructor(private readonly muestraRepository: MuestraRepository) {}
 
     async createMuestra(req: Request, res: Response) {
         const [error, createMuestraDto] = CreateMuestraDto.create(req.body);

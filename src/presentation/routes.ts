@@ -19,8 +19,8 @@ export class AppRoutes{
         router.use('/analisisRapido', AnalisisRapidoRoutes.routes);
         router.use('/analisisSensorial', AnalisisSensorialRoutes.routes);
         router.use('/lote', LoteRoutes.routes);
-        router.use('/muestra', MuestraRoutes.routes);
-        router.use('/tueste', TuesteRoutes.routes);
+        // router.use('/muestra', MuestraRoutes.routes);
+        // router.use('/tueste', TuesteRoutes.routes);
         router.use('/user', UserRoutes.routes);  
         
 

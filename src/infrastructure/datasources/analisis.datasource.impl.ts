@@ -7,7 +7,9 @@ import { AnalisisEntity } from "../../domain/entities/analisis.entity";
 
 export  class AnalisisDataSourceImpl implements AnalisisDataSource {
     async createAnalisis(createAnalisisDto: CreateAnalisisDto): Promise<AnalisisEntity> {
-        const newAnalisis = prisma.analisis.create({
+        
+
+        const newAnalisis = await prisma.analisis.create({
             data: createAnalisisDto!
         });
         return AnalisisEntity.fromObject(newAnalisis);
