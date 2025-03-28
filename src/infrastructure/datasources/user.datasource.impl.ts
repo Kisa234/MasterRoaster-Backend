@@ -1,3 +1,4 @@
+import { Encryption } from "../../config/bcrypt";
 import { prisma } from "../../data/postgres";
 import { UserDataSource } from "../../domain/datasources/user.datasource";
 import { CreateUserDto } from "../../domain/dtos/user/create";
@@ -10,7 +11,8 @@ export  class UserDataSourceImpl implements UserDataSource {
 
   async createUser(createUserDto : CreateUserDto): Promise<UserEntity> {
     const newUser = await prisma.user.create({
-      data: createUserDto!
+      data: createUserDto,
+      
     });
     return UserEntity.fromObject(newUser);
   }
@@ -50,5 +52,24 @@ export  class UserDataSourceImpl implements UserDataSource {
     });
     return user.map(UserEntity.fromObject); 
   }
+
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+    if (!user) return null;
+    return UserEntity.fromObject(user);
+  }
+
+  async authUser(email: string, password: string): Promise<UserEntity | null> {
+    const user = await this.findByEmail(email);
+    if (!user) return null;
+
+    const isMatch = await Encryption.comparePassword(password, user.password);
+    if (!isMatch) return null;
+
+    return user;
+  }
+  
     
 }

@@ -2,6 +2,7 @@ import { create } from 'domain';
 import express, { Router } from 'express'
 import path from 'path';
 import { text } from 'stream/consumers';
+import cookieParser from "cookie-parser";
 
 interface Options{
     port: number;
@@ -28,6 +29,7 @@ export class Server {
         // Middlewares
         this.app.use(express.json()); //raw json
         this.app.use(express.urlencoded({extended: true})); // x-www-form-urlencoded
+        this.app.use(cookieParser());
 
        
         // ROUTES
