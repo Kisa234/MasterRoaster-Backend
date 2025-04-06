@@ -12,6 +12,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lote = await prisma.lote.create({
       data: createLoteDto!
     });
+    console.log('Lote creado en la BD:', lote);
     return LoteEntity.fromObject(lote);
   }
 
@@ -44,11 +45,10 @@ export class LoteDataSourceImpl implements LoteDataSource {
     return LoteEntity.fromObject(deletedLote);
   }
 
-  async getLotesByEstado(estado: string): Promise<LoteEntity[]> {
+  async getLotes(): Promise<LoteEntity[]> {
     const lotes = await prisma.lote.findMany({
       where: {
         eliminado: false,
-        estado: estado
       }
     });
     return lotes.map(lote => LoteEntity.fromObject(lote));

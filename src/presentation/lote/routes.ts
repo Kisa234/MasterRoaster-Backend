@@ -13,10 +13,11 @@ export class LoteRoutes{
         const loteController = new LoteController(loteRepository);
 
         router.post('/', loteController.createLote);
+        router.get('/', loteController.getLotes);
+        
         router.get('/:id', loteController.getLoteById);
         router.put('/:id', loteController.updateLote);
         router.delete('/:id', loteController.deleteLote);
-        router.get('/estado/:estado', loteController.getLotesByEstado);
 
 
 

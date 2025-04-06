@@ -21,8 +21,8 @@ export class LoteRepositoryImpl  implements LoteRepository {
     deleteLote(id: string): Promise<LoteEntity> {
         return this.datasource.deleteLote(id);
     }
-    getLotesByEstado(estado: string): Promise<LoteEntity[]> {
-        return this.datasource.getLotesByEstado(estado);
+    getLotes(): Promise<LoteEntity[]> {
+        return this.datasource.getLotes();
     }
 
 

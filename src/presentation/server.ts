@@ -1,7 +1,5 @@
-import { create } from 'domain';
 import express, { Router } from 'express'
-import path from 'path';
-import { text } from 'stream/consumers';
+import cors from 'cors'; 
 
 interface Options{
     port: number;
@@ -24,6 +22,7 @@ export class Server {
 
 
     async start(){
+        this.app.use(cors());
 
         // Middlewares
         this.app.use(express.json()); //raw json
