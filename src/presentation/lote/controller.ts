@@ -21,6 +21,7 @@ export class LoteController {
             return res.status(400).json({ error });
         }
 
+
         new CreateLote(this.loteRepository)
             .execute(createLoteDto!)
             .then( lote => res.json(lote))

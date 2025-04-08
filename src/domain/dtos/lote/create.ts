@@ -11,7 +11,12 @@ export class CreateLoteDto {
         public readonly peso           : number,
         public readonly variedades     : string,
         public readonly proceso        : string,
+
+        
     ) {}
+
+    
+      
 
     static create(props: { [key: string]: any }): [string?, CreateLoteDto?] {
         const { productor, finca, region, departamento, fecha_compra, peso, variedades,proceso } = props;
@@ -27,17 +32,51 @@ export class CreateLoteDto {
         let fechaParsed = new Date(fecha_compra);
         if (isNaN(fechaParsed.getTime())) return ['La fecha de compra es inválida', undefined];
         
-        // 1 LETRA PRIMER NOMBRE PRODUCTOR
-        // 1 LETRA PRIMER APELLIDO PRODUCTOR
-        // 2 LETRAS DE LA VARIERDAD
-        // SI ES NATURAL "NA" y HONEY "HO" , SI ES LAVADO NADA
-        // NUMERO DE LOTE INGRESADO "1,2,3,4,5,6,7,8,9"
+        const generarIdLote = (productor: string, variedades: string, proceso: string): string  => {
 
-        const id_lote : string= `${productor}-${finca}-${region}-${departamento}-${fechaParsed.toISOString().split('T')[0]}`;
+            // 1 LETRA PRIMER NOMBRE PRODUCTOR
+            // 1 LETRA PRIMER APELLIDO PRODUCTOR
+            // 2 LETRAS DE LA VARIERDAD
+            // SI ES NATURAL "NA" y HONEY "HO" , SI ES LAVADO NADA
+            // NUMERO DE LOTE INGRESADO "1,2,3,4,5,6,7,8,9"
+    
+    
+            const nombres = productor.trim().split(' ');
+            const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
+            const inicialApellido = nombres[1]?.charAt(0).toUpperCase() || '';
+                
+            let inicialVariedad = '';
+            const variedadesArray = variedades.trim().split(' ');
+                
+            if (variedadesArray.length === 2) {
+                inicialVariedad = variedadesArray[0].slice(0, 2).toUpperCase() + variedadesArray[1].slice(0, 2).toUpperCase();
+            } else if (variedadesArray.length > 2) {
+                inicialVariedad = 'BL'; 
+            } else {
+                inicialVariedad = variedades.slice(0, 2).toUpperCase(); 
+            }
+            
+            let inicialProceso = '';
+            if (proceso.toLowerCase() === 'natural') {
+              inicialProceso = 'NA';
+            } else if (proceso.toLowerCase() === 'honey') {
+              inicialProceso = 'HO';
+            }
+          
+            const formattedDate = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format as YYYYMMDD
+            const idLote = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}${formattedDate}`;
+          
+            return idLote;
+        }
+
+        const id_lote = generarIdLote(productor, variedades, proceso);
 
         return [undefined, new CreateLoteDto(
             id_lote,productor, finca, region, departamento,fechaParsed,
             peso, variedades, proceso
         )];
     }
+   
+
+    
 }

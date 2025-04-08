@@ -7,4 +7,5 @@ export abstract class MuestraRepository {
     abstract getMuestraById(id: string): Promise<MuestraEntity | null>;
     abstract updateMuestra(id: string, updateMuestraDto:UpdateMuestraDto): Promise<MuestraEntity>;
     abstract deleteMuestra(id: string): Promise<MuestraEntity>;
+    abstract getMuestras(): Promise<MuestraEntity[]>;
 }

@@ -7,6 +7,7 @@ import { GetMuestra } from "../../domain/usecases/muestra/get-muestra";
 import { UpdateMuestraDto } from '../../domain/dtos/muestra/update';
 import { UpdateMuestra } from "../../domain/usecases/muestra/update-muestra";
 import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
+import { GetMuestras } from "../../domain/usecases/muestra/get-muestras";
 
 export class MuestraController {
     
@@ -51,6 +52,13 @@ export class MuestraController {
         new DeleteMuestra(this.muestraRepository)
             .execute(id_muestra)
             .then( muestra => res.json(muestra))
+            .catch( error => res.status(400).json({ error }));
+    }
+
+    async getMuestras(req: Request, res: Response) {
+        new GetMuestras(this.muestraRepository)
+            .execute()
+            .then( muestras => res.json(muestras))
             .catch( error => res.status(400).json({ error }));
     }
 }

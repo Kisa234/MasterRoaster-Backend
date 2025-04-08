@@ -9,10 +9,11 @@ export class LoteDataSourceImpl implements LoteDataSource {
 
 
   async createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
+   
     const lote = await prisma.lote.create({
       data: createLoteDto!
     });
-    console.log('Lote creado en la BD:', lote);
+
     return LoteEntity.fromObject(lote);
   }
 

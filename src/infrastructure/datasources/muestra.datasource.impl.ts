@@ -46,5 +46,14 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         });
         return MuestraEntity.fromObject(muestraDeleted);
     }
+
+    async getMuestras(): Promise<MuestraEntity[]> {
+        const muestras = await prisma.muestra.findMany({
+            where: {
+                eliminado: false
+            }
+        });
+        return muestras.map(muestra => MuestraEntity.fromObject(muestra));
+    }
     
 }

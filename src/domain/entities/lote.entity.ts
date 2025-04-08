@@ -14,7 +14,6 @@ export class LoteEntity {
     ) {}
 
     public static fromObject(obj: { [key: string]: any }): LoteEntity {
-        console.log("Recibiendo objeto en fromObject:", obj); // Depuración
 
         if (!obj.id_lote) throw new Error('id_lote property is required');
         if (!obj.productor) throw new Error('productor property is required');

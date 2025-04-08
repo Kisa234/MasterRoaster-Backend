@@ -3,6 +3,7 @@ import express, { Router } from 'express'
 import path from 'path';
 import { text } from 'stream/consumers';
 import cookieParser from "cookie-parser";
+import cors from 'cors';
 
 interface Options{
     port: number;
@@ -25,6 +26,9 @@ export class Server {
 
 
     async start(){
+
+        // CORS
+        this.app.use(cors());
 
         // Middlewares
         this.app.use(express.json()); //raw json

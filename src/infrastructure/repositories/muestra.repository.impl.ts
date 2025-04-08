@@ -21,5 +21,8 @@ export class MuestraRepositoryImpl implements MuestraRepository{
     deleteMuestra(id: string): Promise<MuestraEntity> {
         return this.muestraDataSource.deleteMuestra(id);
     }
+    getMuestras(): Promise<MuestraEntity[]> {
+        return this.muestraDataSource.getMuestras();
+    }
 
 }
