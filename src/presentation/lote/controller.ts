@@ -6,7 +6,7 @@ import { GetLote } from "../../domain/usecases/lote/get-lote";
 import { UpdateLote } from '../../domain/usecases/lote/update-lote';
 import { UpdateLoteDto } from "../../domain/dtos/lote/update";
 import { DeleteLote } from "../../domain/usecases/lote/delete.lote";
-import { GetLoteByEstado } from "../../domain/usecases/lote/get-lote-estado";
+import {  GetLotes } from "../../domain/usecases/lote/get-lotes";
 
 
 export class LoteController {
@@ -53,10 +53,9 @@ export class LoteController {
             .catch( error => res.status(400).json({ error }));
     }
 
-    public getLotesByEstado = (req:Request , res : Response) => {
-        const estado = req.params.estado;
-        new GetLoteByEstado(this.loteRepository)
-            .execute(estado)
+    public getLotes = (req:Request , res : Response) => {
+        new GetLotes(this.loteRepository)
+            .execute()
             .then( lotes => res.json(lotes))
             .catch( error => res.status(400).json({ error }));
     }

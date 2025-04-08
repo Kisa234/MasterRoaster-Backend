@@ -7,6 +7,6 @@ export abstract class LoteRepository {
         abstract getLoteById(id: string): Promise<LoteEntity | null>;
         abstract updateLote(id: string, updateLoteDto:UpdateLoteDto): Promise<LoteEntity>;
         abstract deleteLote(id: string): Promise<LoteEntity>;
-        abstract getLotesByEstado(estado: string): Promise<LoteEntity[]>;
+        abstract getLotes(): Promise<LoteEntity[]>;
     
   }

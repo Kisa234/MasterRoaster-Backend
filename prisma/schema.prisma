@@ -44,15 +44,15 @@ model Muestra {
 }
 
 model Lote {
-  id_lote      String   @id @default(uuid())
+  id_lote      String   @id
   productor    String
   finca        String
   region       String
   departamento String
   fecha_compra DateTime
   peso         Float
-  estado       String
   variedades   String
+  proceso      String
   user_id      String?
   analisis_id  String?  @unique
   eliminado    Boolean  @default(false)
