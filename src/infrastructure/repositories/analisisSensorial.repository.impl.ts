@@ -20,5 +20,12 @@ export class AnalisisSensorialRepositoryImpl implements AnalisisSensorialReposit
     updateAnalisisSensorial(id: string, updateAnalisisSensorialDTO: UpdateAnalisisSensorialDTO): Promise<AnalisisSensorialEntity> {
         return this.analisis.updateAnalisisSensorial(id, updateAnalisisSensorialDTO);
     }
+    deleteAnalisisSensorial(id: string): Promise<AnalisisSensorialEntity> {
+        return this.analisis.deleteAnalisisSensorial(id);
+    }
+    getAllAnalisisSensorial(): Promise<AnalisisSensorialEntity[]> {
+        return this.analisis.getAllAnalisisSensorial();
+    }
+    
 
 }

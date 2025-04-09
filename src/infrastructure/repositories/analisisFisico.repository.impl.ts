@@ -20,5 +20,12 @@ export class AnalisisFisicoRepositoryImpl implements AnalisisFisicoRepository {
     updateAnalisisFisico(id: string, updateAnalisisFisicoDTO: UpdateAnalisisFisicoDto): Promise<AnalisisFisicoEntity> {
         return this.analisis.updateAnalisisFisico(id, updateAnalisisFisicoDTO);
     }
+    deleteAnalisisFisico(id: string): Promise<AnalisisFisicoEntity> {
+        return this.analisis.deleteAnalisisFisico(id);
+    }
+    getAllAnalisisFisico(): Promise<AnalisisFisicoEntity[]> {
+        return this.analisis.getAllAnalisisFisico();
+    }
+    
 
 }

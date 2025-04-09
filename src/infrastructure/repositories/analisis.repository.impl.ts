@@ -19,5 +19,11 @@ export class AnalisisRepositoryImpl implements AnalisisRepository{
     updateAnalisis(id: string, updateAnalisisDto: UpdateAnalisisDto): Promise<AnalisisEntity> {
         return this.analisis.updateAnalisis(id, updateAnalisisDto);
     }
+    deleteAnalisis(id: string): Promise<AnalisisEntity> {
+        return this.analisis.deleteAnalisis(id);
+    }
+    getAllAnalisis(): Promise<AnalisisEntity[]> {
+        return this.analisis.getAllAnalisis();
+    }
 
 }

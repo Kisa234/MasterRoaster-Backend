@@ -34,6 +34,22 @@ export  class AnalisisDataSourceImpl implements AnalisisDataSource {
         });
         return AnalisisEntity.fromObject(updateAnalisis);
     }
+
+    async deleteAnalisis(id: string): Promise<AnalisisEntity> {
+        const analisis = this.getAnalisisById(id);
+        const deleteAnalisis = prisma.analisis.delete({
+            where: {
+                id_analisis: id
+            }
+        });
+        return AnalisisEntity.fromObject(deleteAnalisis);
+    }
+
+    async getAllAnalisis(): Promise<AnalisisEntity[]> {
+        const analisis = await prisma.analisis.findMany();
+        return analisis.map((analisis) => AnalisisEntity.fromObject(analisis));
+    }
+    
     
     
 }

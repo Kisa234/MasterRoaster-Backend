@@ -1,4 +1,3 @@
-
 import { LoteRepository } from '../../repository/lote.repository';
 import { LoteEntity } from "../../entities/lote.entity";
 

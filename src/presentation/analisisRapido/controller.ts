@@ -6,6 +6,8 @@ import { CreateAnalisisRapido } from "../../domain/usecases/analisis/rapido/crea
 import { GetAnalisisRapido } from "../../domain/usecases/analisis/rapido/get-analisisRapido";
 import { UpdateAnalisisRapidoDto } from '../../domain/dtos/analisis/rapido/update';
 import { UpdateAnalisisRapido } from "../../domain/usecases/analisis/rapido/update-analisisRapido";
+import { DeleteAnalisisRapido } from "../../domain/usecases/analisis/rapido/delete-analisisRapido";
+import { GetAllAnalisisRapido } from "../../domain/usecases/analisis/rapido/get-all-analisisRapido";
 
 
 export class AnalisisRapidoController {
@@ -44,6 +46,21 @@ export class AnalisisRapidoController {
             .then( analisisRapido => res.json(analisisRapido))
             .catch( error => res.status(400).json({ error }
             ));
+    };
+
+    public deleteAnalisisRapido = async (req: Request, res: Response) => {
+        const id_analisis_rapido = req.params.id;
+        new DeleteAnalisisRapido(this.analisisRapidoRepository)
+            .execute(id_analisis_rapido)
+            .then( analisisRapido => res.json(analisisRapido))
+            .catch( error => res.status(400).json({ error }));
+    };
+
+    public getAllAnalisisRapido = async (req: Request, res: Response) => {
+        new GetAllAnalisisRapido(this.analisisRapidoRepository)
+            .execute()
+            .then( analisisRapido => res.json(analisisRapido))
+            .catch( error => res.status(400).json({ error }));
     };
 
 }

@@ -6,6 +6,8 @@ import { CreateAnalisisFisico } from "../../domain/usecases/analisis/fisico/crea
 import { GetAnalisisFisico } from "../../domain/usecases/analisis/fisico/get-analisisFisico";
 import { UpdateAnalisisFisico } from "../../domain/usecases/analisis/fisico/update-analisisFisico";
 import { UpdateAnalisisFisicoDto } from "../../domain/dtos/analisis/fisico/update";
+import { DeleteAnalisisFisico } from "../../domain/usecases/analisis/fisico/delete-analisisFisico";
+import { GetAllAnalisisFisico } from "../../domain/usecases/analisis/fisico/get-all-analisisFisico";
 
 export class AnalisisFisicoController {
 
@@ -44,5 +46,21 @@ export class AnalisisFisicoController {
             .catch( error => res.status(400).json({ error }
             ));
             
+    };
+
+    public deleteAnalisisFisico = async (req: Request, res: Response) => {
+        const id_analisis_fisico = req.params.id;
+
+        new DeleteAnalisisFisico(this.analisisFisicoRepository)
+            .execute(id_analisis_fisico)
+            .then( analisisFisico => res.json(analisisFisico))
+            .catch( error => res.status(400).json({ error }));
+    };
+
+    public getAllAnalisisFisico = async (req: Request, res: Response) => {
+        new GetAllAnalisisFisico(this.analisisFisicoRepository)
+            .execute()
+            .then( analisisFisico => res.json(analisisFisico))
+            .catch( error => res.status(400).json({ error }));
     };
 }

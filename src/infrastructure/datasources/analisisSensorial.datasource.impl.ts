@@ -33,6 +33,23 @@ export  class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSo
     });
     return AnalisisSensorialEntity.fromObject(updateAnalisisSensorial);
   }
+
+  async deleteAnalisisSensorial(id: string): Promise<AnalisisSensorialEntity> {
+    const analisis = this.getAnalisisSensorialById(id);
+    const deleteAnalisisSensorial = await prisma.analisisSensorial.delete({
+      where: {
+        id_analisis_sensorial: id
+      }
+    });
+    return AnalisisSensorialEntity.fromObject(deleteAnalisisSensorial);
+  }
+
+  async getAllAnalisisSensorial(): Promise<AnalisisSensorialEntity[]> {
+    const analisisSensorial = await prisma.analisisSensorial.findMany();
+    return analisisSensorial.map((analisis) => AnalisisSensorialEntity.fromObject(analisis));
+  }
+
+  
   
     
 }

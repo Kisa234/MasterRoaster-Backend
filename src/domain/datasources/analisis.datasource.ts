@@ -6,4 +6,6 @@ export abstract class AnalisisDataSource {
     abstract createAnalisis(createAnalisisDto:CreateAnalisisDto): Promise<AnalisisEntity>;
     abstract getAnalisisById(id_lote: string): Promise<AnalisisEntity | null>;
     abstract updateAnalisis(id: string, updateAnalisisDto:UpdateAnalisisDto): Promise<AnalisisEntity>;
+    abstract deleteAnalisis(id: string): Promise<AnalisisEntity>;
+    abstract getAllAnalisis(): Promise<AnalisisEntity[]>;
 }

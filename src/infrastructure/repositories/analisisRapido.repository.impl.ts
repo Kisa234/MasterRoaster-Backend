@@ -21,5 +21,12 @@ export class AnalisisRapidoRepositoryImpl implements AnalisisRapidoRepository {
     updateAnalisisRapido(id: string, updateAnalisisRapidoDto:UpdateAnalisisRapidoDto ): Promise<AnalisisRapidoEntity> {
         return this.analisis.updateAnalisisRapido(id,updateAnalisisRapidoDto );
     }
+    deleteAnalisisRapido(id: string): Promise<AnalisisRapidoEntity> {
+        return this.analisis.deleteAnalisisRapido(id);
+    }
+    getAllAnalisisRapido(): Promise<AnalisisRapidoEntity[]> {
+        return this.analisis.getAllAnalisisRapido();
+    }
+    
     
 }

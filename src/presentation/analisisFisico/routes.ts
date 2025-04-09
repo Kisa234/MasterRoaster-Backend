@@ -16,6 +16,8 @@ export class AnalisisFisicoRoutes {
         router.post('/', analisisFisicoController.createAnalisisFisico);
         router.get('/:id', analisisFisicoController.getAnalisisFisicoById);
         router.put('/:id', analisisFisicoController.updateAnalisisFisico);
+        router.get('/all', analisisFisicoController.getAllAnalisisFisico);
+        router.delete('/:id', analisisFisicoController.deleteAnalisisFisico);
 
         return router;
     }

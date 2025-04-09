@@ -7,6 +7,8 @@ import { CreateAnalisisSensorial } from "../../domain/usecases/analisis/sensoria
 import { GetAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/get-analisisSensorial";
 import { UpdateAnalisisSensorialDTO } from "../../domain/dtos/analisis/sensorial/update";
 import { UpdateAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/update-analisisSensorial";
+import { DeleteAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/delete-analisisSensorial";
+import { GetAllAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/get-all-analisisSensorial";
 
 export class AnalisisSensorialController {
 
@@ -46,6 +48,21 @@ export class AnalisisSensorialController {
             .catch( error => res.status(400).json({ error }
             ));
 
+    };
+
+    public deleteAnalisisSensorial = async (req: Request, res: Response) => {
+        const id_analisis_sensorial = req.params.id;
+        new DeleteAnalisisSensorial(this.analisisSensorialRepository)
+            .execute(id_analisis_sensorial)
+            .then( analisisSensorial => res.json(analisisSensorial))
+            .catch( error => res.status(400).json({ error }));
+    };
+
+    public getAllAnalisisSensorial = async (req: Request, res: Response) => {
+        new GetAllAnalisisSensorial(this.analisisSensorialRepository)
+            .execute()
+            .then( analisisSensorial => res.json(analisisSensorial))
+            .catch( error => res.status(400).json({ error }));
     };
 
 

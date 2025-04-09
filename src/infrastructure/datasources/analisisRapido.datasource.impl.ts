@@ -32,6 +32,22 @@ export  class AnalisisRapidoDataSourceImpl implements AnalisisRapidoDataSource {
     });
     return AnalisisRapidoEntity.fromObject(updateAnalisisRapido);
   }
+
+  async deleteAnalisisRapido(id: string): Promise<AnalisisRapidoEntity> {
+    const analisis = this.getAnalisisRapidoById(id);
+    const deleteAnalisisRapido = await prisma.analisisRapido.delete({
+      where: {
+        id_analisis_rapido: id
+      }
+    });
+    return AnalisisRapidoEntity.fromObject(deleteAnalisisRapido);
+  }
+
+  async getAllAnalisisRapido(): Promise<AnalisisRapidoEntity[]> {
+    const analisisRapido = await prisma.analisisRapido.findMany();
+    return analisisRapido.map((analisis) => AnalisisRapidoEntity.fromObject(analisis));
+  }
+  
   
     
 }

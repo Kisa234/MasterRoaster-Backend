@@ -6,4 +6,6 @@ export abstract class AnalisisFisicoDataSource {
     abstract createAnalisisFisico(createAnalisisFisicoDto:CreateAnalisisFisicoDto): Promise<AnalisisFisicoEntity>;
     abstract getAnalisisFisicoById(id: string): Promise<AnalisisFisicoEntity | null>;
     abstract updateAnalisisFisico(id: string, updateAnalisisFisicoDto:UpdateAnalisisFisicoDto): Promise<AnalisisFisicoEntity>;
-  }
+    abstract deleteAnalisisFisico(id: string): Promise<AnalisisFisicoEntity>;
+    abstract getAllAnalisisFisico(): Promise<AnalisisFisicoEntity[]>;
+}
