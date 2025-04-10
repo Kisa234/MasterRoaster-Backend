@@ -15,9 +15,6 @@ export class CreateLoteDto {
         
     ) {}
 
-    
-      
-
     static create(props: { [key: string]: any }): [string?, CreateLoteDto?] {
         const { productor, finca, region, departamento, fecha_compra, peso, variedades,proceso } = props;
 

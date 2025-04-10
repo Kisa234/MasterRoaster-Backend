@@ -14,6 +14,7 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         return MuestraEntity.fromObject(newMuestra);
 
     }
+    
     async getMuestraById(id: string): Promise<MuestraEntity | null> {
         const muestra = await prisma.muestra.findFirst({
             where: {

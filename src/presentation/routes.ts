@@ -14,9 +14,9 @@ export class AppRoutes{
     static get routes():Router{
         const router = Router();
 
-        // router.use('/analisis', AnalisisRoutes.routes);
-        // router.use('/analisisFisico', AnalisisFisicoRoutes.routes);
-        // router.use('/analisisRapido', AnalisisRapidoRoutes.routes);
+        router.use('/analisis', AnalisisRoutes.routes);
+        router.use('/analisisFisico', AnalisisFisicoRoutes.routes);
+        router.use('/analisisRapido', AnalisisRapidoRoutes.routes);
         router.use('/analisisSensorial', AnalisisSensorialRoutes.routes);
         router.use('/lote', LoteRoutes.routes);
         // router.use('/muestra', MuestraRoutes.routes);

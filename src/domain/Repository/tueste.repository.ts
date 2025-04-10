@@ -8,4 +8,5 @@ export abstract class TuesteRepository {
         abstract updateTueste(id: string, updateTuesteDto:UpdateTuesteDto): Promise<TuesteEntity>;
         abstract deleteTueste(id: string): Promise<TuesteEntity>;
         abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
+        abstract getAllTuestes(): Promise<TuesteEntity[]>;
   }

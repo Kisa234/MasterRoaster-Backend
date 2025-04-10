@@ -47,5 +47,13 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     });
     return tuestes.map(TuesteEntity.fromObject);
   }
+  async getAllTuestes(): Promise<TuesteEntity[]> {
+    const tuestes = await prisma.tueste.findMany({
+      where: {
+        eliminado: false
+      }
+    });
+    return tuestes.map(TuesteEntity.fromObject);
+  }
    
 }

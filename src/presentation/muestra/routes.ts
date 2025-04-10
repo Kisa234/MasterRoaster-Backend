@@ -13,10 +13,12 @@ export class MuestraRoutes {
         const muestraRepository = new MuestraRepositoryImpl(datasource);
         const muestraController = new MuestraController(muestraRepository);
 
+
         router.post('/', muestraController.createMuestra);
         router.get('/:id', muestraController.getMuestraById);
         router.put('/:id', muestraController.updateMuestra);
         router.delete('/:id', muestraController.deleteMuestra);
+        router.get('/', muestraController.getMuestras);
 
         return router;
         

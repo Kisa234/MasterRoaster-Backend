@@ -33,12 +33,12 @@ model Muestra {
   nombre         String
   peso           Float
   fecha_registro DateTime @default(now())
-  user_id        String
-  analisis_id    String   @unique
+  user_id        String?
+  analisis_id    String?   @unique
   eliminado      Boolean  @default(false)
 
   // Relación con Usuario
-  user     User      @relation(fields: [user_id], references: [id_user])
+  user     User?     @relation(fields: [user_id], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
 }

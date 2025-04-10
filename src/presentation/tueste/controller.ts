@@ -7,6 +7,7 @@ import { UpdateTuesteDto } from '../../domain/dtos/tueste/update';
 import { UpdateTueste } from "../../domain/usecases/tueste/update-tueste";
 import { DeleteTueste } from "../../domain/usecases/tueste/delete-tueste";
 import { GetTueste } from "../../domain/usecases/tueste/get-tueste";
+import { GetAllTueste } from "../../domain/usecases/tueste/get-all-tueste";
 
 export class TuesteController {
 
@@ -56,6 +57,13 @@ export class TuesteController {
         new GetTueste(this.tuesteRepository)
             .execute(req.params.fecha)
             .then( tueste => res.json(tueste))
+            .catch( error => res.status(400).json({ error}));
+    }
+
+    public getAllTuestes = async (req: Request, res: Response) => {
+        new GetAllTueste(this.tuesteRepository)
+            .execute()
+            .then( tuestes => res.json(tuestes))
             .catch( error => res.status(400).json({ error}));
     }
 

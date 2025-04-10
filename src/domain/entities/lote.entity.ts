@@ -14,15 +14,15 @@ export class LoteEntity {
     ) {}
 
     public static fromObject(obj: { [key: string]: any }): LoteEntity {
-
-        if (!obj.id_lote) throw new Error('id_lote property is required');
-        if (!obj.productor) throw new Error('productor property is required');
-        if (!obj.finca) throw new Error('finca property is required');
-        if (!obj.region) throw new Error('region property is required');
-        if (!obj.departamento) throw new Error('departamento property is required');
-        if (!obj.fecha_compra) throw new Error('fecha_compra property is required');
-        if (!obj.peso) throw new Error('peso property is required');
-        if (!obj.variedades) throw new Error('variedades property is required');
+        const { id_lote, productor, finca, region, departamento, fecha_compra, peso, variedades } = obj;
+        if (!id_lote) throw new Error('id_lote property is required');
+        if (!productor) throw new Error('productor property is required');
+        if (!finca) throw new Error('finca property is required');
+        if (!region) throw new Error('region property is required');
+        if (!departamento) throw new Error('departamento property is required');
+        if (!fecha_compra) throw new Error('fecha_compra property is required');
+        if (!peso) throw new Error('peso property is required');
+        if (!variedades) throw new Error('variedades property is required');
         
         // Estos campos son opcionales, no deben lanzar error si no existen
         const user_id_user = obj.user_id_user ?? undefined;
@@ -30,14 +30,14 @@ export class LoteEntity {
         const eliminado = obj.eliminado ?? false; // Valor por defecto si no existe
 
         return new LoteEntity(
-            obj.id_lote,
-            obj.productor,
-            obj.finca,
-            obj.region,
-            obj.departamento,
-            new Date(obj.fecha_compra),
-            obj.peso,
-            obj.variedades,
+            id_lote,
+            productor,
+            finca,
+            region,
+            departamento,
+            new Date(fecha_compra),
+            peso,
+            variedades,
             eliminado,
             user_id_user,
             analisis_id

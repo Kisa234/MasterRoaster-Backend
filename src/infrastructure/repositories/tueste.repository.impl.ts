@@ -26,5 +26,8 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTostadosByFecha(fecha);
     }
+    getAllTuestes(): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getAllTuestes();
+    }
     
 }
