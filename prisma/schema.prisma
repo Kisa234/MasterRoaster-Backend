@@ -114,6 +114,8 @@ model Analisis {
   fecha_registro       DateTime @default(now())
   analisisFisico_id    String?  @unique
   analisisSensorial_id String?  @unique
+  
+  eliminado          Boolean  @default(false)
 
   // Relación con Analisis Fisico
   analisisFisico    AnalisisFisico?    @relation(fields: [analisisFisico_id], references: [id_analisis_fisico])
@@ -150,6 +152,7 @@ model AnalisisFisico {
   comentario                String
   defectos_primarios        String[]
   defectos_secundarios      String[]
+  eliminado          Boolean  @default(false)
 
   Analisis Analisis?
 }
@@ -171,13 +174,15 @@ model AnalisisSensorial {
   puntaje_taza          Float
   comentario            String
   fecha_registro        DateTime @default(now())
+  
+  eliminado          Boolean  @default(false)
 
   Analisis Analisis?
 }
 
 model AnalisisRapido {
   id_analisis_rapido String   @id @default(uuid())
-  fecha              DateTime @default(now())
+  fecha_registro      DateTime @default(now())
   horneado           Boolean
   humo               Boolean
   uniforme           Boolean
@@ -185,6 +190,7 @@ model AnalisisRapido {
   arrebatado         Boolean
   oscuro             Boolean
   comentario         String?
+  eliminado          Boolean  @default(false)
 
   Tueste Tueste?
 }

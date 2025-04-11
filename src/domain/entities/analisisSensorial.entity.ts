@@ -16,6 +16,7 @@ export class AnalisisSensorialEntity {
         public puntaje_taza: number,
         public comentario: string,
         public fecha_registro: Date,
+        public eliminado?: boolean,
     ) {}
 
     public static fromObject(obj: { [key: string]: any }): AnalisisSensorialEntity {

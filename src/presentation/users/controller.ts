@@ -68,38 +68,38 @@ export class UserController {
             .catch( error => res.status(400).json({ error}));
     }
 
-    public authUser = async (req: Request, res: Response) => {
-        const email = req.body.email;
-        const password = req.body.password;
+    // public authUser = async (req: Request, res: Response) => {
+    //     const email = req.body.email;
+    //     const password = req.body.password;
 
-        if (!email || !password) {
-            return res.status(400).json({ error: "Email y contraseña son requeridos" });
-        }
+    //     if (!email || !password) {
+    //         return res.status(400).json({ error: "Email y contraseña son requeridos" });
+    //     }
         
-        try {
-            const user = await new AuthUser(this.userRepository).execute(email, password);
-            if (!user) {
-                return res.status(401).json({ error: "Credenciales inválidas" });
-            }
+    //     try {
+    //         const user = await new AuthUser(this.userRepository).execute(email, password);
+    //         if (!user) {
+    //             return res.status(401).json({ error: "Credenciales inválidas" });
+    //         }
     
-            // 🔹 Generar token JWT
-            const token = jwt.sign(
-                { userId: user.id_user, email: user.email, rol: user.rol },
-                envs.JWT_SECRET,
-                { expiresIn: "1h" }
-            );
+    //         // 🔹 Generar token JWT
+    //         const token = jwt.sign(
+    //             { userId: user.id_user, email: user.email, rol: user.rol },
+    //             envs.JWT_SECRET,
+    //             { expiresIn: "1h" }
+    //         );
     
-            // 🔹 Guardar el token en una cookie HTTP-only
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-            });
+    //         // 🔹 Guardar el token en una cookie HTTP-only
+    //         res.cookie("token", token, {
+    //             httpOnly: true,
+    //             secure: process.env.NODE_ENV === "production",
+    //             sameSite: "strict",
+    //         });
     
-            return res.json({ message: "Login exitoso", token });
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
-    }
+    //         return res.json({ message: "Login exitoso", token });
+    //     } catch (error: any) {
+    //         return res.status(500).json({ error: error.message });
+    //     }
+    // }
 
 }

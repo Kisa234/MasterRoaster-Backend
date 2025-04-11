@@ -51,6 +51,7 @@ export class AnalisisFisicoEntity {
       public comentario: string,
       public defectos_primarios: string[],
       public defectos_secundarios: string[],
+      public eliminado?: boolean,
   ) {}
 
   public static fromObject(obj: { [key: string]: any }): AnalisisFisicoEntity {

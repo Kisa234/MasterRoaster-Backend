@@ -56,9 +56,7 @@ export class CreateAnalisisFisicoDto {
         if (pocentaje_caramelizcacion === undefined) return ['El porcentaje de caramelización es requerido', undefined];
         if (c_desarrollo === undefined) return ['El c desarrollo es requerido', undefined];
         if (grado === undefined) return ['El grado es requerido', undefined];
-        if (!comentario) return ['El comentario es requerido', undefined];
-        if (!defectos_primarios) return ['Los defectos primarios son requeridos', undefined];
-        if (!defectos_secundarios) return ['Los defectos secundarios son requeridos', undefined];
+   
 
 
 

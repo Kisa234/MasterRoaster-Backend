@@ -15,7 +15,7 @@ export class AnalisisSensorialRoutes {
         router.post('/', analisisSensorialController.createAnalisisSensorial);
         router.get('/:id', analisisSensorialController.getAnalisisSensorialById);
         router.put('/:id', analisisSensorialController.updateAnalisisSensorial);
-        router.get('/all', analisisSensorialController.getAllAnalisisSensorial);
+        router.get('/', analisisSensorialController.getAllAnalisisSensorial);
         router.delete('/:id', analisisSensorialController.deleteAnalisisSensorial);
 
 
