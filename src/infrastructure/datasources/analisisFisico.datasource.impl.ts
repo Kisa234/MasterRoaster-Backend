@@ -35,16 +35,25 @@ export  class AnalisisFisicoDataSourceImpl implements AnalisisFisicoDataSource {
 
     async deleteAnalisisFisico(id: string): Promise<AnalisisFisicoEntity> {
         const analisis = this.getAnalisisFisicoById(id);
-        const deleteAnalisisFisico = await prisma.analisisFisico.delete({
+        const deleteAnalisisFisico = await prisma.analisisFisico.update({
             where: {
                 id_analisis_fisico: id
+            },
+            data: {
+                eliminado: true
             }
         });
         return AnalisisFisicoEntity.fromObject(deleteAnalisisFisico);
     }
 
     async getAllAnalisisFisico(): Promise<AnalisisFisicoEntity[]> {
-        const analisisFisico = await prisma.analisisFisico.findMany();
+        const analisisFisico = await prisma.analisisFisico.findMany(
+            {
+                where: {
+                    eliminado: false
+                }
+            }
+        );
         return analisisFisico.map((analisis) => AnalisisFisicoEntity.fromObject(analisis));
     }
     

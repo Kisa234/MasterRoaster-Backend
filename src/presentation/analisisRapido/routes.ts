@@ -15,7 +15,7 @@ export class AnalisisRapidoRoutes{
         router.post('/',analisisRapidoController.createAnalisisRapido);
         router.get('/:id',analisisRapidoController.getAnalisisRapidoById);
         router.put('/:id',analisisRapidoController.updateAnalisisRapido);
-        router.get('/all',analisisRapidoController.getAllAnalisisRapido);
+        router.get('/',analisisRapidoController.getAllAnalisisRapido);
         router.delete('/:id',analisisRapidoController.deleteAnalisisRapido);
        
         return router;

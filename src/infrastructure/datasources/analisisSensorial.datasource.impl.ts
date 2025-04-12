@@ -36,16 +36,25 @@ export  class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSo
 
   async deleteAnalisisSensorial(id: string): Promise<AnalisisSensorialEntity> {
     const analisis = this.getAnalisisSensorialById(id);
-    const deleteAnalisisSensorial = await prisma.analisisSensorial.delete({
+    const deleteAnalisisSensorial = await prisma.analisisSensorial.update({
       where: {
         id_analisis_sensorial: id
+      },
+      data: {
+        eliminado: true
       }
     });
     return AnalisisSensorialEntity.fromObject(deleteAnalisisSensorial);
   }
 
   async getAllAnalisisSensorial(): Promise<AnalisisSensorialEntity[]> {
-    const analisisSensorial = await prisma.analisisSensorial.findMany();
+    const analisisSensorial = await prisma.analisisSensorial.findMany(
+      {
+        where: {
+          eliminado: false
+        }
+      }
+    );
     return analisisSensorial.map((analisis) => AnalisisSensorialEntity.fromObject(analisis));
   }
 
