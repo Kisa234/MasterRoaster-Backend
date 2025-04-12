@@ -18,7 +18,7 @@ export class MuestraRoutes {
         router.get('/:id', muestraController.getMuestraById);
         router.put('/:id', muestraController.updateMuestra);
         router.delete('/:id', muestraController.deleteMuestra);
-        router.get('/', muestraController.getMuestras);
+        router.get('/', muestraController.getAllMuestra);
 
         return router;
         

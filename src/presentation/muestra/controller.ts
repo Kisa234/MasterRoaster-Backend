@@ -1,3 +1,4 @@
+
 import { Request, Response } from "express";
 import { MuestraRepository } from "../../domain/repository/muestra.repository";
 import { CreateMuestraDto } from "../../domain/dtos/muestra/create";
@@ -6,8 +7,7 @@ import { GetMuestra } from "../../domain/usecases/muestra/get-muestra";
 import { UpdateMuestraDto } from "../../domain/dtos/muestra/update";
 import { UpdateMuestra } from "../../domain/usecases/muestra/update-muestra";
 import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
-import { GetMuestras } from "../../domain/usecases/muestra/get-muestras";
-
+import { GetMuestras as GetAllMuestra } from "../../domain/usecases/muestra/get-muestras";
 
 export class MuestraController {
     
@@ -15,7 +15,7 @@ export class MuestraController {
         private readonly muestraRepository: MuestraRepository
     ) {}
 
-    public createMuestra(req: Request, res: Response) {
+    public createMuestra = (req: Request, res: Response) => {
         const [error, createMuestraDto] = CreateMuestraDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
@@ -27,7 +27,7 @@ export class MuestraController {
             
     }
 
-    public getMuestraById(req: Request, res: Response) {
+    public getMuestraById = (req: Request, res: Response) =>  {
         new GetMuestra(this.muestraRepository)
             .execute(req.params.id)
             .then( muestra => res.json(muestra))
@@ -35,7 +35,7 @@ export class MuestraController {
 
     }
 
-    public updateMuestra(req: Request, res: Response) {
+    public updateMuestra = (req: Request, res: Response) => {
         const id_muestra = req.params.id;
         const [error, updateMuestraDto ] = UpdateMuestraDto.update({...req.body,'id_muestra': id_muestra});
         if (error) {
@@ -49,7 +49,7 @@ export class MuestraController {
 
     }
 
-    public deleteMuestra(req: Request, res: Response) {
+    public deleteMuestra =(req: Request, res: Response) =>{
         const id_muestra = req.params.id;
         new DeleteMuestra(this.muestraRepository)
             .execute(id_muestra)
@@ -57,8 +57,8 @@ export class MuestraController {
             .catch( error => res.status(400).json({ error }));
     }
 
-    public getMuestras(req: Request, res: Response) {
-        new GetMuestras(this.muestraRepository)
+    public getAllMuestra=(req: Request, res: Response) =>{
+        new GetAllMuestra(this.muestraRepository)
             .execute()
             .then( muestras => res.json(muestras))
             .catch( error => res.status(400).json({ error }));

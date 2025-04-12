@@ -26,7 +26,7 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         return MuestraEntity.fromObject(muestra);
     }
     async updateMuestra(id: string, updateMuestraDto:UpdateMuestraDto): Promise<MuestraEntity> {
-        const muestra = this.getMuestraById(id);
+        const muestra = await this.getMuestraById(id);
         const updateMuestra = await prisma.muestra.update({
             where: {
                 id_muestra: id
@@ -36,7 +36,7 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         return MuestraEntity.fromObject(updateMuestra);
     }
     async deleteMuestra(id: string): Promise<MuestraEntity> {
-        const muestra = this.getMuestraById(id);
+        const muestra = await this.getMuestraById(id);
         const muestraDeleted  = await prisma.muestra.update({
             where: {
                 id_muestra: id
