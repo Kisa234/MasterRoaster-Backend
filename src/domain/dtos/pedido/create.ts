@@ -1,27 +1,42 @@
 export class CreatePedidoDto {
     private constructor(
-        public readonly fecha_pedido: Date,
-        public readonly tipo_tueste: string,
-        public readonly cantidad_tostado: number,
-        public readonly estado_pedido: string,
-        public readonly observaciones: string,
-        public readonly cliente_id: string
+        public readonly tipo_pedido  :    string,
+        public readonly cantidad     :    number,
+        public readonly estado_pedido:    string,
+        public readonly observaciones:    string,
+        public readonly user_id   :    string,
+        public readonly id_lote      :    string
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreatePedidoDto?] {
-        const { fecha_pedido, tipo_tueste, cantidad_tostado, estado_pedido, observaciones, cliente_id } = props;
+        const { 
+            tipo_pedido,
+            cantidad,
+            estado_pedido,
+            observaciones,
+            user_id,
+            id_lote
+         } = props;
 
-        if (!fecha_pedido || isNaN(new Date(fecha_pedido).getTime())) {
-            return ['La fecha del pedido es inválida', undefined];
-        }
-        if (!tipo_tueste) return ['El tipo de tueste es requerido', undefined];
-        if (!cantidad_tostado || cantidad_tostado <= 0) return ['La cantidad tostada debe ser mayor a 0', undefined];
+         
+        if (!tipo_pedido) return ['El tipo de pedido es requerido', undefined];
+        if (!cantidad) return ['La cantidad es requerida', undefined];
         if (!estado_pedido) return ['El estado del pedido es requerido', undefined];
-        if (!cliente_id) return ['El ID del cliente es requerido', undefined];
-
+        if (!observaciones) return ['Las observaciones son requeridas', undefined];
+        if (!user_id) return ['El ID del cliente es requerido', undefined];
+        if (!id_lote) return ['El ID del lote es requerido', undefined];
+        
         return [
             undefined,
-            new CreatePedidoDto(new Date(fecha_pedido), tipo_tueste, cantidad_tostado, estado_pedido, observaciones, cliente_id)
+            new CreatePedidoDto(
+                tipo_pedido,
+                cantidad,
+                estado_pedido,
+                observaciones,
+                user_id,
+                id_lote
+            )
+            
         ];
     }
 }

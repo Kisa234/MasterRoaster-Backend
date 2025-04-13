@@ -1,4 +1,5 @@
-import { PedidoDataSource } from '../../domain/datasources/pedido.datasource';
+import { PedidoDatasource } from '../../domain/datasources/pedido.datasource';
+import { CreatePedidoDto } from '../../domain/dtos/pedido/create';
 import { UpdatePedidoDto } from '../../domain/dtos/pedido/update';
 import { PedidoEntity } from '../../domain/entities/pedido.entity';
 import { PedidoRepository } from '../../domain/repository/pedido.repository';
@@ -7,11 +8,11 @@ import { PedidoRepository } from '../../domain/repository/pedido.repository';
 export class PedidoRepositoryImpl implements PedidoRepository {
 
     constructor(
-        private readonly pedidoDataSource: PedidoDataSource
+        private readonly pedidoDataSource: PedidoDatasource
     ) { }
 
-    createPedido(pedido: PedidoEntity): Promise<PedidoEntity> {
-        return this.pedidoDataSource.createPedido(pedido);
+    createPedido( pedido:CreatePedidoDto): Promise<PedidoEntity> {
+        return this.pedidoDataSource.createPedido( pedido);
     }
     getPedidoById(id: string): Promise<PedidoEntity | null> {
         return this.pedidoDataSource.getPedidoById(id);
@@ -27,12 +28,6 @@ export class PedidoRepositoryImpl implements PedidoRepository {
     }
     getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosByCliente(cliente_id);
-    }
-    asignarPedido(id_pedido: string, asignado_a_id: string): Promise<PedidoEntity> {
-        return this.pedidoDataSource.asignarPedido(id_pedido, asignado_a_id);
-    }
-    aceptarPedido(id_pedido: string): Promise<PedidoEntity> {
-        return this.pedidoDataSource.aceptarPedido(id_pedido);
     }
     completarPedido(id_pedido: string): Promise<PedidoEntity> {
         return this.pedidoDataSource.completarPedido(id_pedido);

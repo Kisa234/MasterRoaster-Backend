@@ -7,6 +7,7 @@ import { LoteRoutes } from "./lote/routes";
 import { MuestraRoutes } from "./muestra/routes";
 import  { TuesteRoutes } from "./tueste/routes";
 import { UserRoutes } from "./users/routes";
+import { PedidoRoutes } from "./pedido/routes";
 
 
 export class AppRoutes{
@@ -20,8 +21,10 @@ export class AppRoutes{
         router.use('/analisisSensorial', AnalisisSensorialRoutes.routes);
         router.use('/lote', LoteRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
+        router.use('/pedido', PedidoRoutes.routes);
         // router.use('/tueste', TuesteRoutes.routes);
         router.use('/user', UserRoutes.routes);  
+
         
 
         return router;

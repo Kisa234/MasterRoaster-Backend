@@ -7,26 +7,24 @@ import { AnalisisEntity } from "../../domain/entities/analisis.entity";
 
 export  class AnalisisDataSourceImpl implements AnalisisDataSource {
     async createAnalisis(createAnalisisDto: CreateAnalisisDto): Promise<AnalisisEntity> {
-        
-
         const newAnalisis = await prisma.analisis.create({
             data: createAnalisisDto!
         });
         return AnalisisEntity.fromObject(newAnalisis);
     }
-    async getAnalisisById(id: string): Promise<AnalisisEntity | null> {
-        const analisis = prisma.analisis.findUnique({
+    async getAnalisisById(id: string): Promise<AnalisisEntity|null> {
+        const analisis = await prisma.analisis.findUnique({
             where:
             {
                id_analisis : id
             }
         });
-        if (!analisis) return null;
+        if (!analisis) throw new Error("Analisis not found");
         return AnalisisEntity.fromObject(analisis);
     }
     async updateAnalisis(id: string, updateAnalisisDto: UpdateAnalisisDto): Promise<AnalisisEntity> {
-        const analisis = this.getAnalisisById(id);
-        const updateAnalisis = prisma.analisis.update({
+        const analisis = await this.getAnalisisById(id);
+        const updateAnalisis = await prisma.analisis.update({
             where: {
                 id_analisis: id
             },
@@ -36,8 +34,8 @@ export  class AnalisisDataSourceImpl implements AnalisisDataSource {
     }
 
     async deleteAnalisis(id: string): Promise<AnalisisEntity> {
-        const analisis = this.getAnalisisById(id);
-        const deleteAnalisis = prisma.analisis.delete({
+        const analisis = await this.getAnalisisById(id);
+        const deleteAnalisis = await prisma.analisis.delete({
             where: {
                 id_analisis: id
             }

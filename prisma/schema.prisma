@@ -24,18 +24,22 @@ model User {
   muestras          Muestra[]
   // Relación con pedidos de cliente
   pedidos           Pedido[]  @relation("ClientePedido")
-  // Relación con pedidos asignados
-  pedidos_asignados Pedido[]  @relation("AsignadoPedido")
+
 }
 
 model Muestra {
-  id_muestra     String   @id @default(uuid())
-  nombre         String
-  peso           Float
-  user_id        String?
-  analisis_id    String?   @unique
-  fecha_registro DateTime @default(now())
-  eliminado      Boolean  @default(false)
+  id_muestra      String   @id 
+  productor       String
+  finca           String
+  region          String
+  departamento    String
+  peso            Float
+  variedades      String
+  proceso         String
+  user_id         String?
+  analisis_id     String?  @unique
+  fecha_registro  DateTime @default(now())
+  eliminado       Boolean  @default(false)
 
   // Relación con Usuario
   user     User?     @relation(fields: [user_id], references: [id_user])
@@ -44,42 +48,44 @@ model Muestra {
 }
 
 model Lote {
-  id_lote      String   @id
-  productor    String
-  finca        String
-  region       String
-  departamento String
-  fecha_compra DateTime
-  peso         Float
-  variedades   String
-  proceso      String
-  user_id      String?
-  analisis_id  String?  @unique
-  eliminado    Boolean  @default(false)
+  id_lote         String   @id
+  productor       String
+  finca           String
+  region          String
+  departamento    String
+  peso            Float
+  variedades      String
+  proceso         String
+  user_id         String?
+  analisis_id     String?  
+  fecha_registro  DateTime @default(now())
+  eliminado       Boolean  @default(false)
   
   // Relación con Usuario
   user User? @relation(fields: [user_id], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
+
+  Pedido Pedido[]
 }
 
 model Pedido {
   id_pedido        String    @id @default(uuid())
-  fecha_pedido     DateTime
-  tipo_tueste      String
-  cantidad_tostado Float
+  fecha_registro   DateTime  @default(now())
+  tipo_pedido      String
+  cantidad         Float
   estado_pedido    String
   observaciones    String
-  cliente_id       String
-  asignado_a_id    String?
-  fecha_asignacion DateTime?
+  user_id       String
+  id_lote          String
   eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
-  cliente User @relation(fields: [cliente_id], references: [id_user], name: "ClientePedido")
+  cliente User @relation(fields: [user_id], references: [id_user], name: "ClientePedido")
 
-  // Relación con Usuario como Asignado
-  asignado User? @relation(fields: [asignado_a_id], references: [id_user], name: "AsignadoPedido")
+  //Relación con Lote
+  lote Lote @relation(fields: [id_lote], references: [id_lote]) 
+
 }
 
 model Tueste {
@@ -112,8 +118,9 @@ model Tueste {
 model Analisis {
   id_analisis          String   @id @default(uuid())
   fecha_registro       DateTime @default(now())
-  analisisFisico_id    String?  @unique
+  analisisFisico_id    String?  @unique 
   analisisSensorial_id String?  @unique
+  comentario           String 
   
   eliminado          Boolean  @default(false)
 
@@ -123,7 +130,7 @@ model Analisis {
   analisisSensorial AnalisisSensorial? @relation(fields: [analisisSensorial_id], references: [id_analisis_sensorial])
 
   Muestra Muestra?
-  Lote    Lote?
+  Lote    Lote[]
 }
 
 model AnalisisFisico {

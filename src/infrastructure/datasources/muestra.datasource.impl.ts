@@ -1,8 +1,8 @@
 import { MuestraDataSource } from "../../domain/datasources/muestra.datasource";
 import { MuestraEntity } from "../../domain/entities/muestra.entity";
-import { CreateMuestraDto } from '../../domain/dtos/muestra/create';
 import { prisma } from "../../data/postgres";
 import { UpdateMuestraDto } from '../../domain/dtos/muestra/update';
+import { CreateMuestraDto } from "../../domain/dtos/muestra/create";
 
 
 export class MuestraDataSourceImpl implements MuestraDataSource {

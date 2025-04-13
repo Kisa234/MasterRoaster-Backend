@@ -29,7 +29,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
   }
 
   async updateLote(id: string, updateLoteDto: UpdateLoteDto): Promise<LoteEntity> {
-    const lote =  this.getLoteById(id);
+    const lote =  await this.getLoteById(id);
     const updatedLote = await prisma.lote.update({ 
       where: { id_lote: id },
       data: updateLoteDto.values
@@ -38,7 +38,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
   }
 
   async deleteLote(id: string): Promise<LoteEntity> {
-    const lote = this.getLoteById(id);
+    const lote = await this.getLoteById(id);
     const deletedLote = await prisma.lote.update({
       where: {id_lote: id},
       data: {eliminado: true}

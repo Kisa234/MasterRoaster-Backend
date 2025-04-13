@@ -7,7 +7,6 @@ export class CreateLoteDto {
         public readonly finca          : string,
         public readonly region         : string,
         public readonly departamento   : string,
-        public readonly fecha_compra   : Date,
         public readonly peso           : number,
         public readonly variedades     : string,
         public readonly proceso        : string,
@@ -25,10 +24,7 @@ export class CreateLoteDto {
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
-
-        let fechaParsed = new Date(fecha_compra);
-        if (isNaN(fechaParsed.getTime())) return ['La fecha de compra es inválida', undefined];
-        
+ 
         const generarIdLote = (productor: string, variedades: string, proceso: string): string  => {
 
             // 1 LETRA PRIMER NOMBRE PRODUCTOR
@@ -69,7 +65,7 @@ export class CreateLoteDto {
         const id_lote = generarIdLote(productor, variedades, proceso);
 
         return [undefined, new CreateLoteDto(
-            id_lote,productor, finca, region, departamento,fechaParsed,
+            id_lote,productor, finca, region, departamento,
             peso, variedades, proceso
         )];
     }

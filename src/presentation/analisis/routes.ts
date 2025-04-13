@@ -13,9 +13,9 @@ export class AnalisisRoutes{
         const analisisController = new AnalisisController(analisisRepository);
 
         router.post('/',analisisController.createAnalisis);
-        router.get('/:id',analisisController.getAnalisisById);
         router.put('/:id',analisisController.updateAnalisis);
-        router.get('/all',analisisController.getAllAnalisis);
+        router.get('/:id',analisisController.getAnalisisById);
+        router.get('/',analisisController.getAllAnalisis);
         router.delete('/:id',analisisController.deleteAnalisis);
        
         return router;

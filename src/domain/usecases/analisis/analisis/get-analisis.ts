@@ -1,8 +1,7 @@
 import { CreateAnalisisDto } from "../../../dtos/analisis/analisis/create";
 import { UpdateAnalisisDto } from '../../../dtos/analisis/analisis/update';
 import { AnalisisEntity } from "../../../entities/analisis.entity";
-import { AnalisisRepository } from '../../../repository/analisis.repository';
-
+import { AnalisisRepository } from "../../../repository/analisis.repository";
 
 export interface GetAnalisisUseCase {
     execute(id:string): Promise<AnalisisEntity| null>;
