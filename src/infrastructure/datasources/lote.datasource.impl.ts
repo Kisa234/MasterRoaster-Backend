@@ -80,6 +80,12 @@ export class LoteDataSourceImpl implements LoteDataSource {
         user_id: Muestra.user_id,
       }
     });
+
+    await prisma.muestra.update({
+      where: { id_muestra: id },
+      data: { eliminado: true }
+    });
+
     return LoteEntity.fromObject(lote);
   }
 

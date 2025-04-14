@@ -57,9 +57,11 @@ export class CreateMuestraDto {
               inicialProceso = 'HO';
             }
           
-            const formattedDate = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format as YYYYMMDD
-            const id_muestra = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}${formattedDate}`;
+            const now = new Date();
+            const date = `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+            const id_muestra = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}${date}`;
           
+            
             return id_muestra;
         }
 

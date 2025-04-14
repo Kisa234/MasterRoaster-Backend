@@ -56,8 +56,9 @@ export class CreateLoteDto {
               inicialProceso = 'HO';
             }
           
-            const formattedDate = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format as YYYYMMDD
-            const idLote = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}${formattedDate}`;
+            const now = new Date();
+            const date = `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+            const idLote = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}${date}`;
           
             return idLote;
         }
