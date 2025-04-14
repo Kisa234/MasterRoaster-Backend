@@ -1,6 +1,6 @@
 import { prisma } from "../../data/postgres";
 import { LoteDataSource } from "../../domain/datasources/lote.datasource";
-import { CreateLoteDto } from "../../domain/dtos/lote/create";
+import { CreateLoteDto } from '../../domain/dtos/lote/create';
 import { UpdateLoteDto } from "../../domain/dtos/lote/update";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 
@@ -56,7 +56,32 @@ export class LoteDataSourceImpl implements LoteDataSource {
     
   }
 
+  async createLoteFromMuestra(id: string,peso:number ): Promise<LoteEntity> {
+    const Muestra = await prisma.muestra.findUnique({
+      where: {
+        id_muestra: id,
+        eliminado: false
+      }
+    });
+    if (!Muestra) throw new Error("No existe la muestra");
 
+
+    const lote = await prisma.lote.create({
+      data: {
+        id_lote: Muestra.id_muestra,
+        productor: Muestra.productor,
+        finca : Muestra.finca,
+        region: Muestra.region,
+        departamento: Muestra.departamento,
+        peso: peso,
+        variedades: Muestra.variedades,
+        proceso: Muestra.proceso,
+        analisis_id: Muestra.analisis_id,
+        user_id: Muestra.user_id,
+      }
+    });
+    return LoteEntity.fromObject(lote);
+  }
 
 
 }

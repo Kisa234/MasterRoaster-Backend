@@ -13,6 +13,7 @@ export class LoteRoutes{
         const loteController = new LoteController(loteRepository);
 
         router.post('/', loteController.createLote);
+        router.post('/muestra/:id', loteController.createLoteFromMuestra);
         router.get('/', loteController.getLotes);
         
         router.get('/:id', loteController.getLoteById);

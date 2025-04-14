@@ -6,8 +6,8 @@ import { GetLote } from "../../domain/usecases/lote/get-lote";
 import { UpdateLote } from '../../domain/usecases/lote/update-lote';
 import { UpdateLoteDto } from "../../domain/dtos/lote/update";
 import { DeleteLote } from "../../domain/usecases/lote/delete.lote";
-import {  GetLotes } from "../../domain/usecases/lote/get-lotes";
-
+import { GetLotes } from "../../domain/usecases/lote/get-lotes";
+import { CreateLoteFromMuestra } from "../../domain/usecases/lote/create-lote-muestra";
 
 export class LoteController {
 
@@ -58,6 +58,18 @@ export class LoteController {
         new GetLotes(this.loteRepository)
             .execute()
             .then( lotes => res.json(lotes))
+            .catch( error => res.status(400).json({ error }));
+    }
+
+    public createLoteFromMuestra = (req:Request , res : Response) => {
+        const id_muestra = req.params.id;
+        const peso = req.body.peso;
+        if (!peso) {
+            return res.status(400).json({ error: 'Peso is required' });
+        }
+        new CreateLoteFromMuestra(this.loteRepository)
+            .execute(id_muestra, peso)
+            .then( lote => res.json(lote))
             .catch( error => res.status(400).json({ error }));
     }
 
