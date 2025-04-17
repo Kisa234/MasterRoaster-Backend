@@ -10,7 +10,7 @@ export class UpdateMuestraDto {
     public readonly peso?: number,
     public readonly proceso?: string,
     public readonly variedades?: string,
-    public readonly user_id?: string,
+    public readonly id_user?: string,
     public readonly analisis_id?: string
   ) {}
 
@@ -23,7 +23,7 @@ export class UpdateMuestraDto {
     if (this.peso !== undefined) returnObj.peso = this.peso;
     if (this.variedades) returnObj.variedades = this.variedades;
     if (this.proceso) returnObj.proceso = this.proceso;
-    if (this.user_id) returnObj.user_id = this.user_id;
+    if (this.id_user) returnObj.user_id = this.id_user;
     if (this.analisis_id) returnObj.analisis_id = this.analisis_id;
 
     return returnObj;

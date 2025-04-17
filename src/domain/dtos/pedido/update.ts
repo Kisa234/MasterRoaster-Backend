@@ -5,7 +5,8 @@ export class UpdatePedidoDto {
         public readonly cantidad     :    number,
         public readonly estado_pedido:    string,
         public readonly observaciones:    string,
-        public readonly cliente_id   :    string,
+        public readonly id_user   :    string,
+        public readonly id_lote      :    string
     ) {}
 
     get values() {
@@ -14,7 +15,8 @@ export class UpdatePedidoDto {
         if (this.cantidad) returnObj.cantidad = this.cantidad;
         if (this.estado_pedido) returnObj.estado_pedido = this.estado_pedido;
         if (this.observaciones) returnObj.observaciones = this.observaciones;
-        if (this.cliente_id) returnObj.cliente_id_cliente = this.cliente_id;
+        if (this.id_user) returnObj.id_user = this.id_user;
+        if (this.id_lote) returnObj.id_lote = this.id_lote;
         return returnObj;
     }
 
@@ -25,7 +27,8 @@ export class UpdatePedidoDto {
             cantidad,
             estado_pedido,
             observaciones,
-            cliente_id,
+            id_user,
+            id_lote
          } = props;
 
 
@@ -41,7 +44,8 @@ export class UpdatePedidoDto {
                 cantidad,
                 estado_pedido,
                 observaciones,
-                cliente_id
+                id_user,
+                id_lote
             )
         ];
     }

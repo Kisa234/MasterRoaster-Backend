@@ -24,7 +24,8 @@ model User {
   muestras          Muestra[]
   // Relación con pedidos de cliente
   pedidos           Pedido[]  @relation("ClientePedido")
-
+  // Relación con Historial
+  Historial Historial[]
 }
 
 model Muestra {
@@ -36,13 +37,13 @@ model Muestra {
   peso            Float
   variedades      String
   proceso         String
-  user_id         String?
+  id_user         String?
   analisis_id     String?  @unique
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
 
   // Relación con Usuario
-  user     User?     @relation(fields: [user_id], references: [id_user])
+  user     User?     @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
 }
@@ -56,17 +57,44 @@ model Lote {
   peso            Float
   variedades      String
   proceso         String
-  user_id         String?
+  id_user         String?
   analisis_id     String?  
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
   
   // Relación con Usuario
-  user User? @relation(fields: [user_id], references: [id_user])
+  user User? @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
 
   Pedido Pedido[]
+  LoteTostado LoteTostado[]
+
+}
+
+model LoteTostado {
+  id_lote_tostado  String     @id 
+  id_lote          String     
+  fecha_tostado    DateTime
+  perfil_tostado   String
+  fecha_registro   DateTime   @default(now())
+  eliminado        Boolean     @default(false)
+
+  lote             Lote        @relation(fields: [id_lote], references: [id_lote])
+}
+
+
+model Historial {
+  id_historial     String   @id @default(uuid())
+  entidad          String   // "Lote", "Pedido", "Usuario"
+  id_entidad       String   // ID del lote, pedido o usuario
+  id_user          String   
+  accion           String
+  comentario       String
+  fecha_registro   DateTime @default(now())
+  cambios          Json
+
+  user User @relation(fields: [id_user], references: [id_user])
 }
 
 model Pedido {
@@ -76,12 +104,12 @@ model Pedido {
   cantidad         Float
   estado_pedido    String
   observaciones    String
-  user_id       String
+  id_user          String
   id_lote          String
   eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
-  cliente User @relation(fields: [user_id], references: [id_user], name: "ClientePedido")
+  cliente User @relation(fields: [id_user], references: [id_user], name: "ClientePedido")
 
   //Relación con Lote
   lote Lote @relation(fields: [id_lote], references: [id_lote]) 

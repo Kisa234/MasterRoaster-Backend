@@ -1,7 +1,7 @@
 import { prisma } from "../../data/postgres";
 import { LoteDataSource } from "../../domain/datasources/lote.datasource";
-import { CreateLoteDto } from '../../domain/dtos/lote/create';
-import { UpdateLoteDto } from "../../domain/dtos/lote/update";
+import { CreateLoteDto } from '../../domain/dtos/lotes/lote/create';
+import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 
 
@@ -77,7 +77,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
         variedades: Muestra.variedades,
         proceso: Muestra.proceso,
         analisis_id: Muestra.analisis_id,
-        user_id: Muestra.user_id,
+        id_user: Muestra.id_user,
       }
     });
 

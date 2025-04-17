@@ -1,5 +1,5 @@
-import { CreateLoteDto } from "../dtos/lote/create";
-import { UpdateLoteDto } from "../dtos/lote/update";
+import { CreateLoteDto } from "../dtos/lotes/lote/create";
+import { UpdateLoteDto } from "../dtos/lotes/lote/update";
 import { LoteEntity } from "../entities/lote.entity";
 
 export abstract class LoteRepository {

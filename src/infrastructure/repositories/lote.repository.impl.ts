@@ -1,6 +1,6 @@
 import { LoteDataSource } from "../../domain/datasources/lote.datasource";
-import { CreateLoteDto } from "../../domain/dtos/lote/create";
-import { UpdateLoteDto } from "../../domain/dtos/lote/update";
+import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
+import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 import { LoteRepository } from "../../domain/repository/lote.repository";
 

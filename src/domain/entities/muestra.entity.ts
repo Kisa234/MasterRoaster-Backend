@@ -11,7 +11,7 @@ export class MuestraEntity {
         public proceso: string,
         public fecha_registro: Date, 
         public eliminado: boolean,
-        public user_id: string | null,
+        public id_user: string | null,
         public analisis_id: string | null,
     ) {}
 
@@ -25,7 +25,7 @@ export class MuestraEntity {
         if (!variedades) throw new Error('variedades property is required');
         if (!proceso) throw new Error('proceso property is required');
         // Estos campos son opcionales, no deben lanzar error si no existen
-        const user_id = obj.user_id ?? undefined;
+        const id_user = obj.user_id ?? undefined;
         const analisis_id = obj.analisis_id ?? undefined;
         const eliminado = obj.eliminado ?? false; // Valor por defecto si no existe
 
@@ -45,7 +45,7 @@ export class MuestraEntity {
             proceso,
             newFechaRegistro,
             eliminado,
-            user_id,
+            id_user,
             analisis_id
         );
     }

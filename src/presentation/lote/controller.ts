@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { CreateLoteDto } from "../../domain/dtos/lote/create";
+import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { LoteRepository } from "../../domain/repository/lote.repository";
-import { CreateLote } from "../../domain/usecases/lote/create-lote";
-import { GetLote } from "../../domain/usecases/lote/get-lote";
-import { UpdateLote } from '../../domain/usecases/lote/update-lote';
-import { UpdateLoteDto } from "../../domain/dtos/lote/update";
-import { DeleteLote } from "../../domain/usecases/lote/delete.lote";
-import { GetLotes } from "../../domain/usecases/lote/get-lotes";
-import { CreateLoteFromMuestra } from "../../domain/usecases/lote/create-lote-muestra";
+import { CreateLote } from "../../domain/usecases/lote/lote/create-lote";
+import { GetLote } from "../../domain/usecases/lote/lote/get-lote";
+import { UpdateLote } from '../../domain/usecases/lote/lote/update-lote';
+import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
+import { DeleteLote } from "../../domain/usecases/lote/lote/delete.lote";
+import { GetLotes } from "../../domain/usecases/lote/lote/get-lotes";
+import { CreateLoteFromMuestra } from "../../domain/usecases/lote/lote/create-lote-muestra";
 
 export class LoteController {
 
