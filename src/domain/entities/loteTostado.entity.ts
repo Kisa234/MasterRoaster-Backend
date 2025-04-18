@@ -4,6 +4,7 @@ export class LoteTostadoEntity {
         public id_lote: string,
         public fecha_tostado: Date,
         public perfil_tostado: string,
+        public peso: number,
         public fecha_registro: Date,
     ) {}
   
@@ -13,13 +14,14 @@ export class LoteTostadoEntity {
             id_lote,
             fecha_tostado,
             perfil_tostado,
+            peso,
             fecha_registro
         } = obj;
 
         if(!id_lote_tostado) throw new Error('id_lote_tostado property is required');
         if(!id_lote) throw new Error('id_lote property is required');
         if(!perfil_tostado) throw new Error('perfil_tostado property is required');
-
+        if(!peso) throw new Error('peso property is required');
         const newFechaRegistro = new Date(fecha_registro);
         if (isNaN(newFechaRegistro.getTime())) {
             throw new Error('fecha_registro no es válida');
@@ -31,11 +33,12 @@ export class LoteTostadoEntity {
         }
 
         return new LoteTostadoEntity(
-          id_lote_tostado,
-          id_lote,
-          newFechaTostado,
-          perfil_tostado,
-          newFechaRegistro
+            id_lote_tostado,
+            id_lote,
+            newFechaTostado,
+            perfil_tostado,
+            peso,
+            newFechaRegistro
         );
     }
   }

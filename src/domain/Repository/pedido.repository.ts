@@ -9,5 +9,6 @@ export abstract class PedidoRepository {
     abstract deletePedido(id: string): Promise<PedidoEntity>;
     abstract getPedidosByEstado(estado: string): Promise<PedidoEntity[]>;
     abstract getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]>;
+    abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
 }

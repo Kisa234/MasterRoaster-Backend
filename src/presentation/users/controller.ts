@@ -34,6 +34,7 @@ export class UserController {
             .then( user => res.json(user))
             .catch( error => res.status(400).json({ error }));
     }
+
     public getUserById = async (req: Request, res: Response) => {
         new GetUser(this.userRepository)
             .execute(req.params.id)
@@ -41,6 +42,7 @@ export class UserController {
             .catch( error => res.status(400).json({ error }));
 
     }
+
     public updateUser = async (req: Request, res: Response) => {
         const user_id = req.params.id;
         const [error, createUserDto] = UpdateUserDto.update({...req.body,user_id});
@@ -53,6 +55,7 @@ export class UserController {
             .catch( error => res.status(400).json({ error }));
 
     }
+
     public deleteUser = async (req: Request, res: Response) => {
         const user_id = req.params.id;
         new DeleteUser(this.userRepository)
@@ -60,6 +63,7 @@ export class UserController {
             .then( user => res.json(user))
             .catch( error => res.status(400).json({ error }));
     }
+    
     public getUsersByRole = async (req: Request, res: Response) => {
         const role = req.params.role;
         new GetUsersRol(this.userRepository)

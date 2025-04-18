@@ -23,7 +23,9 @@ export class CreateTuesteDto {
         public readonly agtrom_comercial         :number,
         public readonly agtrom_gourmet           :number,
         public readonly id_analisis_rapido       :string,
+        public readonly id_pedido                :string,
         public readonly eliminado                :boolean
+
 
     ) {}
 
@@ -31,10 +33,10 @@ export class CreateTuesteDto {
         const { fecha_tueste, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
             punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
             porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet, id_analisis_rapido,eliminado } = props;
-
-        if (!fecha_tueste) return ['Fecha de tueste es requerida', undefined];
+            agtrom_comercial, agtrom_gourmet, id_analisis_rapido,id_pedido,eliminado } = props;
+            
         if (!tostadora) return ['Tostadora es requerida', undefined];
+        if (!peso_entrada) return ['Peso de entrada es requerido', undefined];
 
         const fechaParsed = new Date(fecha_tueste);
         if (fechaParsed.toString() === 'Invalid Date') return ['Fecha de tueste no es válida', undefined];
@@ -43,7 +45,7 @@ export class CreateTuesteDto {
             fechaParsed, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
             punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
             porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet,id_analisis_rapido,eliminado
+            agtrom_comercial, agtrom_gourmet,id_analisis_rapido,id_pedido,eliminado
         )];
     }
 }

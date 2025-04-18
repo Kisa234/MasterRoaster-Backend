@@ -77,10 +77,13 @@ model LoteTostado {
   id_lote          String     
   fecha_tostado    DateTime
   perfil_tostado   String
+  peso             Float
   fecha_registro   DateTime   @default(now())
   eliminado        Boolean     @default(false)
 
+
   lote             Lote        @relation(fields: [id_lote], references: [id_lote])
+  tuestes          Tueste[]     
 }
 
 
@@ -114,6 +117,7 @@ model Pedido {
   //Relación con Lote
   lote Lote @relation(fields: [id_lote], references: [id_lote]) 
 
+  tueste Tueste[]
 }
 
 model Tueste {
@@ -121,26 +125,31 @@ model Tueste {
   fecha_tueste              DateTime
   tostadora                 String
   peso_entrada              Float
-  temperatura_entrada       Float
-  llama_inicial             Float
-  aire_inicial              Float
-  punto_no_retorno          Float
-  tiempo_despues_crack      Float
-  temperatura_crack         Float
-  temperatura_salida        Float
-  tiempo_total              Float
-  porcentaje_caramelizacion Float
-  desarrollo                Float
-  grados_desarrollo         Float
-  peso_salida               Float
-  merma                     Float
-  agtrom_comercial          Float
-  agtrom_gourmet            Float
-  id_analisis_rapido        String   @unique
+  temperatura_entrada       Float?
+  llama_inicial             Float?
+  aire_inicial              Float?
+  punto_no_retorno          Float?
+  tiempo_despues_crack      Float?
+  temperatura_crack         Float?
+  temperatura_salida        Float?
+  tiempo_total              Float?
+  porcentaje_caramelizacion Float?
+  desarrollo                Float?
+  grados_desarrollo         Float?
+  peso_salida               Float?
+  merma                     Float?
+  agtrom_comercial          Float?
+  agtrom_gourmet            Float?
+  estado_tueste             String   @default("Pendiente")
+  id_analisis_rapido        String?  @unique
+  id_lote_tostado           String?  
+  id_pedido                 String
   eliminado                 Boolean  @default(false)
 
   // Relación con Analisis Rapido
-  analisisRapido AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
+  analisisRapido            AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
+  loteTostado               LoteTostado?     @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
+  pedido                    Pedido        @relation(fields: [id_pedido], references: [id_pedido])
 }
 
 model Analisis {

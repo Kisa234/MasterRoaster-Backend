@@ -1,19 +1,13 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { envs } from "../../config/envs";
+import { Request, Response, NextFunction } from 'express';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.token; // Obtener token de la cookie
+export function setUserCookie(req: Request, res: Response, next: NextFunction) {
+    
+    const userId = '1daf2d7a-b829-4c0e-921b-95e36ceb8737';
 
-    if (!token) {
-        return res.status(401).json({ error: "Acceso no autorizado. No hay token." });
-    }
-
-    try {
-        const decoded = jwt.verify(token, envs.JWT_SECRET) as { userId: string; email: string; rol: string };
-        req.user = decoded; // Guardamos los datos del usuario en `req.user`
-        next();
-    } catch (error) {
-        return res.status(403).json({ error: "Token inválido o expirado." });
-    }
-};
+    res.cookie('user_id', '1daf2d7a-b829-4c0e-921b-95e36ceb8737', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false, // cambia a true en producción con HTTPS
+    });
+    next();
+}

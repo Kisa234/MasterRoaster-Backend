@@ -10,6 +10,7 @@ import { UserRoutes } from "./users/routes";
 import { PedidoRoutes } from "./pedido/routes";
 import { LoteTostadoRoutes } from "./lote-tostado/routes";
 import { HistorialRoutes } from "./historial/routes";
+import { PersonalizadoRoutes } from "./personalizado/routes";
 
 
 export class AppRoutes{
@@ -33,7 +34,7 @@ export class AppRoutes{
 
         router.use('/user', UserRoutes.routes); 
 
-
+        router.use('/p', PersonalizadoRoutes.routes);        
         
 
         return router;

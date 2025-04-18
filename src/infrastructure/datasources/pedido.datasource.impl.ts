@@ -32,6 +32,16 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         }
         else throw new Error('El tipo de pedido no es válido');
     }
+
+    async getAllPedidos(): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false
+            }
+        });
+        return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
+    }
+
     async getPedidoById(id: string): Promise<PedidoEntity | null> {
         const pedido = await prisma.pedido.findFirst({
             where: {
@@ -68,10 +78,10 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         });
         return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
     }
-    async getPedidosByCliente(user_id: string): Promise<PedidoEntity[]> {
+    async getPedidosByCliente(id_user: string): Promise<PedidoEntity[]> {
         const user = prisma.user.findFirst({
             where: {
-                id_user: user_id,
+                id_user: id_user,
                 eliminado: false
             }
         });
@@ -79,7 +89,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         if(!user) throw new Error('El cliente no existe');
         const pedidos = await prisma.pedido.findMany({
             where: {
-                user_id: user_id,
+                id_user: id_user,
                 eliminado: false
             }
         });
@@ -110,7 +120,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         // Obtener los datos del usuario (cliente)
         const user = await prisma.user.findFirst({
             where: {
-                id_user: createPedidoDto.user_id,
+                id_user: createPedidoDto.id_user,
                 eliminado: false
             }
         });
@@ -135,7 +145,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
                 peso          :createPedidoDto.cantidad, 
                 variedades    :lote.variedades ,
                 proceso       :lote.proceso ,
-                user_id       :createPedidoDto.user_id,
+                id_user       :createPedidoDto.id_user,
                 analisis_id   :lote.analisis_id,      
             }
         });

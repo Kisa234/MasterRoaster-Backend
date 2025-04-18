@@ -2,18 +2,18 @@ import { LoteEntity } from "../../../entities/lote.entity";
 import { LoteTostadoRepository } from '../../../repository/loteTostado.repository';
 import { LoteTostadoEntity } from '../../../entities/loteTostado.entity';
 
-export interface GetLoteTostadoLoteByUseCase {
-    execute(id: string): Promise<LoteTostadoEntity>;
+export interface GetLotesTostadoLoteByUseCase {
+    execute(id: string): Promise<LoteTostadoEntity[]>;
 }
 
-export class GetLoteTostadoByLote implements GetLoteTostadoLoteByUseCase {
+export class GetLotesTostadoByLote implements GetLotesTostadoLoteByUseCase {
     constructor(
         private readonly loteTostadoRepository: LoteTostadoRepository
     ){}
 
     
-    execute(id: string): Promise<LoteTostadoEntity> {
-       return  this.loteTostadoRepository.getLoteTostadoById(id);
+    execute(id: string): Promise<LoteTostadoEntity[]> {
+       return  this.loteTostadoRepository.getLotesTostadoByLoteId(id);
     }
 
 }

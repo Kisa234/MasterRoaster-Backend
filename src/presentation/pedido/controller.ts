@@ -11,6 +11,7 @@ import { GetPedido } from "../../domain/usecases/pedido/get-pedido";
 import { GetPedidosByEstado } from "../../domain/usecases/pedido/getByEstado-pedido";
 import { GetPedidosByCliente } from "../../domain/usecases/pedido/getByCliente-pedido";
 import { CompletarPedido } from "../../domain/usecases/pedido/complete-pedido";
+import { GetAllPedidos } from '../../domain/usecases/pedido/get-pedidos';
 
 export class PedidoController {
 
@@ -71,6 +72,13 @@ export class PedidoController {
             .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));
     };
+
+    public getAllPedidos = async (req: Request, res: Response) => {
+        new GetAllPedidos(this.pedidoRepository)
+            .execute()
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error }));   
+    }
 
     public completarPedido = async (req: Request, res: Response) => {
         new CompletarPedido(this.pedidoRepository)

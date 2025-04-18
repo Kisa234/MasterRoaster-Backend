@@ -4,6 +4,7 @@ import path from 'path';
 import { text } from 'stream/consumers';
 import cookieParser from "cookie-parser";
 import cors from 'cors';
+import { setUserCookie } from '../infrastructure/middlewares/auth.middlewares';
 
 interface Options{
     port: number;
@@ -35,9 +36,11 @@ export class Server {
         this.app.use(express.urlencoded({extended: true})); // x-www-form-urlencoded
         this.app.use(cookieParser());
 
+        this.app.use(setUserCookie); // Middleware global que añade cookie user_id
        
         // ROUTES
         this.app.use(this.router);
+
         
         
 

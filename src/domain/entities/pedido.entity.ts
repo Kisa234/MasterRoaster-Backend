@@ -1,29 +1,54 @@
 export class PedidoEntity {
     constructor(
-        public id_pedido       : string,
-        public fecha_pedido    : Date,
-        public tipo_tueste     : string,
-        public cantidad_tostado: number,
-        public estado_pedido   : string,
-        public observaciones   : string,
-        public id_user      : string,  
-        public asignado_a_id?  : string,
-        public fecha_asignacion?: Date, 
-        public eliminado?      : boolean 
+        public id_pedido      : string,
+        public fecha_registro : Date,
+        public tipo_pedido    : string,
+        public cantidad       : number,
+        public estado_pedido  : string,
+        public observaciones  : string,
+        public id_user        : string,
+        public id_lote        : string,
+        public eliminado      : boolean,
     ){}
 
     static fromObject(obj: { [key: string]: any }): PedidoEntity {
-        const { id_pedido, fecha_pedido, tipo_tueste, cantidad_tostado, estado_pedido, observaciones, id_user, asignado_a_id, fecha_asignacion,eliminado } = obj;
-        if(!id_pedido) throw new Error('El ID del pedido es requerido');
-        if(!fecha_pedido) throw new Error('La fecha del pedido es requerida');
-        if(!tipo_tueste) throw new Error('El tipo de tueste es requerido');
-        if(!cantidad_tostado) throw new Error('La cantidad tostada es requerida');
-        if(!estado_pedido) throw new Error('El estado del pedido es requerido');
-        if(!observaciones) throw new Error('Las observaciones son requeridas');
-        if(!id_user) throw new Error('El ID del cliente es requerido');
-        if(!asignado_a_id) throw new Error('El ID del asignado es requerido');
-        if(!fecha_asignacion) throw new Error('La fecha de asignación es requerida');
-        if(!eliminado) throw new Error('El estado de eliminado es requerido');
-        return new PedidoEntity(id_pedido, fecha_pedido, tipo_tueste, cantidad_tostado, estado_pedido, observaciones, id_user, asignado_a_id, fecha_asignacion, eliminado);
+        const {
+            id_pedido,
+            fecha_registro,
+            tipo_pedido,
+            cantidad,
+            estado_pedido,
+            observaciones,
+            id_user,
+            id_lote,
+            eliminado
+        }= obj;
+
+        const newFechaRegistro = new Date(fecha_registro);
+        if (isNaN(newFechaRegistro.getTime())) {
+            throw new Error('fecha_registro no es válida');
+        }
+
+        if(!id_pedido) throw new Error('id_pedido is required');
+        if(!tipo_pedido) throw new Error('tipo_pedido is required');
+        if(!cantidad) throw new Error('cantidad is required');
+        if(!estado_pedido) throw new Error('estado_pedido is required');
+        if(!observaciones) throw new Error('observaciones is required');
+        if(!id_user) throw new Error('id_user is required');
+        if(!id_lote) throw new Error('id_lote is required');
+        if(!eliminado) throw new Error('eliminado is required');
+    
+        return new PedidoEntity(
+            id_pedido,
+            newFechaRegistro,
+            tipo_pedido,
+            cantidad,
+            estado_pedido,
+            observaciones,
+            id_user,
+            id_lote,
+            eliminado
+        );
+
     }
 }

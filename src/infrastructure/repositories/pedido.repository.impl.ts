@@ -5,17 +5,20 @@ import { PedidoEntity } from '../../domain/entities/pedido.entity';
 import { PedidoRepository } from '../../domain/repository/pedido.repository';
 
 
-export class PedidoRepositoryImpl implements PedidoRepository {
+export default class PedidoRepositoryImpl implements PedidoRepository {
 
     constructor(
         private readonly pedidoDataSource: PedidoDatasource
+        
     ) { }
-
     createPedido( pedido:CreatePedidoDto): Promise<PedidoEntity> {
         return this.pedidoDataSource.createPedido( pedido);
     }
     getPedidoById(id: string): Promise<PedidoEntity | null> {
         return this.pedidoDataSource.getPedidoById(id);
+    }
+    getAllPedidos(): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getAllPedidos();
     }
     updatePedido(id: string,updatePedidoDto:UpdatePedidoDto ): Promise<PedidoEntity> {
         return this.pedidoDataSource.updatePedido(id, updatePedidoDto);

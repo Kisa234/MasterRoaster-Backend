@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PedidoController } from './controller';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
-import { PedidoRepositoryImpl } from '../../infrastructure/repositories/pedido.repository.impl';
+import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 
 export class PedidoRoutes {
 
@@ -17,6 +17,7 @@ export class PedidoRoutes {
 
         // Definición de rutas
         router.post('/', controller.createPedido);
+        router.get('/', controller.getAllPedidos);
         router.get('/:id', controller.getPedidoById);
         router.put('/:id', controller.updatePedido);
         router.delete('/:id', controller.deletePedido);
