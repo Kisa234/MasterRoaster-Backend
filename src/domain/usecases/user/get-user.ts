@@ -1,11 +1,11 @@
 import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repository/user.repository";
 
-export interface GetUserUsecase{
+export interface GetUserUseByIdcase{
     execute(id: string): Promise<UserEntity| null>;
 };
 
-export class GetUser implements GetUserUsecase{
+export class GetUserById implements GetUserUseByIdcase{
     constructor(
         private readonly userRepository: UserRepository
     ){}

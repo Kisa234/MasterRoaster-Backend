@@ -38,14 +38,14 @@ model Muestra {
   variedades      String
   proceso         String
   id_user         String?
-  analisis_id     String?  @unique
+  id_analisis     String?  @unique
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
 
   // Relación con Usuario
   user     User?     @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
-  analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
+  analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
 }
 
 model Lote {
@@ -58,14 +58,14 @@ model Lote {
   variedades      String
   proceso         String
   id_user         String?
-  analisis_id     String?  
+  id_analisis     String?  
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
   
   // Relación con Usuario
   user User? @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
-  analisis Analisis? @relation(fields: [analisis_id], references: [id_analisis])
+  analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
 
   Pedido Pedido[]
   LoteTostado LoteTostado[]

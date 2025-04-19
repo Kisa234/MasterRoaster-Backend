@@ -12,21 +12,31 @@ import { GetPedidosByEstado } from "../../domain/usecases/pedido/getByEstado-ped
 import { GetPedidosByCliente } from "../../domain/usecases/pedido/getByCliente-pedido";
 import { CompletarPedido } from "../../domain/usecases/pedido/complete-pedido";
 import { GetAllPedidos } from '../../domain/usecases/pedido/get-pedidos';
+import { TuesteRepository } from "../../domain/repository/tueste.repository";
+import { UserRepository } from "../../domain/repository/user.repository";
+import { LoteRepository } from "../../domain/repository/lote.repository";
 
 export class PedidoController {
 
     constructor(
-        private readonly pedidoRepository: PedidoRepository
+        private readonly pedidoRepository: PedidoRepository,
+        private readonly loteRepository: LoteRepository,
+        private readonly userRepository: UserRepository,
+        private readonly tuesteRepository: TuesteRepository,
     ) {}
 
     public createPedido = async (req: Request, res: Response) => {
-        const idLote = req.body.id_lote;
         const [error, createPedidoDto] = CreatePedidoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
 
-        new CreatePedido(this.pedidoRepository)
+        new CreatePedido(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.userRepository,
+            this.tuesteRepository
+            )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));

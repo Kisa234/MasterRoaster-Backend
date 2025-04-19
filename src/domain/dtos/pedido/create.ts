@@ -1,11 +1,11 @@
 export class CreatePedidoDto {
     private constructor(
-        public readonly tipo_pedido  :    string,
-        public readonly cantidad     :    number,
-        public readonly estado_pedido:    string,
-        public readonly observaciones:    string,
-        public readonly id_user   :    string,
-        public readonly id_lote      :    string
+        public readonly tipo_pedido     :    string,
+        public readonly cantidad        :    number,
+        public readonly estado_pedido   :    string,
+        public readonly observaciones   :    string,
+        public readonly id_user         :    string,
+        public readonly id_lote         :    string
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreatePedidoDto?] {

@@ -12,6 +12,7 @@ export class LoteTostadoRepositoryImpl implements LoteTostadoRepository {
     ) {}
 
     createLoteTostado(createLoteTostadoDto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
+        
         return this.datasource.createLoteTostado(createLoteTostadoDto);
     }
     getLoteTostadoById(id: string): Promise<LoteTostadoEntity | null> {

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repository/user.repository';
 import { CreateUser } from '../../domain/usecases/user/create-user';
 import { CreateUserDto } from '../../domain/dtos/user/create';
-import { GetUser } from '../../domain/usecases/user/get-user';
+import { GetUserById } from '../../domain/usecases/user/get-user';
 
 import { UpdateUser } from '../../domain/usecases/user/update-user';
 import { DeleteUser } from '../../domain/usecases/user/delete-user';
@@ -36,10 +36,10 @@ export class UserController {
     }
 
     public getUserById = async (req: Request, res: Response) => {
-        new GetUser(this.userRepository)
+        new GetUserById(this.userRepository)
             .execute(req.params.id)
             .then( user => res.json(user))
-            .catch( error => res.status(400).json({ error }));
+            .catch( error => res.status(400).json('error aqui'));
 
     }
 

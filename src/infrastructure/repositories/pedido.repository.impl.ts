@@ -11,8 +11,8 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
         private readonly pedidoDataSource: PedidoDatasource
         
     ) { }
-    createPedido( pedido:CreatePedidoDto): Promise<PedidoEntity> {
-        return this.pedidoDataSource.createPedido( pedido);
+    createPedido( dto:CreatePedidoDto): Promise<PedidoEntity> {
+        return this.pedidoDataSource.createPedido( dto);
     }
     getPedidoById(id: string): Promise<PedidoEntity | null> {
         return this.pedidoDataSource.getPedidoById(id);

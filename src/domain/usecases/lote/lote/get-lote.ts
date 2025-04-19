@@ -8,7 +8,7 @@ export interface GetLoteUseCase {
     execute(id:string ): Promise<LoteEntity| null>;
 }
 
-export class GetLote implements GetLoteUseCase {
+export class GetLoteById implements GetLoteUseCase {
     constructor(
         private readonly loteRepository: LoteRepository
     ){}

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLote } from "../../domain/usecases/lote/lote/create-lote";
-import { GetLote } from "../../domain/usecases/lote/lote/get-lote";
+import { GetLoteById } from "../../domain/usecases/lote/lote/get-lote";
 import { UpdateLote } from '../../domain/usecases/lote/lote/update-lote';
 import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { DeleteLote } from "../../domain/usecases/lote/lote/delete.lote";
@@ -29,7 +29,7 @@ export class LoteController {
     }
 
     public getLoteById = (req:Request , res : Response) => {
-        new GetLote(this.loteRepository)
+        new GetLoteById(this.loteRepository)
             .execute(req.params.id)
             .then( lote => res.json(lote))
             .catch( error => res.status(400).json({ error }));

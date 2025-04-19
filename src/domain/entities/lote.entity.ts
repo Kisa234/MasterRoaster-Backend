@@ -11,7 +11,7 @@ export class LoteEntity {
         public fecha_registro: Date, 
         public eliminado: boolean,
         public id_user: string | null,
-        public analisis_id: string | null,
+        public id_analisis: string | null,
     ) {}
 
     public static fromObject(obj: { [key: string]: any }): LoteEntity {
@@ -26,7 +26,7 @@ export class LoteEntity {
         if (!proceso) throw new Error('proceso property is required');
         // Estos campos son opcionales, no deben lanzar error si no existen
         const id_user = obj.id_user ?? undefined;
-        const analisis_id = obj.analisis_id ?? undefined;
+        const id_analisis = obj.analisis_id ?? undefined;
         const eliminado = obj.eliminado ?? false; // Valor por defecto si no existe
 
         const newFechaRegistro = new Date(fecha_registro);
@@ -46,7 +46,7 @@ export class LoteEntity {
             newFechaRegistro,
             eliminado,
             id_user,
-            analisis_id
+            id_analisis
         );
     }
 }

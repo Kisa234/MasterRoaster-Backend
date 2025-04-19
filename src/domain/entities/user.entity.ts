@@ -9,20 +9,16 @@ export class UserEntity {
         public id_user: string,
         public nombre: string,
         public email: string,
-        public numero_telefono: number,
         public rol: ROL,
         public password: string,
+        public numero_telefono: number,
         public eliminado: boolean,
-        public lote: string[],
-        public muestras: string[],
-        public pedido: string[],
-        public pedido_asignado: string[],
         public fecha_registro: Date,
         public fecha_editado?: Date,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): UserEntity {
-        const { id_user, nombre, email, numero_telefono, rol, password, eliminado, lote, muestras, pedido, pedido_asignado, fecha_registro, fecha_editado } = obj;
+        const { id_user, nombre, email, numero_telefono, rol, password, eliminado, fecha_registro, fecha_editado } = obj;
 
         if (!id_user) throw new Error('id_user property is required');
         if (!nombre) throw new Error('nombre property is required');
@@ -32,6 +28,7 @@ export class UserEntity {
         if (!password) throw new Error('password property is required');
         if (eliminado === undefined || eliminado === null) throw new Error('eliminado property is required');
         if (!fecha_registro) throw new Error('fecha_registro property is required');
+        if (fecha_editado === undefined) throw new Error('fecha_editado property is required');
 
         const newFechaRegistro = new Date(fecha_registro);
         if (isNaN(newFechaRegistro.getTime())) {
@@ -45,19 +42,16 @@ export class UserEntity {
                 throw new Error('fecha_editado is not a valid date');
             }
         }
+        
 
         return new UserEntity(
             id_user,
             nombre,
             email,
-            numero_telefono,
             rol,
             password,
+            numero_telefono,
             eliminado,
-            Array.isArray(lote) ? lote : [],
-            Array.isArray(muestras) ? muestras : [],
-            Array.isArray(pedido) ? pedido : [],
-            Array.isArray(pedido_asignado) ? pedido_asignado : [],
             newFechaRegistro,
             newFechaEditado
         );

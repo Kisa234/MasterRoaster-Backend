@@ -2,6 +2,12 @@ import { Router } from 'express';
 import { PedidoController } from './controller';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
 import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
+import { LoteDataSourceImpl } from '../../infrastructure/datasources/lote.datasource.impl';
+import { LoteRepositoryImpl } from '../../infrastructure/repositories/lote.repository.impl';
+import { TuesteDataSourceImpl } from '../../infrastructure/datasources/tueste.datasource.impl';
+import { TuesteRepositoryImpl } from '../../infrastructure/repositories/tueste.repository.impl';
+import { UserRepositoryImpl } from '../../infrastructure/repositories/user.repository.impl';
+import { UserDataSourceImpl } from '../../infrastructure/datasources/user.datasource.impl';
 
 export class PedidoRoutes {
 
@@ -11,9 +17,26 @@ export class PedidoRoutes {
         const router = Router();
 
         // Inyección de dependencias
-        const datasource = new PedidoDataSourceImpl();
-        const repository = new PedidoRepositoryImpl(datasource);
-        const controller = new PedidoController(repository);
+        // Pedido
+        const PedidoDatasource = new PedidoDataSourceImpl();
+        const PedidoRepository = new PedidoRepositoryImpl(PedidoDatasource);
+        // Lote
+        const LoteDatasource = new LoteDataSourceImpl();
+        const LoteLoteRepository = new LoteRepositoryImpl(LoteDatasource);
+        // Tueste
+        const TuesteDatasource = new TuesteDataSourceImpl();
+        const TuesteRepository = new TuesteRepositoryImpl(TuesteDatasource);
+        // User
+        const Userdatasource = new UserDataSourceImpl();
+        const UserRepository = new UserRepositoryImpl(Userdatasource);
+
+
+        const controller = new PedidoController(
+            PedidoRepository,
+            LoteLoteRepository,
+            UserRepository,
+            TuesteRepository
+        );
 
         // Definición de rutas
         router.post('/', controller.createPedido);

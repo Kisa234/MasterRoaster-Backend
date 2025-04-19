@@ -20,8 +20,7 @@ export class PedidoEntity {
             estado_pedido,
             observaciones,
             id_user,
-            id_lote,
-            eliminado
+            id_lote
         }= obj;
 
         const newFechaRegistro = new Date(fecha_registro);
@@ -36,7 +35,7 @@ export class PedidoEntity {
         if(!observaciones) throw new Error('observaciones is required');
         if(!id_user) throw new Error('id_user is required');
         if(!id_lote) throw new Error('id_lote is required');
-        if(!eliminado) throw new Error('eliminado is required');
+        const eliminado = obj.eliminado ?? false; 
     
         return new PedidoEntity(
             id_pedido,
