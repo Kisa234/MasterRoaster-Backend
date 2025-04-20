@@ -106,58 +106,68 @@ export class CreatePedido implements CreatePedidoUseCase {
         console.log('cantTuestes', cantTuestes);
         const fechaTuestes = this.getFechaCercana();
         for (let cant of cantTuestes) {
+           
             let [a,createDto] = CreateTuesteDto.create({
                 fecha_tueste: fechaTuestes,
                 tostadora: 'Candela',
                 peso_entrada: cant,
                 id_pedido: pedido.id_pedido,
             });
-            console.log('createDto', createDto);
             await this.tuesteRepository.createTueste(createDto!);
+
         }
         
         return PedidoEntity.fromObject(pedido);
     }
 
-    private generarPesoTuestes(cantidadRequerida: number): number[] {
+    private generarPesoTuestes(cantidadRequerida:number): number[] {
         const MIN = 2;
         const MAX = 3.5;
-        const tuestes: number[] = [];
+        const tuestes = [];
     
-        while (cantidadRequerida >= MIN) {
-            // Si la cantidad restante está dentro del rango permitido, úsala directamente
-            if (cantidadRequerida <= MAX) {
-                tuestes.push(parseFloat(cantidadRequerida.toFixed(2)));
-                return tuestes;
+        let cantidad = cantidadRequerida;
+        let cantidadEntera = Math.floor(cantidad / MAX);
+        let residuo = parseFloat((cantidad % MAX).toFixed(2));
+    
+        // Si el residuo es menor al mínimo y no es 0, redistribuir
+        if (residuo > 0 && residuo < MIN) {
+            // intentar distribuir el residuo entre los tuestes
+            if (cantidadEntera === 0) {
+                // No se puede ni un tueste válido
+                return [];
             }
     
-            // Si no, agrega un bloque máximo y resta
-            tuestes.push(MAX);
-            cantidadRequerida -= MAX;
-        }
+            const total = cantidadRequerida;
+            const nuevoTamaño = total / cantidadEntera;
     
-        // Si quedó un residuo menor al mínimo, intenta redistribuir
-        if (cantidadRequerida > 0 && cantidadRequerida < MIN) {
-            let distribuido = false;
-            for (let i = 0; i < tuestes.length; i++) {
-                if (tuestes[i] + cantidadRequerida <= MAX) {
-                    tuestes[i] = parseFloat((tuestes[i] + cantidadRequerida).toFixed(2));
-                    distribuido = true;
-                    break;
+            // Si redistribuyendo se cumple el rango, ok
+            if (nuevoTamaño >= MIN && nuevoTamaño <= MAX) {
+                return Array(cantidadEntera).fill(parseFloat(nuevoTamaño.toFixed(2)));
+            } else {
+                // Si redistribuir no cumple, hacemos un tueste más y ajustamos todos
+                cantidadEntera += 1;
+                const ajustado = total / cantidadEntera;
+    
+                if (ajustado >= MIN && ajustado <= MAX) {
+                    return Array(cantidadEntera).fill(parseFloat(ajustado.toFixed(2)));
+                } else {
+                    return []; // No se puede repartir válido
                 }
             }
+        }
     
-            if (!distribuido) {
-                throw new Error(`No se puede asignar el residuo de ${cantidadRequerida.toFixed(2)} kg sin superar los límites por tueste.`);
-            }
+        // Si el residuo sí permite un tueste válido, agregarlo al final
+        for (let i = 0; i < cantidadEntera; i++) {
+            tuestes.push(MAX);
+        }
+    
+        if (residuo >= MIN) {
+            tuestes.push(residuo);
         }
     
         return tuestes;
     }
-    
-    
-    
-    
+        
     private getFechaCercana(): Date {
         const now = new Date();
         const day = now.getDay(); // 0 (Dom) - 6 (Sáb)

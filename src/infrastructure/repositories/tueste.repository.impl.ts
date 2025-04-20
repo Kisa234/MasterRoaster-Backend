@@ -12,6 +12,7 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     ) { }
 
     createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity> {
+        console.log('funca repository');
         return this.tuesteDataSource.createTueste(createTuesteDto);
     }
     getTuesteById(id: string): Promise<TuesteEntity | null> {

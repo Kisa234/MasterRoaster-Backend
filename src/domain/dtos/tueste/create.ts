@@ -24,7 +24,6 @@ export class CreateTuesteDto {
         public readonly agtrom_comercial         ?:number,
         public readonly agtrom_gourmet           ?:number,
         public readonly id_analisis_rapido       ?:string,
-        public readonly eliminado                ?:boolean
 
 
     ) {}
@@ -63,7 +62,7 @@ export class CreateTuesteDto {
                 merma,
                 agtrom_comercial,
                 agtrom_gourmet,
-                id_analisis_rapido
+                id_analisis_rapido ? id_analisis_rapido : undefined, 
         )];
     }
 }
