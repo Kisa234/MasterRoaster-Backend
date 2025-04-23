@@ -22,8 +22,8 @@ export class UpdateLoteDto {
         if (this.peso) returnObj.peso = this.peso;
         if (this.variedades) returnObj.variedades = this.variedades;
         if (this.proceso) returnObj.proceso = this.proceso;
-        if (this.id_user) returnObj.user_id_user = this.id_user;
-        if (this.id_analisis) returnObj.analisis_id = this.id_analisis;
+        if (this.id_user) returnObj.id_user = this.id_user;
+        if (this.id_analisis) returnObj.id_analisis = this.id_analisis;
 
 
         return returnObj;

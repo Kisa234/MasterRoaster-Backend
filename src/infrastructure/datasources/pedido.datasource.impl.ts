@@ -19,13 +19,13 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
             data: createPedidoDto!
         });
         return PedidoEntity.fromObject(newPedido);
-        // return newPedido as any;
     }
 
     async getAllPedidos(): Promise<PedidoEntity[]> {
         const pedidos = await prisma.pedido.findMany({
             where: {
-                eliminado: false
+                eliminado: false,
+                estado_pedido: { not: 'Completado' }
             }
         });
         return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
@@ -90,7 +90,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         const pedido =  await this.getPedidoById(id);
         const pedidoCompletado = await prisma.pedido.update({
             where: { id_pedido: id },
-            data: { estado_pedido: 'COMPLETADO' }
+            data: { estado_pedido: 'Completado' }
         });
         return PedidoEntity.fromObject(pedidoCompletado);
 

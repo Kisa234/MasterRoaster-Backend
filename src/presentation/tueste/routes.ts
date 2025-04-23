@@ -15,9 +15,10 @@ export class TuesteRoutes {
         const tuesteController = new TuesteController(tuesteRepository);
         
         router.post('/', tuesteController.createTueste);
+        router.get('/', tuesteController.getAllTuestes);
         router.get('/:id', tuesteController.getTuesteById);
         router.put('/:id', tuesteController.updateTueste);
-        router.delete('/:id', tuesteController.deleteTueste);
+        // router.delete('/:id', tuesteController.deleteTueste);
         router.get('/fecha/:fecha', tuesteController.getTuesteByFecha);
 
         return router;

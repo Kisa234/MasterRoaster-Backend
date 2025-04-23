@@ -10,4 +10,5 @@ export abstract class UserRepository {
     abstract getUsersByRole(role: string): Promise<UserEntity[]>;
     abstract findByEmail(email: string): Promise<UserEntity | null>;
     abstract authUser(email: string, password: string): Promise<UserEntity | null>;
+    abstract getAllUsers(): Promise<{id_user: string, name: string}[]>;
   }

@@ -72,6 +72,12 @@ export class UserController {
             .catch( error => res.status(400).json({ error}));
     }
 
+    public getAllUsers = async (req: Request, res: Response) => {
+        this.userRepository.getAllUsers()
+            .then( users => res.json(users))
+            .catch( error => res.status(400).json({ error}));
+    }
+
     // public authUser = async (req: Request, res: Response) => {
     //     const email = req.body.email;
     //     const password = req.body.password;
@@ -105,5 +111,6 @@ export class UserController {
     //         return res.status(500).json({ error: error.message });
     //     }
     // }
+    
 
 }

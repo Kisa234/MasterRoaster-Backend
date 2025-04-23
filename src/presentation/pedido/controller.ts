@@ -49,14 +49,24 @@ export class PedidoController {
             return res.status(400).json({ error });
         }
 
-        new UpdatePedido(this.pedidoRepository)
+        new UpdatePedido( 
+            this.pedidoRepository,
+            this.loteRepository,
+            this.tuesteRepository,
+            this.userRepository,
+        )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
     };
 
     public deletePedido = async (req: Request, res: Response) => {
-        new DeletePedido(this.pedidoRepository)
+        new DeletePedido(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.tuesteRepository,
+            this.userRepository,
+        )
             .execute(req.params.id)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));

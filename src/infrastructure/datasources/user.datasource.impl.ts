@@ -70,6 +70,18 @@ export  class UserDataSourceImpl implements UserDataSource {
 
     return user;
   }
+  async getAllUsers(): Promise<{id_user: string, name: string}[]>{
+    const users = await prisma.user.findMany({
+      where: {
+        eliminado: false
+      },
+      select: {
+        id_user: true,
+        nombre: true
+      }
+    });
+    return users.map(user => ({ id_user: user.id_user, name: user.nombre }));
+  }
   
     
 }

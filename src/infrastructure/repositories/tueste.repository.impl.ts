@@ -12,7 +12,6 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     ) { }
 
     createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity> {
-        console.log('funca repository');
         return this.tuesteDataSource.createTueste(createTuesteDto);
     }
     getTuesteById(id: string): Promise<TuesteEntity | null> {
@@ -29,6 +28,9 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     }
     getAllTuestes(): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getAllTuestes();
+    }
+    getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getTostadosByPedido(id_pedido);
     }
     
 }

@@ -5,7 +5,7 @@ export class PedidoEntity {
         public tipo_pedido    : string,
         public cantidad       : number,
         public estado_pedido  : string,
-        public observaciones  : string,
+        public comentario  : string,
         public id_user        : string,
         public id_lote        : string,
         public eliminado      : boolean,
@@ -18,7 +18,7 @@ export class PedidoEntity {
             tipo_pedido,
             cantidad,
             estado_pedido,
-            observaciones,
+            comentario,
             id_user,
             id_lote
         }= obj;
@@ -32,7 +32,7 @@ export class PedidoEntity {
         if(!tipo_pedido) throw new Error('tipo_pedido is required');
         if(!cantidad) throw new Error('cantidad is required');
         if(!estado_pedido) throw new Error('estado_pedido is required');
-        if(!observaciones) throw new Error('observaciones is required');
+        if(!comentario) throw new Error('observaciones is required');
         if(!id_user) throw new Error('id_user is required');
         if(!id_lote) throw new Error('id_lote is required');
         const eliminado = obj.eliminado ?? false; 
@@ -43,7 +43,7 @@ export class PedidoEntity {
             tipo_pedido,
             cantidad,
             estado_pedido,
-            observaciones,
+            comentario,
             id_user,
             id_lote,
             eliminado

@@ -32,9 +32,8 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
   }
   async deleteTueste(id: string): Promise<TuesteEntity> {
     const tueste = this.getTuesteById(id);
-    const tuesteEliminado = await prisma.tueste.update({
-      where: { id_tueste: id },
-      data: { eliminado: true }
+    const tuesteEliminado = await prisma.tueste.delete({
+      where: { id_tueste: id }
     });
     return TuesteEntity.fromObject(tuesteEliminado);
   }
@@ -55,5 +54,14 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     });
     return tuestes.map(TuesteEntity.fromObject);
   }
-   
+  async getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]> {
+    const tuestes = await prisma.tueste.findMany({
+      where: {
+        id_pedido: id_pedido,
+        eliminado: false
+      }
+    });
+    return tuestes.map(TuesteEntity.fromObject);
+  }
+  
 }

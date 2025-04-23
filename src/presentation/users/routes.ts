@@ -17,7 +17,7 @@ export class UserRoutes{
         router.get('/role/:role', userController.getUsersByRole);
         router.put('/:id', userController.updateUser);
         router.delete('/:id', userController.deleteUser);
-
+        router.get('/', userController.getAllUsers);
 
 
         return router;

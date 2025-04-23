@@ -10,6 +10,9 @@ export class UserRepositoryImpl implements UserRepository {
   constructor(
     private readonly datasource: UserDataSource
   ){}
+  getAllUsers(): Promise<{ id_user: string; name: string; }[]> {
+    return this.datasource.getAllUsers();
+  }
   createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     return this.datasource.createUser(createUserDto);
   }
@@ -31,6 +34,7 @@ export class UserRepositoryImpl implements UserRepository {
   authUser(email: string, password: string): Promise<UserEntity | null> {
     return this.datasource.authUser(email, password);
   }
+  
   
     
 }

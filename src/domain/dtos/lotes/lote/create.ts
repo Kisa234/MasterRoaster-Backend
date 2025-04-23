@@ -10,12 +10,12 @@ export class CreateLoteDto {
         public readonly peso           : number,
         public readonly variedades     : string,
         public readonly proceso        : string,
-        public readonly id_user        : string,
+        public readonly id_user?        : string,
         public readonly id_analisis?    : string,
         
     ) {}
 
-    static create(props: { [key: string]: any }): [string?, CreateLoteDto?] {
+    static create(props: { [key: string]: any } ): [string?, CreateLoteDto?] {
         const { id_lote, productor, finca, region, departamento, peso, variedades,proceso,id_user,id_analisis } = props;
 
         if (!productor) return ['El productor es requerido', undefined];
@@ -25,8 +25,8 @@ export class CreateLoteDto {
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
-        if (!id_user) return ['El id_user es requerido', undefined];
-        if (id_analisis) return ['El id_analisis no es requerido', undefined];
+        // if (!id_user) return ['El id_user es requerido', undefined];
+        // if (id_analisis) return ['El id_analisis no es requerido', undefined];
 
         const generarIdLote = (productor: string, variedades: string, proceso: string): string  => {
 

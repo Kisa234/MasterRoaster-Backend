@@ -23,7 +23,7 @@ model User {
   // Relación con muestra
   muestras          Muestra[]
   // Relación con pedidos de cliente
-  pedidos           Pedido[]  @relation("ClientePedido")
+  pedidos           Pedido[] 
   // Relación con Historial
   Historial Historial[]
 }
@@ -105,14 +105,14 @@ model Pedido {
   fecha_registro   DateTime  @default(now())
   tipo_pedido      String
   cantidad         Float
-  estado_pedido    String
-  observaciones    String
+  estado_pedido    String    @default("Pendiente")
+  comentario       String?
   id_user          String
   id_lote          String
   eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
-  cliente User @relation(fields: [id_user], references: [id_user], name: "ClientePedido")
+  cliente User @relation(fields: [id_user], references: [id_user])
 
   //Relación con Lote
   lote Lote @relation(fields: [id_lote], references: [id_lote]) 
@@ -145,6 +145,7 @@ model Tueste {
   id_lote_tostado           String?  
   id_pedido                 String
   eliminado                 Boolean  @default(false)
+  
 
   // Relación con Analisis Rapido
   analisisRapido            AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])

@@ -99,11 +99,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         await this.loteRepository.updateLote(lote.id_lote, updateDto!);
         
         //crear pedido
+        
         const pedido = await this.pedidoRepository.createPedido(dto);
   
         //crear tueste
         const cantTuestes = this.generarPesoTuestes(cantidadRequerida);
-        console.log('cantTuestes', cantTuestes);
         const fechaTuestes = this.getFechaCercana();
         for (let cant of cantTuestes) {
            
