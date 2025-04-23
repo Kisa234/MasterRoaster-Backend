@@ -49,7 +49,9 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
   async getAllTuestes(): Promise<TuesteEntity[]> {
     const tuestes = await prisma.tueste.findMany({
       where: {
-        eliminado: false
+        eliminado: false,
+        estado_tueste: { not: 'Completado' }
+
       }
     });
     return tuestes.map(TuesteEntity.fromObject);

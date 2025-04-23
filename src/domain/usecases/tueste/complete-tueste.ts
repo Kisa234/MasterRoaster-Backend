@@ -1,9 +1,10 @@
 import { TuesteEntity } from "../../entities/tueste.entity";
-import { TuesteRepository } from "../../repository/tueste.repository";
+import { TuesteRepository } from '../../repository/tueste.repository';
 import { LoteTostadoEntity } from "../../entities/loteTostado.entity";
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { CreateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/create";
 import { PedidoRepository } from '../../repository/pedido.repository';
+import { LoteRepository } from '../../repository/lote.repository';
 
 export interface CompleteTuesteUseCase {
     execute(id_tueste: string): Promise<LoteTostadoEntity | null>;
@@ -20,11 +21,15 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
 
+        this.tuesteRepository.completarTostados(tueste.id_tueste);
+
         const tuestesDelPedido = await this.tuesteRepository.getTostadosByPedido(tueste.id_pedido);
 
         const todosCompletados = tuestesDelPedido.every(t =>
             t.estado_tueste === "Completado"
         );
+
+       
 
         const pedido = await this.pedidoRepository.getPedidoById(tueste.id_pedido);
         if (!pedido) throw new Error("Pedido no encontrado");

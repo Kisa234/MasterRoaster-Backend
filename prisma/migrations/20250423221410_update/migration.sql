@@ -83,7 +83,7 @@ CREATE TABLE "Pedido" (
     "tipo_pedido" TEXT NOT NULL,
     "cantidad" DOUBLE PRECISION NOT NULL,
     "estado_pedido" TEXT NOT NULL DEFAULT 'Pendiente',
-    "comentario" TEXT NOT NULL,
+    "comentario" TEXT,
     "id_user" TEXT NOT NULL,
     "id_lote" TEXT NOT NULL,
     "eliminado" BOOLEAN NOT NULL DEFAULT false,
