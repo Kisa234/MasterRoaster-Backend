@@ -8,11 +8,16 @@ import { UpdateTueste } from "../../domain/usecases/tueste/update-tueste";
 import { DeleteTueste } from "../../domain/usecases/tueste/delete-tueste";
 import { GetTueste } from "../../domain/usecases/tueste/get-tueste";
 import { GetAllTueste } from "../../domain/usecases/tueste/get-all-tueste";
+import { CompleteTueste } from "../../domain/usecases/tueste/complete-tueste";
+import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
+import { PedidoRepository } from "../../domain/repository/pedido.repository";
 
 export class TuesteController {
 
     constructor(
-        private readonly tuesteRepository: TuesteRepository
+        private readonly tuesteRepository: TuesteRepository,
+        private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly pedidoRepository: PedidoRepository
     ){}
 
     public createTueste = async (req: Request, res: Response) => {
@@ -64,6 +69,17 @@ export class TuesteController {
         new GetAllTueste(this.tuesteRepository)
             .execute()
             .then( tuestes => res.json(tuestes))
+            .catch( error => res.status(400).json({ error}));
+    }
+
+    public completarTostados = async (req: Request, res: Response) => {
+        new CompleteTueste(
+            this.tuesteRepository,
+            this.loteTostadoRepository,
+            this.pedidoRepository
+            )
+            .execute(req.params.id)
+            .then( tueste => res.json(tueste))
             .catch( error => res.status(400).json({ error}));
     }
 

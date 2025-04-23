@@ -64,4 +64,12 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     return tuestes.map(TuesteEntity.fromObject);
   }
   
+  async completarTostados(id: string): Promise<TuesteEntity> {
+    const tueste = await this.getTuesteById(id);
+    const tuesteCompletado = await prisma.tueste.update({
+      where: { id_tueste: id },
+      data: { estado_tueste: "Completado" }
+    });
+    return TuesteEntity.fromObject(tuesteCompletado);
+  }
 }

@@ -21,7 +21,9 @@ export class TuesteEntity {
         public merma                    : number,
         public agtrom_comercial         : number,
         public agtrom_gourmet           : number,
+        public estado_tueste            : string,
         public id_analisis_rapido       : string,
+        public id_lote_tostado          : string,
         public id_pedido                : string,
         public eliminado                : boolean
     ){}
@@ -31,7 +33,7 @@ export class TuesteEntity {
                 llama_inicial, aire_inicial, punto_no_retorno, tiempo_despues_crack,
                 temperatura_crack, temperatura_salida, tiempo_total, porcentaje_caramelizacion,
                 desarrollo, grados_desarrollo, peso_salida, merma, agtrom_comercial,
-                agtrom_gourmet, id_analisis_rapido, id_pedido,eliminado} = obj;
+                agtrom_gourmet,estado_tueste ,id_analisis_rapido, id_lote_tostado,id_pedido,eliminado} = obj;
 
         if (!id_tueste) throw new Error('El ID del tueste es requerido');
         if (!fecha_tueste) throw new Error('La fecha del tueste es requerida');
@@ -44,7 +46,7 @@ export class TuesteEntity {
             llama_inicial, aire_inicial, punto_no_retorno, tiempo_despues_crack,
             temperatura_crack, temperatura_salida, tiempo_total, porcentaje_caramelizacion,
             desarrollo, grados_desarrollo, peso_salida, merma, agtrom_comercial,
-            agtrom_gourmet, id_analisis_rapido,id_pedido,eliminado
+            agtrom_gourmet, estado_tueste,id_analisis_rapido,id_lote_tostado,id_pedido,eliminado
         );
     };
 }

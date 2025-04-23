@@ -10,7 +10,7 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     constructor(
         private readonly tuesteDataSource: TuesteDataSource
     ) { }
-
+    
     createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity> {
         return this.tuesteDataSource.createTueste(createTuesteDto);
     }
@@ -32,5 +32,10 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTostadosByPedido(id_pedido);
     }
+    completarTostados(id: string): Promise<TuesteEntity> {
+        return this.tuesteDataSource.completarTostados(id);
+    }
+    
+    
     
 }

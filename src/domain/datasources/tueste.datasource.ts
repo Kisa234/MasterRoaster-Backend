@@ -10,5 +10,5 @@ export abstract class TuesteDataSource {
     abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
     abstract getAllTuestes(): Promise<TuesteEntity[]>;
     abstract getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]>;
-    
+    abstract completarTostados(id: string): Promise<TuesteEntity>;    
 }
