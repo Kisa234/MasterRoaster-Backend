@@ -16,6 +16,7 @@ export class PersonalizadoController {
       if (!tuestes) return res.status(404).json({ message: 'No se encontraron tuestes' });
 
       let resumen:{
+        
         id_pedido:      string,
         id_tueste:      string,
         id_lote:        string,

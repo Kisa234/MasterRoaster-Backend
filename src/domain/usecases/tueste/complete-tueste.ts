@@ -21,7 +21,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
 
-        this.tuesteRepository.completarTostados(tueste.id_tueste);
+        await this.tuesteRepository.completarTostados(tueste.id_tueste);
 
         const tuestesDelPedido = await this.tuesteRepository.getTostadosByPedido(tueste.id_pedido);
 
