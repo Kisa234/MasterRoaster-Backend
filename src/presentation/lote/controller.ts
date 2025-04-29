@@ -8,11 +8,13 @@ import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { DeleteLote } from "../../domain/usecases/lote/lote/delete.lote";
 import { GetLotes } from "../../domain/usecases/lote/lote/get-lotes";
 import { CreateLoteFromMuestra } from "../../domain/usecases/lote/lote/create-lote-muestra";
+import { UserRepository } from "../../domain/repository/user.repository";
 
 export class LoteController {
 
     constructor (
-        private readonly loteRepository: LoteRepository
+        private readonly loteRepository: LoteRepository,
+        private readonly userRepository: UserRepository,
     ){}
 
     public createLote = (req:Request , res : Response) => {
@@ -22,7 +24,10 @@ export class LoteController {
         }
 
 
-        new CreateLote(this.loteRepository)
+        new CreateLote(
+            this.loteRepository,
+            this.userRepository,
+        )
             .execute(createLoteDto!)
             .then( lote => res.json(lote))
             .catch( error => res.status(400).json({ error }));

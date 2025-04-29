@@ -1,4 +1,4 @@
-import { CreateLoteDto } from "../../dtos/lotes/lote/create";
+import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { CreatePedidoDto } from "../../dtos/pedido/create";
 import { CreateTuesteDto } from "../../dtos/tueste/create";
@@ -71,7 +71,6 @@ export class CreatePedido implements CreatePedidoUseCase {
         };
 
         const [error, createLoteDto] = CreateLoteDto.create({
-            id_lote: nuevoIdLote,
             productor: lote.productor,
             finca: lote.finca,
             region: lote.region,
@@ -90,101 +89,33 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     private async tostadoVerde(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
         //validar cantidad lote
-        const cantidadRequerida = dto.cantidad * 1.5;
+        const cantidadRequerida = dto.cantidad * 1.15;
         if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
        
        //actualizar peso del lote 
         const newpeso = lote.peso-cantidadRequerida;   
-        const [a,updateDto] = UpdateLoteDto.update({ peso: newpeso });
+        const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
         await this.loteRepository.updateLote(lote.id_lote, updateDto!);
+  
+        const [,createLoteDto] = CreateLoteDto.create({
+            id_lote     : lote.id_lote,
+            productor   : lote.productor,
+            finca       : lote.finca,
+            region      : lote.region,
+            departamento: lote.departamento,
+            peso        : cantidadRequerida,
+            variedades  : lote.id_lote,
+            proceso     : lote.id_lote,
+        });
+        const newLote =  await this.loteRepository.createLote(createLoteDto!);
         
         //crear pedido
-        
         const pedido = await this.pedidoRepository.createPedido(dto);
   
-        //crear tueste
-        const cantTuestes = this.generarPesoTuestes(cantidadRequerida);
-        const fechaTuestes = this.getFechaCercana();
-        for (let cant of cantTuestes) {
-           
-            let [a,createDto] = CreateTuesteDto.create({
-                fecha_tueste: fechaTuestes,
-                tostadora: 'Candela',
-                peso_entrada: cant,
-                id_pedido: pedido.id_pedido,
-            });
-            await this.tuesteRepository.createTueste(createDto!);
-
-        }
-        
         return PedidoEntity.fromObject(pedido);
     }
 
-    private generarPesoTuestes(cantidadRequerida:number): number[] {
-        const MIN = 2;
-        const MAX = 3.5;
-        const tuestes = [];
     
-        let cantidad = cantidadRequerida;
-        let cantidadEntera = Math.floor(cantidad / MAX);
-        let residuo = parseFloat((cantidad % MAX).toFixed(2));
     
-        // Si el residuo es menor al mínimo y no es 0, redistribuir
-        if (residuo > 0 && residuo < MIN) {
-            // intentar distribuir el residuo entre los tuestes
-            if (cantidadEntera === 0) {
-                // No se puede ni un tueste válido
-                return [];
-            }
-    
-            const total = cantidadRequerida;
-            const nuevoTamaño = total / cantidadEntera;
-    
-            // Si redistribuyendo se cumple el rango, ok
-            if (nuevoTamaño >= MIN && nuevoTamaño <= MAX) {
-                return Array(cantidadEntera).fill(parseFloat(nuevoTamaño.toFixed(2)));
-            } else {
-                // Si redistribuir no cumple, hacemos un tueste más y ajustamos todos
-                cantidadEntera += 1;
-                const ajustado = total / cantidadEntera;
-    
-                if (ajustado >= MIN && ajustado <= MAX) {
-                    return Array(cantidadEntera).fill(parseFloat(ajustado.toFixed(2)));
-                } else {
-                    return []; // No se puede repartir válido
-                }
-            }
-        }
-    
-        // Si el residuo sí permite un tueste válido, agregarlo al final
-        for (let i = 0; i < cantidadEntera; i++) {
-            tuestes.push(MAX);
-        }
-    
-        if (residuo >= MIN) {
-            tuestes.push(residuo);
-        }
-    
-        return tuestes;
-    }
-        
-    private getFechaCercana(): Date {
-        const now = new Date();
-        const day = now.getDay(); // 0 (Dom) - 6 (Sáb)
-      
-        const daysToTuesday = (2 - day + 7) % 7;
-        const daysToThursday = (4 - day + 7) % 7;
-      
-        const nextTuesday = new Date(now);
-        nextTuesday.setDate(now.getDate() + daysToTuesday);
-      
-        const nextThursday = new Date(now);
-        nextThursday.setDate(now.getDate() + daysToThursday);
-      
-        const diffTuesday = Math.abs(nextTuesday.getTime() - now.getTime());
-        const diffThursday = Math.abs(nextThursday.getTime() - now.getTime());
-      
-        return diffTuesday <= diffThursday ? nextTuesday : nextThursday;
-    }
 }
 

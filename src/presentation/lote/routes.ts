@@ -2,15 +2,23 @@ import { Router } from "express";
 import { LoteDataSourceImpl } from "../../infrastructure/datasources/lote.datasource.impl";
 import { LoteRepositoryImpl } from "../../infrastructure/repositories/lote.repository.impl";
 import { LoteController } from "./controller";
+import { MuestraRepositoryImpl } from "../../infrastructure/repositories/muestra.repository.impl";
+import { MuestraDataSourceImpl } from "../../infrastructure/datasources/muestra.datasource.impl";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository.impl";
+import { UserDataSourceImpl } from "../../infrastructure/datasources/user.datasource.impl";
 
 export class LoteRoutes{
 
     static get routes():Router{
         const router = Router();
 
-        const datasource = new LoteDataSourceImpl();
-        const loteRepository = new LoteRepositoryImpl(datasource);
-        const loteController = new LoteController(loteRepository);
+        const loteDatasource = new LoteDataSourceImpl();
+        const loteRepository = new LoteRepositoryImpl(loteDatasource);
+
+        const userDatasource = new UserDataSourceImpl();
+        const userRepository = new UserRepositoryImpl(userDatasource);
+
+        const loteController = new LoteController(loteRepository,userRepository);
 
         router.post('/', loteController.createLote);
         router.post('/muestra/:id', loteController.createLoteFromMuestra);

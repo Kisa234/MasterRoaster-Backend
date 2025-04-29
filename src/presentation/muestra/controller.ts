@@ -8,11 +8,13 @@ import { UpdateMuestraDto } from "../../domain/dtos/muestra/update";
 import { UpdateMuestra } from "../../domain/usecases/muestra/update-muestra";
 import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
 import { GetMuestras as GetAllMuestra } from "../../domain/usecases/muestra/get-muestras";
+import { UserRepository } from "../../domain/repository/user.repository";
 
 export class MuestraController {
     
     constructor(
-        private readonly muestraRepository: MuestraRepository
+        private readonly muestraRepository: MuestraRepository,
+        private readonly userRepository: UserRepository,
     ) {}
 
     public createMuestra = (req: Request, res: Response) => {
@@ -20,11 +22,13 @@ export class MuestraController {
         if (error) {
             return res.status(400).json({ error });
         }
-        new CreateMuestra(this.muestraRepository)
+        new CreateMuestra(
+            this.muestraRepository,
+            this.userRepository,
+            )
             .execute(createMuestraDto!)
             .then( muestra => res.json(muestra))
             .catch( error => res.status(400).json({ error }));
-            
     }
 
     public getMuestraById = (req: Request, res: Response) =>  {

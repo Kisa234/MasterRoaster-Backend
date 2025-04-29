@@ -1,5 +1,3 @@
-import { AnalisisEntity } from "../../entities/analisis.entity";
-
 export class UpdateMuestraDto {
   private constructor(
     public readonly id_muestra: string,
@@ -10,8 +8,8 @@ export class UpdateMuestraDto {
     public readonly peso?: number,
     public readonly proceso?: string,
     public readonly variedades?: string,
-    public readonly id_user?: string,
-    public readonly analisis_id?: string
+    public readonly id_user?: string ,
+    public readonly id_analisis?: string 
   ) {}
 
   get values() {
@@ -20,17 +18,17 @@ export class UpdateMuestraDto {
     if (this.finca) returnObj.finca = this.finca;
     if (this.region) returnObj.region = this.region;
     if (this.departamento) returnObj.departamento = this.departamento;
-    if (this.peso !== undefined) returnObj.peso = this.peso;
-    if (this.variedades) returnObj.variedades = this.variedades;
+    if (this.peso) returnObj.peso = this.peso;
     if (this.proceso) returnObj.proceso = this.proceso;
+    if (this.variedades) returnObj.variedades = this.variedades;
     if (this.id_user) returnObj.user_id = this.id_user;
-    if (this.analisis_id) returnObj.analisis_id = this.analisis_id;
+    if (this.id_analisis) returnObj.id_analisis = this.id_analisis;
 
     return returnObj;
   }
 
   static update(props: { [key: string]: any }): [string?, UpdateMuestraDto?] {
-    const {
+    let {
       id_muestra,
       productor,
       finca,
@@ -39,11 +37,11 @@ export class UpdateMuestraDto {
       peso,
       proceso,
       variedades,
-      user_id,
-      analisis_id
+      id_user,
+      id_analisis
     } = props;
 
-    if (!id_muestra) return ['El ID de la muestra es requerido', undefined];
+    
 
     return [
       undefined,
@@ -56,8 +54,8 @@ export class UpdateMuestraDto {
         peso,
         proceso,
         variedades,
-        user_id,
-        analisis_id
+        id_user,
+        id_analisis 
       )
     ];
   }

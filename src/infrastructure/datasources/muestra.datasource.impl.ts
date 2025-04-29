@@ -31,7 +31,7 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
             where: {
                 id_muestra: id
             },
-            data: updateMuestraDto!
+            data: updateMuestraDto.values
         });
         return MuestraEntity.fromObject(updateMuestra);
     }

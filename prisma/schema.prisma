@@ -35,10 +35,10 @@ model Muestra {
   region          String
   departamento    String
   peso            Float
-  variedades      String
+  variedades      String[]
   proceso         String
   id_user         String?
-  id_analisis     String?  @unique
+  id_analisis     String?  
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
 
@@ -55,7 +55,7 @@ model Lote {
   region          String
   departamento    String
   peso            Float
-  variedades      String
+  variedades      String[]
   proceso         String
   id_user         String?
   id_analisis     String?  
@@ -167,7 +167,7 @@ model Analisis {
   //  Relación con Analisis Sensorial
   analisisSensorial AnalisisSensorial? @relation(fields: [analisisSensorial_id], references: [id_analisis_sensorial])
 
-  Muestra Muestra?
+  Muestra Muestra[]
   Lote    Lote[]
 }
 

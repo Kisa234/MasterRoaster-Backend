@@ -22,15 +22,14 @@ export class UpdateLoteDto {
         if (this.peso) returnObj.peso = this.peso;
         if (this.variedades) returnObj.variedades = this.variedades;
         if (this.proceso) returnObj.proceso = this.proceso;
-        if (this.id_user) returnObj.id_user = this.id_user;
+        if (this.id_user) returnObj.user_id = this.id_user;
         if (this.id_analisis) returnObj.id_analisis = this.id_analisis;
-
 
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateLoteDto?] {
-        const { productor, finca, region, departamento, peso, 
+        let { productor, finca, region, departamento, peso, 
             id_user,variedades,proceso, id_analisis } = props;
 
         return [undefined, 
@@ -42,8 +41,8 @@ export class UpdateLoteDto {
                 peso, 
                 variedades, 
                 proceso,
-                id_user, 
-                id_analisis
+                id_user , 
+                id_analisis 
         )];
     }
 }

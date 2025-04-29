@@ -1,15 +1,11 @@
-enum ROL{
-    ADMIN,
-    LABORATORISTA,
-    CLIENTE,
-}
+
 
 export class UserEntity {
     constructor(
         public id_user: string,
         public nombre: string,
         public email: string,
-        public rol: ROL,
+        public rol: string,
         public password: string,
         public numero_telefono: number,
         public eliminado: boolean,
