@@ -8,6 +8,7 @@ import { TuesteDataSourceImpl } from '../../infrastructure/datasources/tueste.da
 import { TuesteRepositoryImpl } from '../../infrastructure/repositories/tueste.repository.impl';
 import { UserRepositoryImpl } from '../../infrastructure/repositories/user.repository.impl';
 import { UserDataSourceImpl } from '../../infrastructure/datasources/user.datasource.impl';
+import { CreateLote } from '../../domain/usecases/lote/lote/create-lote';
 
 export class PedidoRoutes {
 
@@ -29,13 +30,15 @@ export class PedidoRoutes {
         // User
         const Userdatasource = new UserDataSourceImpl();
         const UserRepository = new UserRepositoryImpl(Userdatasource);
-
+        
+        const cl = new CreateLote(LoteLoteRepository, UserRepository)
 
         const controller = new PedidoController(
             PedidoRepository,
             LoteLoteRepository,
             UserRepository,
-            TuesteRepository
+            TuesteRepository,
+            cl
         );
 
         // Definición de rutas

@@ -8,6 +8,7 @@ import { LoteRepository } from "../../repository/lote.repository";
 import { PedidoRepository } from "../../repository/pedido.repository";
 import { TuesteRepository } from "../../repository/tueste.repository";
 import { UserRepository } from "../../repository/user.repository";
+import { CreateLoteUseCase } from '../lote/lote/create-lote';
 
 export interface CreatePedidoUseCase {
     execute(createPedidoDto: CreatePedidoDto): Promise<PedidoEntity>;
@@ -18,8 +19,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
-        private readonly tuesteRepository: TuesteRepository,
-
+        private readonly createLoteUseCase: CreateLoteUseCase
     ){}
 
     async execute(dto: CreatePedidoDto): Promise<PedidoEntity> {
@@ -52,6 +52,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         await this.loteRepository.updateLote(lote.id_lote, updateDto!);
         
         
+        
         //crear nuevo lote
         const nombres = user.nombre.trim().split(' ');
         
@@ -70,7 +71,9 @@ export class CreatePedido implements CreatePedidoUseCase {
             return PedidoEntity.fromObject(pedido);
         };
 
-        const [error, createLoteDto] = CreateLoteDto.create({
+        
+
+        const [, createLoteDto] = CreateLoteDto.create({
             productor: lote.productor,
             finca: lote.finca,
             region: lote.region,
@@ -81,7 +84,9 @@ export class CreatePedido implements CreatePedidoUseCase {
             id_user: user.id_user,
         });
 
-        await this.loteRepository.createLote(createLoteDto!);
+
+
+        await this.createLoteUseCase.execute(createLoteDto!);
         // Crear el pedido
         const pedido = await this.pedidoRepository.createPedido(dto);
         return PedidoEntity.fromObject(pedido);
@@ -104,10 +109,12 @@ export class CreatePedido implements CreatePedidoUseCase {
             region      : lote.region,
             departamento: lote.departamento,
             peso        : cantidadRequerida,
-            variedades  : lote.id_lote,
-            proceso     : lote.id_lote,
+            variedades  : lote.variedades,
+            proceso     : lote.proceso,
+            id_user     : dto.id_user,
+            id_analisis : lote.id_analisis,
         });
-        const newLote =  await this.loteRepository.createLote(createLoteDto!);
+        await this.createLoteUseCase.execute(createLoteDto!,'Tostado Verde');
         
         //crear pedido
         const pedido = await this.pedidoRepository.createPedido(dto);

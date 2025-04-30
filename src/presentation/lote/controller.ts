@@ -9,11 +9,13 @@ import { DeleteLote } from "../../domain/usecases/lote/lote/delete.lote";
 import { GetLotes } from "../../domain/usecases/lote/lote/get-lotes";
 import { CreateLoteFromMuestra } from "../../domain/usecases/lote/lote/create-lote-muestra";
 import { UserRepository } from "../../domain/repository/user.repository";
+import { MuestraRepository } from "../../domain/repository/muestra.repository";
 
 export class LoteController {
 
     constructor (
         private readonly loteRepository: LoteRepository,
+        private readonly muestraRepository: MuestraRepository,
         private readonly userRepository: UserRepository,
     ){}
 
@@ -22,7 +24,6 @@ export class LoteController {
         if (error) {
             return res.status(400).json({ error });
         }
-
 
         new CreateLote(
             this.loteRepository,
@@ -72,7 +73,11 @@ export class LoteController {
         if (!peso) {
             return res.status(400).json({ error: 'Peso is required' });
         }
-        new CreateLoteFromMuestra(this.loteRepository)
+        new CreateLoteFromMuestra(
+            this.loteRepository,
+            this.muestraRepository,
+            this.userRepository,
+        )
             .execute(id_muestra, peso)
             .then( lote => res.json(lote))
             .catch( error => res.status(400).json({ error }));

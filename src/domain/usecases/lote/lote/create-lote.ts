@@ -5,7 +5,7 @@ import { LoteEntity } from "../../../entities/lote.entity";
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto,tueste?:string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
@@ -14,11 +14,10 @@ export class CreateLote implements CreateLoteUseCase {
         private readonly userRepository: UserRepository,
     ){}
 
-    async execute( createLoteDto: CreateLoteDto): Promise<LoteEntity> {
+    async execute( createLoteDto: CreateLoteDto, tueste?:string): Promise<LoteEntity> {
 
-        const id= await this.generarId(createLoteDto);
+        const id= await this.generarId(createLoteDto, tueste);
         
-
         const [,dto] = CreateLoteDto.create({
             id_lote      : id,
             productor    : createLoteDto.productor,
@@ -32,10 +31,12 @@ export class CreateLote implements CreateLoteUseCase {
             id_analisis  : createLoteDto.id_analisis,
         });
 
+        console.log(dto);
+
         return this.loteRepository.createLote(dto!);
     }
 
-    generarId = async (dto: CreateLoteDto): Promise<string> => {
+    generarId = async (dto: CreateLoteDto,tueste?:string): Promise<string> => {
         const { productor, variedades, proceso } = dto;
       
     
@@ -80,11 +81,17 @@ export class CreateLote implements CreateLoteUseCase {
             idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
         }
 
+        if (tueste) {
+            idGenerado = `${idGenerado}-T`;
+        }
+
         // NUMERO FINAL
         const numeroLote = await this.loteRepository.getLotes();
         const numeroLoteFinal = numeroLote.length + 1;
     
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
+
+       
 
         return idGenerado;
     }

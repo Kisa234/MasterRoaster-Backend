@@ -15,6 +15,7 @@ import { GetAllPedidos } from '../../domain/usecases/pedido/get-pedidos';
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { LoteRepository } from "../../domain/repository/lote.repository";
+import { CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
 
 export class PedidoController {
 
@@ -23,6 +24,7 @@ export class PedidoController {
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
+        private readonly createLoteUseCase: CreateLoteUseCase
     ) {}
 
     public createPedido = async (req: Request, res: Response) => {
@@ -31,11 +33,12 @@ export class PedidoController {
             return res.status(400).json({ error });
         }
 
+
         new CreatePedido(
             this.pedidoRepository,
             this.loteRepository,
             this.userRepository,
-            this.tuesteRepository
+            this.createLoteUseCase
             )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))

@@ -9,6 +9,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
 
 
   async createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
+    
     const lote = await prisma.lote.create({
       data: createLoteDto!
     });
@@ -55,7 +56,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     
   }
 
-  async createLoteFromMuestra(id: string,peso:number ): Promise<LoteEntity> {
+  async createLoteFromMuestra(id: string,peso:number, dto:CreateLoteDto ): Promise<LoteEntity> {
     const Muestra = await prisma.muestra.findUnique({
       where: {
         id_muestra: id,
@@ -64,21 +65,10 @@ export class LoteDataSourceImpl implements LoteDataSource {
     });
     if (!Muestra) throw new Error("No existe la muestra");
 
-
     const lote = await prisma.lote.create({
-      data: {
-        id_lote: Muestra.id_muestra,
-        productor: Muestra.productor,
-        finca : Muestra.finca,
-        region: Muestra.region,
-        departamento: Muestra.departamento,
-        peso: peso,
-        variedades: Muestra.variedades,
-        proceso: Muestra.proceso,
-        id_analisis: Muestra.id_analisis,
-        id_user: Muestra.id_user,
-      }
+      data: dto!,
     });
+
 
     await prisma.muestra.update({
       where: { id_muestra: id },

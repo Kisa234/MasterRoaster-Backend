@@ -18,7 +18,10 @@ export class LoteRoutes{
         const userDatasource = new UserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasource);
 
-        const loteController = new LoteController(loteRepository,userRepository);
+        const muestraDatasource = new MuestraDataSourceImpl();
+        const muestraRepository = new MuestraRepositoryImpl(muestraDatasource);
+
+        const loteController = new LoteController(loteRepository,muestraRepository,userRepository);
 
         router.post('/', loteController.createLote);
         router.post('/muestra/:id', loteController.createLoteFromMuestra);

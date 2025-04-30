@@ -10,6 +10,7 @@ export class LoteRepositoryImpl  implements LoteRepository {
     ){}
 
     createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
+        
         return this.datasource.createLote(createLoteDto);
     }
     getLoteById(id: string): Promise<LoteEntity | null> {
@@ -24,8 +25,8 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getLotes(): Promise<LoteEntity[]> {
         return this.datasource.getLotes();
     }
-    createLoteFromMuestra(id: string, peso: number): Promise<LoteEntity> {
-        return this.datasource.createLoteFromMuestra(id, peso);
+    createLoteFromMuestra(id: string, peso: number, dto:CreateLoteDto): Promise<LoteEntity> {
+        return this.datasource.createLoteFromMuestra(id, peso,dto);
     }
 
 

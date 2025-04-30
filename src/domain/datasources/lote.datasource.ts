@@ -8,5 +8,5 @@ export abstract class LoteDataSource {
     abstract updateLote(id: string, updateLoteDto:UpdateLoteDto): Promise<LoteEntity>;
     abstract deleteLote(id: string): Promise<LoteEntity>;
     abstract getLotes(): Promise<LoteEntity[]>;
-    abstract createLoteFromMuestra(id: string,peso:number): Promise<LoteEntity>;
+    abstract createLoteFromMuestra(id: string,peso:number,dto:CreateLoteDto): Promise<LoteEntity>;
   }
