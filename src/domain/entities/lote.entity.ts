@@ -6,7 +6,7 @@ export class LoteEntity {
         public region: string,
         public departamento: string,
         public peso: number,
-        public variedades: string,
+        public variedades: string[],
         public proceso: string,
         public fecha_registro: Date, 
         public eliminado: boolean,

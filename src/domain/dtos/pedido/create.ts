@@ -2,9 +2,10 @@ export class CreatePedidoDto {
     private constructor(
         public readonly tipo_pedido     :    string,
         public readonly cantidad        :    number,
-        public readonly comentario   :    string,
+        public readonly comentario      :    string,
         public readonly id_user         :    string,
-        public readonly id_lote         :    string
+        public readonly id_lote         :    string,
+        public readonly id_nuevoLote?   :    string,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreatePedidoDto?] {
@@ -13,7 +14,8 @@ export class CreatePedidoDto {
             cantidad,
             comentario,
             id_user,
-            id_lote
+            id_lote,
+            id_nuevoLote,
          } = props;
 
          
@@ -23,6 +25,8 @@ export class CreatePedidoDto {
         if (!id_user) return ['El ID del cliente es requerido', undefined];
         if (!id_lote) return ['El ID del lote es requerido', undefined];
         
+        
+
         return [
             undefined,
             new CreatePedidoDto(
@@ -30,7 +34,8 @@ export class CreatePedidoDto {
                 cantidad,
                 comentario,
                 id_user,
-                id_lote
+                id_lote,
+                id_nuevoLote,
             )
             
         ];

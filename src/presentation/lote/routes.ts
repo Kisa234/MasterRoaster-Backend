@@ -30,8 +30,7 @@ export class LoteRoutes{
         router.get('/:id', loteController.getLoteById);
         router.put('/:id', loteController.updateLote);
         router.delete('/:id', loteController.deleteLote);
-
-
+        router.get('/user/:id', loteController.getLotesByUserId);
 
         return router;
     }

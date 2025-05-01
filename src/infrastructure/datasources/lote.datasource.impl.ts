@@ -6,17 +6,17 @@ import { LoteEntity } from "../../domain/entities/lote.entity";
 
 
 export class LoteDataSourceImpl implements LoteDataSource {
-
-
+  
+  
   async createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
     
     const lote = await prisma.lote.create({
       data: createLoteDto!
     });
-
+    
     return LoteEntity.fromObject(lote);
   }
-
+  
   async getLoteById(id: string): Promise<LoteEntity | null> {
     const lote = await prisma.lote.findUnique({
       where: {
@@ -27,7 +27,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     if (!lote) return null;
     return LoteEntity.fromObject(lote);
   }
-
+  
   async updateLote(id: string, updateLoteDto: UpdateLoteDto): Promise<LoteEntity> {
     const lote =  await this.getLoteById(id);
     const updatedLote = await prisma.lote.update({ 
@@ -36,7 +36,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     });
     return LoteEntity.fromObject(updatedLote);
   }
-
+  
   async deleteLote(id: string): Promise<LoteEntity> {
     const lote = await this.getLoteById(id);
     const deletedLote = await prisma.lote.update({
@@ -45,7 +45,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     });
     return LoteEntity.fromObject(deletedLote);
   }
-
+  
   async getLotes(): Promise<LoteEntity[]> {
     const lotes = await prisma.lote.findMany({
       where: {
@@ -55,7 +55,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     return lotes.map(lote => LoteEntity.fromObject(lote));
     
   }
-
+  
   async createLoteFromMuestra(id: string,peso:number, dto:CreateLoteDto ): Promise<LoteEntity> {
     const Muestra = await prisma.muestra.findUnique({
       where: {
@@ -64,19 +64,38 @@ export class LoteDataSourceImpl implements LoteDataSource {
       }
     });
     if (!Muestra) throw new Error("No existe la muestra");
-
+    
     const lote = await prisma.lote.create({
       data: dto!,
     });
-
-
+    
+    
     await prisma.muestra.update({
       where: { id_muestra: id },
       data: { eliminado: true }
     });
-
+    
     return LoteEntity.fromObject(lote);
   }
-
-
+  
+  async getLotesByUserId(id: string): Promise<LoteEntity[]> {
+    //verificar si existe el usuario
+    const user = await prisma.user.findUnique({
+      where: {
+        id_user: id,
+        eliminado: false
+      }
+    });
+    if (!user) throw new Error("No existe el usuario");
+    //obtener los lotes del usuario
+    const lotes = await prisma.lote.findMany({
+      where: {
+        id_user: id,
+        eliminado: false
+      }
+    });
+    if (!lotes) throw new Error("No existen lotes para el usuario");
+    return lotes.map(lote => LoteEntity.fromObject(lote));
+  }
+  
 }

@@ -83,4 +83,11 @@ export class LoteController {
             .catch( error => res.status(400).json({ error }));
     }
 
+    public getLotesByUserId = (req:Request , res : Response) => {
+        new GetLotes(this.loteRepository)
+            .execute()
+            .then( lotes => res.json(lotes))
+            .catch( error => res.status(400).json({ error }));
+    }
+
 }

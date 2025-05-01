@@ -5,10 +5,11 @@ export class PedidoEntity {
         public tipo_pedido    : string,
         public cantidad       : number,
         public estado_pedido  : string,
-        public comentario  : string,
+        public comentario     : string,
         public id_user        : string,
         public id_lote        : string,
         public eliminado      : boolean,
+        public id_nuevoLote   : string,
     ){}
 
     static fromObject(obj: { [key: string]: any }): PedidoEntity {
@@ -20,7 +21,8 @@ export class PedidoEntity {
             estado_pedido,
             comentario,
             id_user,
-            id_lote
+            id_lote,
+            
         }= obj;
 
         const newFechaRegistro = new Date(fecha_registro);
@@ -36,6 +38,7 @@ export class PedidoEntity {
         if(!id_user) throw new Error('id_user is required');
         if(!id_lote) throw new Error('id_lote is required');
         const eliminado = obj.eliminado ?? false; 
+        const id_nuevoLote = obj.id_nuevoLote ?? null;
     
         return new PedidoEntity(
             id_pedido,
@@ -46,7 +49,8 @@ export class PedidoEntity {
             comentario,
             id_user,
             id_lote,
-            eliminado
+            eliminado,
+            id_nuevoLote,
         );
 
     }

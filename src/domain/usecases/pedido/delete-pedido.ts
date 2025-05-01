@@ -1,4 +1,5 @@
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
+import { LoteEntity } from "../../entities/lote.entity";
 import { PedidoEntity } from "../../entities/pedido.entity";
 import { TuesteEntity } from "../../entities/tueste.entity";
 import { LoteRepository } from "../../repository/lote.repository";
@@ -20,7 +21,7 @@ export class DeletePedido implements DeletePedidoUseCase {
 
     async execute(id_pedido: string): Promise<void> {
         const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
-        if (!pedido || pedido.eliminado) {
+        if (!pedido) {
           throw new Error('El pedido no existe o ya fue eliminado');
         }
     
@@ -40,58 +41,55 @@ export class DeletePedido implements DeletePedidoUseCase {
         await this.pedidoRepository.deletePedido(id_pedido);
       }
     
-      private async eliminarVentaVerde(pedido: any, loteOriginal: any) {
+      private async eliminarVentaVerde(pedido: PedidoEntity, loteOriginal: LoteEntity) {
         // 1. Restaurar peso al lote original
         const pesoRestaurado = loteOriginal.peso + pedido.cantidad;
-        const [a, updateDtoOriginal] = UpdateLoteDto.update({ peso: pesoRestaurado });
-        await this.loteRepository.updateLote(pedido.id_lote, updateDtoOriginal!);
+        const [, updateDtoOriginal] = UpdateLoteDto.update({ peso: pesoRestaurado });
+        if (!updateDtoOriginal) throw new Error('Error generando DTO para lote original');
+        await this.loteRepository.updateLote(loteOriginal.id_lote, updateDtoOriginal);
       
-        // 2. Obtener el ID del lote clonado
-        const user = await this.userRepository.getUserById(pedido.id_user);
-        if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
-        const nombres = user.nombre.trim().split(' ');
-        const iniciales = `${nombres[0]?.charAt(0) ?? ''}${nombres[1]?.charAt(0) ?? ''}-`.toUpperCase();
-        const id_lote_clonado = iniciales + pedido.id_lote;
+        // 2. Eliminar o actualizar el lote clonado
+        if (!pedido.id_nuevoLote) return;
       
-        // 3. Buscar lote clonado y decidir si se elimina o se actualiza
-        const loteClonado = await this.loteRepository.getLoteById(id_lote_clonado);
-        if (loteClonado && !loteClonado.eliminado) {
-          const pesoRestante = loteClonado.peso - pedido.cantidad;
+        const loteClonado = await this.loteRepository.getLoteById(pedido.id_nuevoLote);
+        if (!loteClonado || loteClonado.eliminado) return;
       
-          if (pesoRestante <= 0) {
-            // Si ya no queda peso, eliminar lote clonado
-            const [, updateClonadoDto] = UpdateLoteDto.update({ peso: pesoRestante });
-            await this.loteRepository.updateLote(id_lote_clonado, updateClonadoDto!);
-            await this.loteRepository.deleteLote(id_lote_clonado);
-          } else {
-            // Si aún queda peso, actualizar el lote clonado
-            const [, updateClonadoDto] = UpdateLoteDto.update({ peso: pesoRestante });
-            await this.loteRepository.updateLote(id_lote_clonado, updateClonadoDto!);
+        // 3. Restar el peso del pedido
+        const pesoRestante = loteClonado.peso - pedido.cantidad;
+        const [, updateDtoClonado] = UpdateLoteDto.update({ peso: pesoRestante });
+        if (!updateDtoClonado) throw new Error('Error generando DTO para lote clonado');
+        await this.loteRepository.updateLote(loteClonado.id_lote, updateDtoClonado);
+      
+        // 4. Si el peso restante es 0, eliminar lote
+        if (pesoRestante <= 0) {
+          await this.loteRepository.deleteLote(loteClonado.id_lote);
+        }
+      }
+      
+    
+      private async eliminarTostadoVerde(pedido: PedidoEntity, loteOriginal: LoteEntity) {
+        // 1. Restaurar peso al lote original (1.15x la cantidad)
+        const pesoRestaurado = loteOriginal.peso + pedido.cantidad * 1.15;
+        const [, dto] = UpdateLoteDto.update({ peso: pesoRestaurado });
+        if (!dto) throw new Error('Error generando DTO para restaurar lote original');
+        await this.loteRepository.updateLote(loteOriginal.id_lote, dto);
+      
+        // 3. Eliminar lote clonado si existe (id_nuevoLote)
+        if (pedido.id_nuevoLote) {
+          const loteClonado = await this.loteRepository.getLoteById(pedido.id_nuevoLote);
+          if (loteClonado && !loteClonado.eliminado) {
+            // Descontar peso
+            const pesoRestante = loteClonado.peso - pedido.cantidad;
+            const [, updateDtoClonado] = UpdateLoteDto.update({ peso: pesoRestante });
+            if (!updateDtoClonado) throw new Error('Error generando DTO para lote clonado');
+            await this.loteRepository.updateLote(loteClonado.id_lote, updateDtoClonado);
+      
+            // Si queda en 0, eliminar
+            if (pesoRestante <= 0) {
+              await this.loteRepository.deleteLote(loteClonado.id_lote);
+            }
           }
         }
       }
       
-    
-      private async eliminarTostadoVerde(pedido: any, loteOriginal: any) {
-        // Restaurar el peso consumido (1.5x la cantidad)
-
-        const pesoRestaurado = loteOriginal.peso + pedido.cantidad * 1.5;
-        const [a_,dto] = UpdateLoteDto.update({ peso: pesoRestaurado });
-        await this.loteRepository.updateLote(pedido.id_lote, dto!);
-    
-        //Obtener tuestes relacionados al pedido
-        const tuestes = await this.tuesteRepository.getTostadosByPedido(pedido.id_pedido);
-        if (!tuestes || tuestes.length === 0) throw new Error('No se encontraron tuestes relacionados al pedido');
-
-
-        //Eliminar tuestes relacionados al pedido
-        for (const tueste of tuestes) {
-            const tuesteEntity = TuesteEntity.fromObject(tueste);
-            await this.tuesteRepository.deleteTueste(tuesteEntity.id_tueste);
-        }
-        
-
-        //Eliminar pedido
-        await this.pedidoRepository.deletePedido(pedido.id_pedido);
-      }
 }

@@ -28,6 +28,9 @@ export class LoteRepositoryImpl  implements LoteRepository {
     createLoteFromMuestra(id: string, peso: number, dto:CreateLoteDto): Promise<LoteEntity> {
         return this.datasource.createLoteFromMuestra(id, peso,dto);
     }
+    getLotesByUserId(id: string): Promise<LoteEntity[]> {
+        return this.datasource.getLotesByUserId(id);
+    }
 
 
 }

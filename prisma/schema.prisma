@@ -67,7 +67,12 @@ model Lote {
   // Relación con Analisis
   analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
 
-  Pedido Pedido[]
+   // pedidos que usan este lote como entrada
+  pedidosOrigen  Pedido[] @relation("LoteOrigen")
+
+  // pedidos que generaron este lote como nuevo
+  pedidosDestino Pedido[] @relation("LoteCreado")
+
   LoteTostado LoteTostado[]
 
 }
@@ -109,16 +114,22 @@ model Pedido {
   comentario       String?
   id_user          String
   id_lote          String
+  id_nuevoLote     String?
   eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
   cliente User @relation(fields: [id_user], references: [id_user])
 
-  //Relación con Lote
-  lote Lote @relation(fields: [id_lote], references: [id_lote]) 
+  // Relación con lote original
+  lote Lote @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
+
+  // Relación con lote creado
+  loteCreado Lote? @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
 
   tueste Tueste[]
 }
+
+
 
 model Tueste {
   id_tueste                 String   @id @default(uuid())

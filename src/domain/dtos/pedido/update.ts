@@ -6,7 +6,8 @@ export class UpdatePedidoDto {
         public readonly estado_pedido?:    string,
         public readonly comentario   ?:    string,
         public readonly id_user      ?:    string,
-        public readonly id_lote      ?:    string
+        public readonly id_lote      ?:    string,
+        public readonly id_nuevoLote ?:    string,
     ) {}
 
     get values() {
@@ -17,6 +18,7 @@ export class UpdatePedidoDto {
         if (this.comentario) returnObj.comentario = this.comentario;
         if (this.id_user) returnObj.id_user = this.id_user;
         if (this.id_lote) returnObj.id_lote = this.id_lote;
+        if (this.id_nuevoLote) returnObj.id_nuevoLote = this.id_nuevoLote;
         return returnObj;
     }
 
@@ -28,7 +30,8 @@ export class UpdatePedidoDto {
             estado_pedido,
             comentario,
             id_user,
-            id_lote
+            id_lote,
+            id_nuevoLote,
          } = props;
 
 
@@ -48,7 +51,8 @@ export class UpdatePedidoDto {
                 estado_pedido,
                 comentario,
                 id_user,
-                id_lote
+                id_lote,
+                id_nuevoLote,
             )
         ];
     }

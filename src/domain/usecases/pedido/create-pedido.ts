@@ -9,6 +9,7 @@ import { PedidoRepository } from "../../repository/pedido.repository";
 import { TuesteRepository } from "../../repository/tueste.repository";
 import { UserRepository } from "../../repository/user.repository";
 import { CreateLoteUseCase } from '../lote/lote/create-lote';
+import { create } from 'domain';
 
 export interface CreatePedidoUseCase {
     execute(createPedidoDto: CreatePedidoDto): Promise<PedidoEntity>;
@@ -36,6 +37,10 @@ export class CreatePedido implements CreatePedidoUseCase {
             return this.tostadoVerde(loteEntity, dto);
         }
 
+        if (dto.tipo_pedido === 'Orden Tueste'){
+
+        }
+
         throw new Error('Tipo de pedido inválido');
 
     }
@@ -53,26 +58,21 @@ export class CreatePedido implements CreatePedidoUseCase {
         
         
         
-        //crear nuevo lote
-        const nombres = user.nombre.trim().split(' ');
         
-        const iniciales = `${nombres[0]?.charAt(0) ?? ''}${nombres[1]?.charAt(0) ?? ''}-`.toUpperCase();
-        const nuevoIdLote = iniciales + lote.id_lote;
-        
-        //validar que el lote no exista y si existe actualizarlo
-        const loteExistente = await this.loteRepository.getLoteById(nuevoIdLote);
-        if (loteExistente) {
-
-            const newpeso_lote = loteExistente?.peso + dto.cantidad;
-            const [b, updateLoteDto] = UpdateLoteDto.update({peso: newpeso_lote});
-            await this.loteRepository.updateLote(nuevoIdLote, updateLoteDto!);
-
-            const pedido = await this.pedidoRepository.createPedido(dto);
-            return PedidoEntity.fromObject(pedido);
-        };
+        const lotes = await this.loteRepository.getLotesByUserId(user.id_user);
+        //validar si el usuario tiene un lote del mismo lote Origen
+        if (lotes.length > 0) {
+            const loteOrigen = lotes.find(l => l.id_lote === lote.id_lote);
+            if (loteOrigen) {
+                //actualizar peso del lote origen
+                const newpesoOrigen = loteOrigen.peso + dto.cantidad;    
+                const [,updateDto] = UpdateLoteDto.update({ peso: newpesoOrigen });
+                await this.loteRepository.updateLote(loteOrigen.id_lote, updateDto!);
+            }               
+        }
 
         
-
+        //crear Nuevo lote
         const [, createLoteDto] = CreateLoteDto.create({
             productor: lote.productor,
             finca: lote.finca,
@@ -82,13 +82,22 @@ export class CreatePedido implements CreatePedidoUseCase {
             variedades: lote.variedades,
             proceso: lote.proceso,
             id_user: user.id_user,
+            id_analisis: lote.id_analisis,
         });
 
-
-
-        await this.createLoteUseCase.execute(createLoteDto!);
+        const nuevoLote = await this.createLoteUseCase.execute(createLoteDto!);
         // Crear el pedido
-        const pedido = await this.pedidoRepository.createPedido(dto);
+
+        const [,newDto] = CreatePedidoDto.create({
+            tipo_pedido: dto.tipo_pedido,
+            cantidad: dto.cantidad,
+            comentario: dto.comentario,
+            id_user: dto.id_user,
+            id_lote: lote.id_lote,
+            id_nuevoLote: nuevoLote.id_lote,
+        });
+
+        const pedido = await this.pedidoRepository.createPedido(newDto!);
         return PedidoEntity.fromObject(pedido);
     }
 
@@ -96,12 +105,28 @@ export class CreatePedido implements CreatePedidoUseCase {
         //validar cantidad lote
         const cantidadRequerida = dto.cantidad * 1.15;
         if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
+       //validar cliente
+       const user = await this.userRepository.getUserById(dto.id_user);
+       if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
        
+        //validar si el usuario tiene un lote del mismo lote Origen
+        const lotes = await this.loteRepository.getLotesByUserId(user.id_user);
+        if (lotes.length > 0) {
+            const loteOrigen = lotes.find(l => l.id_lote === lote.id_lote);
+            if (loteOrigen) {
+                //actualizar peso del lote origen
+                const newpesoOrigen = loteOrigen.peso + cantidadRequerida;    
+                const [,updateDto] = UpdateLoteDto.update({ peso: newpesoOrigen });
+                await this.loteRepository.updateLote(loteOrigen.id_lote, updateDto!);
+            }               
+        }
+
        //actualizar peso del lote 
         const newpeso = lote.peso-cantidadRequerida;   
         const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
         await this.loteRepository.updateLote(lote.id_lote, updateDto!);
   
+        //crear Nuevo lote
         const [,createLoteDto] = CreateLoteDto.create({
             id_lote     : lote.id_lote,
             productor   : lote.productor,
@@ -114,13 +139,25 @@ export class CreatePedido implements CreatePedidoUseCase {
             id_user     : dto.id_user,
             id_analisis : lote.id_analisis,
         });
-        await this.createLoteUseCase.execute(createLoteDto!,'Tostado Verde');
-        
+        const nuevoLote = await this.createLoteUseCase.execute(createLoteDto!,'Tostado Verde');
+
         //crear pedido
-        const pedido = await this.pedidoRepository.createPedido(dto);
+
+        const [,newDto] = CreatePedidoDto.create({
+            tipo_pedido: dto.tipo_pedido,
+            cantidad: dto.cantidad,
+            comentario: dto.comentario,
+            id_user: dto.id_user,
+            id_lote: lote.id_lote,
+            id_nuevoLote: nuevoLote.id_lote,
+        });
+
+        const pedido = await this.pedidoRepository.createPedido(newDto!);
   
         return PedidoEntity.fromObject(pedido);
     }
+
+    
 
     
     
