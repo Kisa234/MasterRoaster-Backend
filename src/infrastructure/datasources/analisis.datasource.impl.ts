@@ -3,6 +3,8 @@ import { AnalisisDataSource } from "../../domain/datasources/analisis.datasource
 import { CreateAnalisisDto } from "../../domain/dtos/analisis/analisis/create";
 import { UpdateAnalisisDto } from "../../domain/dtos/analisis/analisis/update";
 import { AnalisisEntity } from "../../domain/entities/analisis.entity";
+import { AnalisisFisicoEntity } from "../../domain/entities/analisisFisico.entity";
+import { AnalisisSensorialEntity } from "../../domain/entities/analisisSensorial.entity";
 
 
 export  class AnalisisDataSourceImpl implements AnalisisDataSource {
@@ -47,6 +49,8 @@ export  class AnalisisDataSourceImpl implements AnalisisDataSource {
         const analisis = await prisma.analisis.findMany();
         return analisis.map((analisis) => AnalisisEntity.fromObject(analisis));
     }
+   
+
     
     
     

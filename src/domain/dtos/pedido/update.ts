@@ -8,17 +8,20 @@ export class UpdatePedidoDto {
         public readonly id_user      ?:    string,
         public readonly id_lote      ?:    string,
         public readonly id_nuevoLote ?:    string,
+        public readonly pesos        ?:    number[],
+        public readonly tostadora    ?:    string,
+        public readonly fecha_tueste ?:    Date,
     ) {}
 
     get values() {
         const returnObj: { [key: string]: any } = {};
-        if (this.tipo_pedido) returnObj.tipo_pedido = this.tipo_pedido;
         if (this.cantidad) returnObj.cantidad = this.cantidad;
         if (this.estado_pedido) returnObj.estado_pedido = this.estado_pedido;
         if (this.comentario) returnObj.comentario = this.comentario;
-        if (this.id_user) returnObj.id_user = this.id_user;
-        if (this.id_lote) returnObj.id_lote = this.id_lote;
         if (this.id_nuevoLote) returnObj.id_nuevoLote = this.id_nuevoLote;
+        if (this.pesos) returnObj.pesos = this.pesos;
+        if (this.tostadora) returnObj.tostadora = this.tostadora;
+        if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
         return returnObj;
     }
 
@@ -32,14 +35,14 @@ export class UpdatePedidoDto {
             id_user,
             id_lote,
             id_nuevoLote,
+            pesos,
+            tostadora,
+            fecha_tueste,
          } = props;
 
-
-        if (!id_pedido) return ['El ID del pedido es requerido', undefined];
         if( tipo_pedido) return ['El tipo de pedido no puede ser modificado', undefined];
         if( id_user) return ['El ID del usuario no puede ser modificado', undefined];
         if( id_lote) return ['El ID del lote no puede ser modificado', undefined];
-
         
         
 
@@ -53,6 +56,9 @@ export class UpdatePedidoDto {
                 id_user,
                 id_lote,
                 id_nuevoLote,
+                pesos,
+                tostadora,
+                fecha_tueste
             )
         ];
     }

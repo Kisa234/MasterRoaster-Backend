@@ -7,6 +7,8 @@ import { UserRepository } from "../../repository/user.repository";
 import { CreateTuesteDto } from "../../dtos/tueste/create";
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { LoteEntity } from "../../entities/lote.entity";
+import { AnalisisRepository } from "../../repository/analisis.repository";
+import { AnalisisFisicoRepository } from "../../repository/analisisFisico.repository";
 
 export interface UpdatePedidoUseCase {
   execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity>;
@@ -17,7 +19,10 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     private readonly pedidoRepository: PedidoRepository,
     private readonly loteRepository: LoteRepository,
     private readonly tuesteRepository: TuesteRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly analisisRepository: AnalisisRepository,
+    private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+
   ) {}
 
   async execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity> {
@@ -38,6 +43,10 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     if (pedido.tipo_pedido === 'Tostado Verde') {
 
       return this.actualizarTostadoVerde(pedido, loteOriginal, updateDto);
+    }
+
+    if (pedido.tipo_pedido === 'Orden Tueste') {
+      return this.editarOrdenTueste(pedido, loteOriginal, updateDto);
     }
 
     throw new Error('Tipo de pedido inválido');
@@ -120,7 +129,62 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
-  
 
+  async editarOrdenTueste(pedido: PedidoEntity, loteOriginal: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    const pesoAnterior = pedido.cantidad;
+    const pesoNuevo = dto.cantidad!;
+    const diferencia = pesoNuevo - pesoAnterior;
+  
+    if (diferencia === 0) throw new Error('La cantidad no ha cambiado');
+  
+    if (diferencia > 0 && loteOriginal.peso < diferencia) {
+      throw new Error('No hay suficiente café verde disponible en el lote original');
+    }
+  
+    // 1. Actualizar peso en lote original
+    const nuevoPesoLote = loteOriginal.peso - diferencia;
+    const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
+    if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
+    await this.loteRepository.updateLote(loteOriginal.id_lote, updateLoteDto);
+  
+    //2. Actualizar pedido
+    const newpedido = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+    
+    //3. eliminar tuestes anteriores
+    const tuestes = await this.tuesteRepository.getTostadosByPedido(pedido.id_pedido);
+    if (!tuestes || tuestes.length === 0) throw new Error('No se encontraron tuestes para este pedido');  
+    for (const tueste of tuestes) {
+      await this.tuesteRepository.deleteTueste(tueste.id_tueste);
+    }
+    
+    // 4. crear nuevo tueste
+
+    //consegir analisis fisico
+    if (!loteOriginal.id_analisis){console.log ('El lote no tiene analisis'); throw new Error('El lote no tiene analisis');}
+    const analisis = await this.analisisRepository.getAnalisisById(loteOriginal.id_analisis);
+    if (!analisis) throw new Error('El analisis no existe');
+    const analisisFisico = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
+    if (!analisisFisico) throw new Error('El analisis fisico no existe');
+    
+    //generar tuestes
+    if (!dto.pesos) throw new Error('Los pesos son requeridos');
+    for (let peso of dto.pesos) {
+      console.log('checkpoint');
+      const [, createTuesteDto] = CreateTuesteDto.create({
+        id_lote: loteOriginal.id_lote,
+        fecha_tueste: dto.fecha_tueste,
+            tostadora: dto.tostadora,
+            id_cliente: pedido.id_user,
+            densidad: analisisFisico.densidad,
+            humedad: analisisFisico.humedad,
+            peso_entrada: peso,
+            id_pedido: pedido.id_pedido,
+        });
+        await this.tuesteRepository.createTueste(createTuesteDto!);
+    }
+
+
+    return PedidoEntity.fromObject(newpedido!);
+  }
   
 }

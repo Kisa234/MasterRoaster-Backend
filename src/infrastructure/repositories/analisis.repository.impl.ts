@@ -2,6 +2,8 @@ import { AnalisisDataSource } from "../../domain/datasources/analisis.datasource
 import { CreateAnalisisDto } from "../../domain/dtos/analisis/analisis/create";
 import { UpdateAnalisisDto } from "../../domain/dtos/analisis/analisis/update";
 import { AnalisisEntity } from "../../domain/entities/analisis.entity";
+import { AnalisisFisicoEntity } from "../../domain/entities/analisisFisico.entity";
+import { AnalisisSensorialEntity } from "../../domain/entities/analisisSensorial.entity";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 
 export class AnalisisRepositoryImpl implements AnalisisRepository{
@@ -25,5 +27,8 @@ export class AnalisisRepositoryImpl implements AnalisisRepository{
     getAllAnalisis(): Promise<AnalisisEntity[]> {
         return this.analisis.getAllAnalisis();
     }
+    // getAnalisisFSByLoteId(id: string): Promise<{ AnalisisFisicoEntity: AnalisisFisicoEntity, AnalisisSensorialEntity: AnalisisSensorialEntity }> {
+    //     return this.analisis.getAnalisisFSByLoteId(id);
+    // }
 
 }

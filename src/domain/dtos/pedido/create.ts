@@ -6,6 +6,9 @@ export class CreatePedidoDto {
         public readonly id_user         :    string,
         public readonly id_lote         :    string,
         public readonly id_nuevoLote?   :    string,
+        public readonly pesos?          :    number[],
+        public readonly tostadora?      :    string,
+        public readonly fecha_tueste?   :    Date,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreatePedidoDto?] {
@@ -16,6 +19,9 @@ export class CreatePedidoDto {
             id_user,
             id_lote,
             id_nuevoLote,
+            pesos,
+            tostadora,
+            fecha_tueste,
          } = props;
 
          
@@ -36,6 +42,9 @@ export class CreatePedidoDto {
                 id_user,
                 id_lote,
                 id_nuevoLote,
+                pesos,
+                tostadora,
+                fecha_tueste
             )
             
         ];

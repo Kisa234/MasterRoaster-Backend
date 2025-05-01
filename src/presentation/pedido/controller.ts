@@ -16,6 +16,8 @@ import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
+import { AnalisisRepository } from "../../domain/repository/analisis.repository";
+import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
 
 export class PedidoController {
 
@@ -24,7 +26,9 @@ export class PedidoController {
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
-        private readonly createLoteUseCase: CreateLoteUseCase
+        private readonly createLoteUseCase: CreateLoteUseCase,
+        private readonly analisisRepository: AnalisisRepository,
+        private readonly analisisFisicoRepository: AnalisisFisicoRepository,
     ) {}
 
     public createPedido = async (req: Request, res: Response) => {
@@ -38,7 +42,10 @@ export class PedidoController {
             this.pedidoRepository,
             this.loteRepository,
             this.userRepository,
-            this.createLoteUseCase
+            this.createLoteUseCase,
+            this.tuesteRepository,
+            this.analisisRepository,
+            this.analisisFisicoRepository,
             )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))
@@ -57,7 +64,9 @@ export class PedidoController {
             this.loteRepository,
             this.tuesteRepository,
             this.userRepository,
-        )
+            this.analisisRepository,
+            this.analisisFisicoRepository
+            )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));

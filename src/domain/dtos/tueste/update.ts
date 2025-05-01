@@ -5,6 +5,8 @@ export class UpdateTuesteDto {
         public readonly id_tueste                :string,
         public readonly fecha_tueste             :Date,
         public readonly tostadora                :string,
+        public readonly densidad                 :number,
+        public readonly humedad                  :number,
         public readonly peso_entrada             :number,
         public readonly temperatura_entrada      :number,
         public readonly llama_inicial            :number,
@@ -22,7 +24,6 @@ export class UpdateTuesteDto {
         public readonly agtrom_comercial         :number,
         public readonly agtrom_gourmet           :number,
         public readonly id_analisis_rapido       :string,
-        public readonly eliminado                :boolean
     ) {}
 
     get values() {
@@ -50,20 +51,58 @@ export class UpdateTuesteDto {
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateTuesteDto?] {
-        const { id_tueste, fecha_tueste, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
-            punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
-            porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido,eliminado } = props;
+        const { 
+            id_tueste,
+            fecha_tueste,
+            tostadora,
+            densidad,
+            humedad,
+            peso_entrada,
+            temperatura_entrada,
+            llama_inicial,
+            aire_inicial,
+            punto_no_retorno,
+            tiempo_despues_crack,
+            temperatura_crack,
+            temperatura_salida,
+            tiempo_total,
+            porcentaje_caramelizacion,
+            desarrollo,
+            grados_desarrollo,
+            peso_salida,
+            merma,
+            agtrom_comercial,
+            agtrom_gourmet,
+            id_analisis_rapido
+         } = props;
 
         if (!id_tueste) return ['ID de tueste es requerido', undefined];
 
         
 
         return [undefined, new UpdateTuesteDto(
-            id_tueste, fecha_tueste, tostadora, peso_entrada, temperatura_entrada, llama_inicial, aire_inicial,
-            punto_no_retorno, tiempo_despues_crack, temperatura_crack, temperatura_salida, tiempo_total,
-            porcentaje_caramelizacion, desarrollo, grados_desarrollo, peso_salida, merma,
-            agtrom_comercial, agtrom_gourmet, analisis_sensorial_rapido, eliminado
+            id_tueste,
+            fecha_tueste,
+            tostadora,
+            densidad,
+            humedad,
+            peso_entrada,
+            temperatura_entrada,
+            llama_inicial,
+            aire_inicial,
+            punto_no_retorno,
+            tiempo_despues_crack,
+            temperatura_crack,
+            temperatura_salida,
+            tiempo_total,
+            porcentaje_caramelizacion,
+            desarrollo,
+            grados_desarrollo,
+            peso_salida,
+            merma,
+            agtrom_comercial,
+            agtrom_gourmet,
+            id_analisis_rapido
         )];
     }
 }

@@ -9,6 +9,10 @@ import { TuesteRepositoryImpl } from '../../infrastructure/repositories/tueste.r
 import { UserRepositoryImpl } from '../../infrastructure/repositories/user.repository.impl';
 import { UserDataSourceImpl } from '../../infrastructure/datasources/user.datasource.impl';
 import { CreateLote } from '../../domain/usecases/lote/lote/create-lote';
+import { AnalisisDataSourceImpl } from '../../infrastructure/datasources/analisis.datasource.impl';
+import { AnalisisRepositoryImpl } from '../../infrastructure/repositories/analisis.repository.impl';
+import { AnalisisFisicoDataSourceImpl } from '../../infrastructure/datasources/analisisFisico.datasource.impl';
+import { AnalisisFisicoRepositoryImpl } from '../../infrastructure/repositories/analisisFisico.repository.impl';
 
 export class PedidoRoutes {
 
@@ -30,6 +34,15 @@ export class PedidoRoutes {
         // User
         const Userdatasource = new UserDataSourceImpl();
         const UserRepository = new UserRepositoryImpl(Userdatasource);
+
+        // Analisis
+        const AnalisisDatasource = new AnalisisDataSourceImpl();
+        const AnalisisRepository = new AnalisisRepositoryImpl(AnalisisDatasource);
+
+        // AnalisisFisico
+        const AnalisisFisicoDatasource = new AnalisisFisicoDataSourceImpl();
+        const AnalisisFisicoRepository = new AnalisisFisicoRepositoryImpl(AnalisisFisicoDatasource);
+
         
         const cl = new CreateLote(LoteLoteRepository, UserRepository)
 
@@ -38,7 +51,9 @@ export class PedidoRoutes {
             LoteLoteRepository,
             UserRepository,
             TuesteRepository,
-            cl
+            cl,
+            AnalisisRepository,
+            AnalisisFisicoRepository,
         );
 
         // Definición de rutas

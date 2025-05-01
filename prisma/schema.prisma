@@ -111,10 +111,13 @@ model Pedido {
   tipo_pedido      String
   cantidad         Float
   estado_pedido    String    @default("Pendiente")
-  comentario       String?
   id_user          String
   id_lote          String
   id_nuevoLote     String?
+  comentario       String?
+  pesos            Float[]
+  fecha_tueste     DateTime?
+  tostadora        String?
   eliminado        Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
@@ -133,9 +136,14 @@ model Pedido {
 
 model Tueste {
   id_tueste                 String   @id @default(uuid())
-  fecha_tueste              DateTime
+  id_lote                   String
   tostadora                 String
+  id_cliente                String
+  id_pedido                 String
+  densidad                  Float
+  humedad                   Float    
   peso_entrada              Float
+  fecha_tueste              DateTime
   temperatura_entrada       Float?
   llama_inicial             Float?
   aire_inicial              Float?
@@ -154,7 +162,6 @@ model Tueste {
   estado_tueste             String   @default("Pendiente")
   id_analisis_rapido        String?  @unique
   id_lote_tostado           String?  
-  id_pedido                 String
   eliminado                 Boolean  @default(false)
   
 

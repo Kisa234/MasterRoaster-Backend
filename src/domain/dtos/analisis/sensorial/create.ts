@@ -37,8 +37,8 @@ export class CreateAnalisisSensorialDTO {
         if (!taza_limpia) return ['La taza limpia es requerida', undefined];
         if (!dulzor) return ['El dulzor es requerido', undefined];
         if (!puntaje_catador) return ['El puntaje del catador es requerido', undefined];
-        if (!taza_defecto_ligero) return ['El taza defecto ligero es requerido', undefined];
-        if (!tazas_defecto_rechazo) return ['El taza defecto rechazo es requerido', undefined];
+        if (taza_defecto_ligero === undefined) return ['El taza defecto ligero es requerido', undefined];
+        if (tazas_defecto_rechazo === undefined) return ['El taza defecto rechazo es requerido', undefined];
         if (!puntaje_taza) return ['El puntaje de la taza es requerido', undefined];
         if (!comentario) return ['El comentario es requerido', undefined];
    

@@ -51,9 +51,8 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
     }
     async deletePedido(id: string): Promise<PedidoEntity> {
         const pedido = this.getPedidoById(id);
-        const pedidoEliminado = await prisma.pedido.update({
-            where: { id_pedido: id },
-            data: { eliminado: true }
+        const pedidoEliminado = await prisma.pedido.delete({
+            where: { id_pedido: id }
         });
         return PedidoEntity.fromObject(pedidoEliminado);
         
