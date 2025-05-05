@@ -62,7 +62,7 @@ export class PedidoRoutes {
         router.get('/:id', controller.getPedidoById);
         router.put('/:id', controller.updatePedido);
         router.delete('/:id', controller.deletePedido);
-
+        router.get('/orden/tueste', controller.getPedidosOrdenTueste);
         router.get('/estado/:estado', controller.getPedidosByEstado);
         router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
         router.put('/completar/:id', controller.completarPedido);

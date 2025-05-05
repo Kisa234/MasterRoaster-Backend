@@ -21,16 +21,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         return PedidoEntity.fromObject(newPedido);
     }
 
-    async getAllPedidos(): Promise<PedidoEntity[]> {
-        const pedidos = await prisma.pedido.findMany({
-            where: {
-                eliminado: false,
-                estado_pedido: { not: 'Completado' }
-            }
-        });
-        return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
-    }
-
+    
     async getPedidoById(id: string): Promise<PedidoEntity | null> {
         const pedido = await prisma.pedido.findFirst({
             where: {
@@ -92,12 +83,33 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
             data: { estado_pedido: 'Completado' }
         });
         return PedidoEntity.fromObject(pedidoCompletado);
-
-
-
+        
+        
+        
         
     }
-
+    async getAllPedidos(): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false,
+                estado_pedido: { not: 'Completado' }
+            }
+        });
+        return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
+    }
     
+    async getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+              eliminado: false,
+              tipo_pedido: {
+                equals: 'Orden Tueste',
+                mode: 'insensitive'
+              }
+            }
+          });
+          
+        return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
+    }   
     
 }

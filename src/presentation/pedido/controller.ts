@@ -18,6 +18,7 @@ import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
+import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
 
 export class PedidoController {
 
@@ -29,7 +30,8 @@ export class PedidoController {
         private readonly createLoteUseCase: CreateLoteUseCase,
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
-    ) {}
+    ) {
+    }
 
     public createPedido = async (req: Request, res: Response) => {
         const [error, createPedidoDto] = CreatePedidoDto.create(req.body);
@@ -110,12 +112,18 @@ export class PedidoController {
             .execute()
             .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));   
-    }
+    };
 
     public completarPedido = async (req: Request, res: Response) => {
         new CompletarPedido(this.pedidoRepository)
             .execute(req.params.id)
             .then(pedido => res.json(pedido))
+            .catch(error => res.status(400).json({ error }));
+    };
+    public getPedidosOrdenTueste = async (req: Request, res: Response) => {
+        new GetPedidosOrdenTueste(this.pedidoRepository)
+            .execute()
+            .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));
     };
 }

@@ -27,10 +27,9 @@ export class CreatePedidoDto {
          
         if (!tipo_pedido) return ['El tipo de pedido es requerido', undefined];
         if (!cantidad) return ['La cantidad es requerida', undefined];
-         if (!comentario) return ['Las observaciones son requeridas', undefined];
+        if (!comentario) return ['Las observaciones son requeridas', undefined];
         if (!id_user) return ['El ID del cliente es requerido', undefined];
         if (!id_lote) return ['El ID del lote es requerido', undefined];
-        
         
 
         return [
@@ -44,7 +43,7 @@ export class CreatePedidoDto {
                 id_nuevoLote,
                 pesos,
                 tostadora,
-                fecha_tueste
+                new Date(fecha_tueste)
             )
             
         ];
