@@ -22,6 +22,7 @@ export class UpdatePedidoDto {
         if (this.pesos) returnObj.pesos = this.pesos;
         if (this.tostadora) returnObj.tostadora = this.tostadora;
         if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
+        if (this.pesos) returnObj.pesos = this.pesos;
         return returnObj;
     }
 
@@ -40,12 +41,8 @@ export class UpdatePedidoDto {
             fecha_tueste,
          } = props;
 
-        if( tipo_pedido) return ['El tipo de pedido no puede ser modificado', undefined];
-        if( id_user) return ['El ID del usuario no puede ser modificado', undefined];
-        if( id_lote) return ['El ID del lote no puede ser modificado', undefined];
-        
-        
 
+        
         return [undefined, 
             new UpdatePedidoDto(
                 id_pedido,
@@ -58,7 +55,7 @@ export class UpdatePedidoDto {
                 id_nuevoLote,
                 pesos,
                 tostadora,
-                fecha_tueste
+                new Date(fecha_tueste)
             )
         ];
     }

@@ -33,7 +33,7 @@ export class PersonalizadoController {
               id_lote: pedido!.id_lote,
               fecha_tueste: tueste.fecha_tueste.toLocaleDateString('es-ES'),
               peso: tueste.peso_entrada,
-              comentario: pedido!.comentario
+              comentario: pedido!.comentario!
           });
       }
 

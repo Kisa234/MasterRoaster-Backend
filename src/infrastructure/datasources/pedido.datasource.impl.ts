@@ -97,19 +97,25 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         });
         return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
     }
+
     
     async getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0); // normaliza a medianoche UTC
+      
         const pedidos = await prisma.pedido.findMany({
-            where: {
-              eliminado: false,
-              tipo_pedido: {
-                equals: 'Orden Tueste',
-                mode: 'insensitive'
-              }
-            }
-          });
-          
-        return pedidos.map( (pedido) => PedidoEntity.fromObject(pedido));
-    }   
+          where: {
+            eliminado: false,
+            tipo_pedido: {
+              equals: 'Orden Tueste',
+              mode: 'insensitive'
+            },
+          }
+        });
+      
+        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+      }
+      
+       
     
 }

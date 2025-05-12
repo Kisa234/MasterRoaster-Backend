@@ -180,6 +180,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
             peso_entrada: peso,
             id_pedido: pedido.id_pedido,
         });
+        console.log('checkpoint2');
         await this.tuesteRepository.createTueste(createTuesteDto!);
     }
 
