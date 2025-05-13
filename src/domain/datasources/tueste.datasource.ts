@@ -1,6 +1,7 @@
 import { CreateTuesteDto } from "../dtos/tueste/create";
 import { UpdateTuesteDto } from "../dtos/tueste/update";
 import { TuesteEntity } from "../entities/tueste.entity";
+import { CompleteTuesteDto } from '../dtos/tueste/complete';
 
 export abstract class TuesteDataSource {
     abstract createTueste(createTuesteDto:CreateTuesteDto): Promise<TuesteEntity>;
@@ -10,5 +11,5 @@ export abstract class TuesteDataSource {
     abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
     abstract getAllTuestes(): Promise<TuesteEntity[]>;
     abstract getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]>;
-    abstract completarTostados(id: string): Promise<TuesteEntity>;    
+    abstract completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;    
 }

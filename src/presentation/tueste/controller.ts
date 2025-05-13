@@ -11,6 +11,7 @@ import { GetAllTueste } from "../../domain/usecases/tueste/get-all-tueste";
 import { CompleteTueste } from "../../domain/usecases/tueste/complete-tueste";
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
+import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 
 export class TuesteController {
 
@@ -32,17 +33,34 @@ export class TuesteController {
     };
 
     public updateTueste = async (req: Request, res: Response) => {
-        const id_pedido = req.params.id;
-        const [error, updateTuesteDto] = UpdateTuesteDto.update({...req.body, id: id_pedido});
+        const id_tueste = req.params.id;
+        const [error, updateTuesteDto] = UpdateTuesteDto.update(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
         new UpdateTueste(this.tuesteRepository)
-            .execute(id_pedido,updateTuesteDto!)
+            .execute(id_tueste,updateTuesteDto!)
             .then( tueste => res.json(tueste))
             .catch( error => res.status(400).json({ error }
             ));
     };
+
+    public completarTostados = async (req: Request, res: Response) => {
+        const id_tueste = req.params.id;
+        const [error, completeTuesteDto] = CompleteTuesteDto.update(req.body);
+        console.log(completeTuesteDto);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+        new CompleteTueste(
+            this.tuesteRepository,
+            this.loteTostadoRepository,
+            this.pedidoRepository
+            )
+            .execute(id_tueste, completeTuesteDto!)
+            .then( tueste => res.json(tueste))
+            .catch( error => res.status(400).json({ error}));
+    }
 
     public deleteTueste = async (req: Request, res: Response) => {
         new DeleteTueste(this.tuesteRepository)
@@ -72,15 +90,6 @@ export class TuesteController {
             .catch( error => res.status(400).json({ error}));
     }
 
-    public completarTostados = async (req: Request, res: Response) => {
-        new CompleteTueste(
-            this.tuesteRepository,
-            this.loteTostadoRepository,
-            this.pedidoRepository
-            )
-            .execute(req.params.id)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error}));
-    }
+    
 
 }

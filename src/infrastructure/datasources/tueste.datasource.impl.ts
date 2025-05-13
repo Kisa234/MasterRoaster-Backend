@@ -3,6 +3,7 @@ import { TuesteEntity } from "../../domain/entities/tueste.entity";
 import { CreateTuesteDto } from '../../domain/dtos/tueste/create';
 import { prisma } from "../../data/postgres";
 import { UpdateTuesteDto } from '../../domain/dtos/tueste/update';
+import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 
 export class TuesteDataSourceImpl implements TuesteDataSource {
   
@@ -29,6 +30,15 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
       data: updateTuesteDto.values
     });
     return TuesteEntity.fromObject(updatedTueste);
+  }
+  async completarTueste(id: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
+    const tueste = await this.getTuesteById(id);
+
+    const tuesteCompletado = await prisma.tueste.update({
+      where: { id_tueste: id },
+      data:  completeTuesteDto.values
+    });
+    return TuesteEntity.fromObject(tuesteCompletado);
   }
   async deleteTueste(id: string): Promise<TuesteEntity> {
     const tueste = this.getTuesteById(id);
@@ -66,12 +76,5 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     return tuestes.map(TuesteEntity.fromObject);
   }
   
-  async completarTostados(id: string): Promise<TuesteEntity> {
-    const tueste = await this.getTuesteById(id);
-    const tuesteCompletado = await prisma.tueste.update({
-      where: { id_tueste: id },
-      data: { estado_tueste: "Completado" }
-    });
-    return TuesteEntity.fromObject(tuesteCompletado);
-  }
+  
 }

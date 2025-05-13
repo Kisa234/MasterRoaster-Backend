@@ -19,10 +19,6 @@ export class UpdateTuesteDto {
         public readonly porcentaje_caramelizacion:number,
         public readonly desarrollo               :number,
         public readonly grados_desarrollo        :number,
-        public readonly peso_salida              :number,
-        public readonly merma                    :number,
-        public readonly agtrom_comercial         :number,
-        public readonly agtrom_gourmet           :number,
         public readonly id_analisis_rapido       :string,
     ) {}
 
@@ -42,10 +38,6 @@ export class UpdateTuesteDto {
         if (this.porcentaje_caramelizacion !== undefined) returnObj.porcentaje_caramelizacion = this.porcentaje_caramelizacion;
         if (this.desarrollo !== undefined) returnObj.desarrollo = this.desarrollo;
         if (this.grados_desarrollo !== undefined) returnObj.grados_desarrollo = this.grados_desarrollo;
-        if (this.peso_salida !== undefined) returnObj.peso_salida = this.peso_salida;
-        if (this.merma !== undefined) returnObj.merma = this.merma;
-        if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;
-        if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;
         if (this.id_analisis_rapido) returnObj.id_analisis_rapido = this.id_analisis_rapido;
         return returnObj;
     }
@@ -69,10 +61,6 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
-            peso_salida,
-            merma,
-            agtrom_comercial,
-            agtrom_gourmet,
             id_analisis_rapido
          } = props;
 
@@ -98,10 +86,6 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
-            peso_salida,
-            merma,
-            agtrom_comercial,
-            agtrom_gourmet,
             id_analisis_rapido
         )];
     }

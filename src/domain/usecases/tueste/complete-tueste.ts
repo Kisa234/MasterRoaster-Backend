@@ -5,9 +5,10 @@ import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { CreateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/create";
 import { PedidoRepository } from '../../repository/pedido.repository';
 import { LoteRepository } from '../../repository/lote.repository';
+import { CompleteTuesteDto } from '../../dtos/tueste/complete';
 
 export interface CompleteTuesteUseCase {
-    execute(id_tueste: string): Promise<LoteTostadoEntity | null>;
+    execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<LoteTostadoEntity | null>;
 }
 
 export class CompleteTueste implements CompleteTuesteUseCase {
@@ -17,12 +18,13 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         private readonly pedidoRepository: PedidoRepository
     ) {}
 
-    async execute(id_tueste: string): Promise<LoteTostadoEntity | null> {
+    async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<LoteTostadoEntity | null> {
+        console.log("Complete tueste");
+
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
 
-        await this.tuesteRepository.completarTostados(tueste.id_tueste);
-
+        await this.tuesteRepository.completarTueste(tueste.id_tueste,completeTuesteDto);
         const tuestesDelPedido = await this.tuesteRepository.getTostadosByPedido(tueste.id_pedido);
 
         const todosCompletados = tuestesDelPedido.every(t =>
@@ -38,6 +40,8 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         if (!todosCompletados) {
             return null; 
         }
+        //completar pedido
+        await this.pedidoRepository.completarPedido(pedido.id_pedido);
 
         // Crear lote tostado (puedes ajustar el dto según tu estructura)
         const [,dto]  = CreateLoteTostadoDto.create({

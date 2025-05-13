@@ -1,4 +1,5 @@
 import { TuesteDataSource } from '../../domain/datasources/tueste.datasource';
+import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 import { CreateTuesteDto } from '../../domain/dtos/tueste/create';
 import { UpdateTuesteDto } from '../../domain/dtos/tueste/update';
 import { TuesteEntity } from '../../domain/entities/tueste.entity';
@@ -32,8 +33,8 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTostadosByPedido(id_pedido);
     }
-    completarTostados(id: string): Promise<TuesteEntity> {
-        return this.tuesteDataSource.completarTostados(id);
+    completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
+        return this.tuesteDataSource.completarTueste(id,completeTuesteDto);
     }
     
     
