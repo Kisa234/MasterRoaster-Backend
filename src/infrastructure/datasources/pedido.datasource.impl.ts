@@ -110,6 +110,7 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
               equals: 'Orden Tueste',
               mode: 'insensitive'
             },
+            estado_pedido: { not: 'Completado' }
           }
         });
       

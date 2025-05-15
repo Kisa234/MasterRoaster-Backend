@@ -19,7 +19,6 @@ export class CompleteTueste implements CompleteTuesteUseCase {
     ) {}
 
     async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<LoteTostadoEntity | null> {
-        console.log("Complete tueste");
 
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
@@ -30,25 +29,24 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         const todosCompletados = tuestesDelPedido.every(t =>
             t.estado_tueste === "Completado"
         );
-
-       
-
+        
         const pedido = await this.pedidoRepository.getPedidoById(tueste.id_pedido);
         if (!pedido) throw new Error("Pedido no encontrado");
-
-
+        
+        
         if (!todosCompletados) {
             return null; 
         }
         //completar pedido
         await this.pedidoRepository.completarPedido(pedido.id_pedido);
-
+        const pesoTotal = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
+        
         // Crear lote tostado (puedes ajustar el dto según tu estructura)
         const [,dto]  = CreateLoteTostadoDto.create({
             id_lote_tostado: `${pedido.id_pedido}-T`,
             id_lote: pedido.id_lote,
             fecha_tostado: Date.now(),
-            peso: pedido.cantidad ,
+            peso: pesoTotal ,
             perfil_tostado: pedido.comentario,
         })
         const nuevoLoteTostado = await this.loteTostadoRepository.createLoteTostado(dto!);

@@ -48,7 +48,6 @@ export class TuesteController {
     public completarTostados = async (req: Request, res: Response) => {
         const id_tueste = req.params.id;
         const [error, completeTuesteDto] = CompleteTuesteDto.update(req.body);
-        console.log(completeTuesteDto);
         if (error) {
             return res.status(400).json({ error });
         }

@@ -62,7 +62,7 @@ export class UpdateTuesteDto {
             desarrollo,
             grados_desarrollo,
             id_analisis_rapido
-         } = props;
+        } = props;
 
         if (!id_tueste) return ['ID de tueste es requerido', undefined];
 

@@ -8,10 +8,11 @@ export class CreateLoteTostadoDto {
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateLoteTostadoDto?] {
-        const {  id_lote, fecha_tostado, perfil_tostado, peso } = props;
+        const {  id_lote, fecha_tostado, perfil_tostado, peso, id_lote_tostado } = props;
         
 
         if (!id_lote) return ['El id_lote es requerido', undefined];
+        if (!id_lote_tostado) return ['El id_lote_tostado es requerido', undefined];
         if (!perfil_tostado) return ['El perfil_tostado es requerido', undefined];
         if (!peso) return ['El peso es requerido', undefined];
         const newFechaTostado = new Date(fecha_tostado);
@@ -19,7 +20,6 @@ export class CreateLoteTostadoDto {
             return ['La fecha_tostado no es válida', undefined];
         }
 
-        const id_lote_tostado = `${id_lote}-T`;
         
         return [undefined, 
             new CreateLoteTostadoDto(

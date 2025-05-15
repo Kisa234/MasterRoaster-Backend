@@ -43,7 +43,7 @@ export class CreatePedidoDto {
                 id_nuevoLote,
                 pesos,
                 tostadora,
-                new Date(fecha_tueste)
+                new Date(fecha_tueste ? fecha_tueste : Date.now())
             )
             
         ];

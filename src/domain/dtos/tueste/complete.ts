@@ -5,7 +5,7 @@ export class CompleteTuesteDto {
         public readonly peso_salida              :number,
         public readonly merma                    :number,
         public readonly agtrom_comercial         :number,
-        public readonly agtrom_gourmet           :number
+        public readonly agtrom_gourmet           :number,
     ) {}
 
     get values() {
@@ -14,18 +14,24 @@ export class CompleteTuesteDto {
         if (this.merma !== undefined) returnObj.merma = this.merma;
         if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;
         if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;
+        returnObj.estado_tueste = "Completado";
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, CompleteTuesteDto?] {
-        const { 
+         const {
             id_tueste,
             peso_salida,
             merma,
             agtrom_comercial,
-            agtrom_gourmet,
-         } = props;        
-        // if (!id_tueste) return ['ID de tueste es requerido', undefined];
+            agtrom_gourmet
+        } = props.tueste;
+        
+        if (!id_tueste) return ['ID de tueste es requerido', undefined];
+        if (!peso_salida) return ['Peso de salida es requerido', undefined];
+        if (!merma) return ['Merma es requerido', undefined];
+        if (!agtrom_comercial) return ['Agtrom comercial es requerido', undefined];
+        if (!agtrom_gourmet) return ['Agtrom gourmet es requerido', undefined];
 
         return [undefined, new CompleteTuesteDto(
             id_tueste,

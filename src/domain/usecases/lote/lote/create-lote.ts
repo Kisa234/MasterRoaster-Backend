@@ -5,18 +5,19 @@ import { LoteEntity } from "../../../entities/lote.entity";
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto,tueste?:string): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto,tueste?:string, usuario?:boolean, id_c?:string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
+    
     constructor(
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
     ){}
 
-    async execute( createLoteDto: CreateLoteDto, tueste?:string): Promise<LoteEntity> {
+    async execute( createLoteDto: CreateLoteDto, tueste?:string,usuario?:boolean, id_c?:string): Promise<LoteEntity> {
 
-        const id= await this.generarId(createLoteDto, tueste);
+        const id= await this.generarId(createLoteDto, tueste,usuario, id_c);
         
         const [,dto] = CreateLoteDto.create({
             id_lote      : id,
@@ -27,16 +28,13 @@ export class CreateLote implements CreateLoteUseCase {
             peso         : createLoteDto.peso,
             variedades   : createLoteDto.variedades,
             proceso      : createLoteDto.proceso,
-            id_user      : createLoteDto.id_user,
-            id_analisis  : createLoteDto.id_analisis,
+            id_user      : createLoteDto.id_user
         });
-
-        console.log(dto);
 
         return this.loteRepository.createLote(dto!);
     }
 
-    generarId = async (dto: CreateLoteDto,tueste?:string): Promise<string> => {
+    generarId = async (dto: CreateLoteDto,tueste?:string,usuario?:boolean, id_c?:string): Promise<string> => {
         const { productor, variedades, proceso } = dto;
       
     
@@ -68,29 +66,30 @@ export class CreateLote implements CreateLoteUseCase {
         }
     
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
-    
-        // LOTE CLIENTE
-        let user;
-        if (dto.id_user) {
-            user = await this.userRepository.getUserById(dto.id_user);
-        } 
-        if (user?.rol === 'Cliente') {
-            const partesNombre = user.nombre.trim().split(' ');
-            const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
-            const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
-            idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
-        }
-
-        if (tueste) {
-            idGenerado = `${idGenerado}-T`;
-        }
 
         // NUMERO FINAL
         const numeroLote = await this.loteRepository.getLotes();
         const numeroLoteFinal = numeroLote.length + 1;
-    
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
+    
+        // LOTE PARA CLIENTE
+        let user;if (usuario) {
+            if (dto.id_user) {
+                user = await this.userRepository.getUserById(dto.id_user);
+            } 
+            if (user?.rol === 'Cliente') {
+                const partesNombre = user.nombre.trim().split(' ');
+                const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
+                const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
+                idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
+            }
+            else if (user?.rol !== 'Cliente') {
+                throw new Error('No se puede generar un Lote para un usuario que no es cliente');
+            }
+        }
 
+
+       
        
 
         return idGenerado;

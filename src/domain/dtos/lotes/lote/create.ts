@@ -11,7 +11,6 @@ export class CreateLoteDto {
         public readonly variedades     : string[],
         public readonly proceso        : string,
         public readonly id_user?       : string,
-        public readonly id_analisis?   : string,
         
     ) {}
 
@@ -30,7 +29,7 @@ export class CreateLoteDto {
 
         return [undefined, new CreateLoteDto(
             id_lote,productor, finca, region, departamento,
-            peso, variedades, proceso, id_user, id_analisis
+            peso, variedades, proceso, id_user
         )];
     }
    
