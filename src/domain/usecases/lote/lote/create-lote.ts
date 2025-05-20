@@ -1,7 +1,7 @@
 import { CreateLoteDto } from "../../../dtos/lotes/lote/create";
-import { UserRepository } from "../../../repository/user.repository";
 import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteEntity } from "../../../entities/lote.entity";
+import { UserRepository } from "../../../repository/user.repository";
 
 
 export interface CreateLoteUseCase {
@@ -28,6 +28,7 @@ export class CreateLote implements CreateLoteUseCase {
             peso         : createLoteDto.peso,
             variedades   : createLoteDto.variedades,
             proceso      : createLoteDto.proceso,
+            tipo_lote    : createLoteDto.tipo_lote,
             id_user      : createLoteDto.id_user
         });
 

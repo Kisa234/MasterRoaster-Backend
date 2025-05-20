@@ -1,5 +1,3 @@
-import { CreateLoteDto } from "../../../dtos/lotes/lote/create";
-import { UserRepository } from "../../../repository/user.repository";
 import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteEntity } from "../../../entities/lote.entity";
 import { UpdateLoteDto } from "../../../dtos/lotes/lote/update";

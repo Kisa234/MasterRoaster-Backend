@@ -1,3 +1,4 @@
+import { CreateAnalisis } from './../analisis/analisis/create-analisis';
 import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { CreatePedidoDto } from "../../dtos/pedido/create";
@@ -85,6 +86,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             peso: dto.cantidad,
             variedades: lote.variedades,
             proceso: lote.proceso,
+            tipo_lote: 'Lote Verde',
             id_user: user.id_user,
             id_analisis: lote.id_analisis,
         });
@@ -140,6 +142,8 @@ export class CreatePedido implements CreatePedidoUseCase {
             peso        : cantidadRequerida,
             variedades  : lote.variedades,
             proceso     : lote.proceso,
+            tipo_lote   : 'Tostado Verde',
+            peso_tostado: dto.cantidad,
             id_user     : dto.id_user,
             id_analisis : lote.id_analisis,
         });
@@ -164,25 +168,28 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
-        //validar cantidad lote
-        const cantidadRequerida = dto.cantidad;
-        if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
+        
         //validar cliente
         const user = await this.userRepository.getUserById(dto.id_user);
         if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
-        //validar si la suma de pesos es igual a la cantidad requerida
-        // if (ct.pesos) {
-        //     const sumaPesos = ct.pesos.reduce((a, b) => a + b, 0);
-        //     if (sumaPesos !== cantidadRequerida) throw new Error('La suma de los pesos no es igual a la cantidad requerida');
-        // }
         
-        //actualizar peso del lote 
-        const newpeso = lote.peso-cantidadRequerida;   
-        const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
-        await this.loteRepository.updateLote(lote.id_lote, updateDto!);
-        
-        //crear Pedido
-        const pedido = await this.pedidoRepository.createPedido(dto);
+        if(lote.tipo_lote === 'Lote Verde'){
+            //validar cantidad lote
+            const cantidadRequerida = dto.cantidad;
+            if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
+            
+            //actualizar peso del lote 
+            const newpeso = lote.peso-cantidadRequerida;   
+            const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
+            await this.loteRepository.updateLote(lote.id_lote, updateDto!);
+        }
+        if(lote.tipo_lote === 'Tostado Verde'){
+            //validar cantidad de tostado
+            const cantidadRequerida = dto.cantidad;
+            if (lote.peso_tostado! < cantidadRequerida) throw new Error('No hay suficiente cantidad');
+
+        }
+
         
         //consegir analisis fisico
         if (!lote.id_analisis){console.log ('El lote no tiene analisis'); throw new Error('El lote no tiene analisis');}
@@ -190,6 +197,9 @@ export class CreatePedido implements CreatePedidoUseCase {
         if (!analisis) throw new Error('El analisis no existe');
         const analisisFisico = await this.AnalisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
         if (!analisisFisico) throw new Error('El analisis fisico no existe');
+        
+        //crear Pedido
+        const pedido = await this.pedidoRepository.createPedido(dto);
         
         //generar tuestes
         if (!dto.pesos) throw new Error('Los pesos son requeridos');
@@ -204,14 +214,9 @@ export class CreatePedido implements CreatePedidoUseCase {
                 peso_entrada: peso,
                 id_pedido: pedido.id_pedido,
             });
-
             console.log('createTuesteDto', createTuesteDto);
-
             await this.tuesteRepository.createTueste(createTuesteDto!);
         }
-
-
-       
 
         return PedidoEntity.fromObject(pedido);
     }    

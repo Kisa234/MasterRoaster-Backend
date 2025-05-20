@@ -1,8 +1,8 @@
 import { CreateLoteDto } from "../../../dtos/lotes/lote/create";
-import { UserRepository } from "../../../repository/user.repository";
 import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteEntity } from "../../../entities/lote.entity";
-import { MuestraRepository } from '../../../repository/muestra.repository';
+import { UserRepository } from "../../../repository/user.repository";
+import { MuestraRepository } from "../../../repository/muestra.repository";
 
 
 export interface CreateLoteFromMuestraUseCase {
@@ -21,7 +21,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         if (!muestra) {
             throw new Error('Muestra no encontrada');
         }
-        const [ , muestraDto] = CreateLoteDto.create({
+        const [ , createLoteDto] = CreateLoteDto.create({
             productor    : muestra.productor,
             finca        : muestra.finca,
             region       : muestra.region,
@@ -29,10 +29,11 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             peso         : muestra.peso,
             variedades   : muestra.variedades,
             proceso      : muestra.proceso,
+            tipo_lote    : 'Lote Verde',
             id_user      : muestra.id_user,
             id_analisis  : muestra.analisis_id,
         })
-        const idGenerado = await this.generarId(muestraDto!);
+        const idGenerado = await this.generarId(createLoteDto!);
 
         const [ , dto] = CreateLoteDto.create({
             id_lote      : idGenerado,
@@ -43,6 +44,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             peso         : muestra.peso,
             variedades   : muestra.variedades,
             proceso      : muestra.proceso,
+            tipo_lote    : 'Lote Verde',
             id_user      : muestra.id_user,
             id_analisis  : muestra.analisis_id,
         })

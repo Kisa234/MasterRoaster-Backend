@@ -41,7 +41,7 @@ model Muestra {
   id_analisis     String?  
   fecha_registro  DateTime @default(now())
   eliminado       Boolean  @default(false)
-
+  tipo_lote       String
   // Relación con Usuario
   user     User?     @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
@@ -55,8 +55,10 @@ model Lote {
   region          String
   departamento    String
   peso            Float
+  peso_tostado    Float?
   variedades      String[]
   proceso         String
+  tipo_lote       String
   id_user         String?
   id_analisis     String?  
   fecha_registro  DateTime @default(now())
