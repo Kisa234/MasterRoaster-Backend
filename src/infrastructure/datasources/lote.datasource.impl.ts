@@ -97,5 +97,24 @@ export class LoteDataSourceImpl implements LoteDataSource {
     if (!lotes) throw new Error("No existen lotes para el usuario");
     return lotes.map(lote => LoteEntity.fromObject(lote));
   }
+  async getLotesTostados(): Promise<LoteEntity[]> {
+    const lotes = await prisma.lote.findMany({
+      where: {
+        eliminado: false,
+        tipo_lote: 'Tostado Verde'
+      }
+    });
+    return lotes.map(lote => LoteEntity.fromObject(lote));
+  }
+  async getLotesVerdes(): Promise<LoteEntity[]> {
+    const lotes = await prisma.lote.findMany({
+      where: {
+        eliminado: false,
+        tipo_lote: 'Lote Verde'
+      }
+    });
+    return lotes.map(lote => LoteEntity.fromObject(lote));
+  }
+  
   
 }

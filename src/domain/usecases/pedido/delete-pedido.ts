@@ -20,9 +20,15 @@ export class DeletePedido implements DeletePedidoUseCase {
     ){}
 
     async execute(id_pedido: string): Promise<void> {
+        //verificar si el pedido ya fue eliminado o no existe
         const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
         if (!pedido) {
           throw new Error('El pedido no existe o ya fue eliminado');
+        }
+
+        //verificar si el pedido no esta completado
+        if (pedido.estado_pedido === 'Completado') {
+          throw new Error('No se puede eliminar un pedido completado');
         }
     
         const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote);
@@ -52,9 +58,8 @@ export class DeletePedido implements DeletePedidoUseCase {
         if (!updateDtoOriginal) throw new Error('Error generando DTO para lote original');
         await this.loteRepository.updateLote(loteOriginal.id_lote, updateDtoOriginal);
         
-        // 2. Eliminar o actualizar el lote clonado
+        // 2. Eliminar el nuevo lote hecho por el pedido
         if (!pedido.id_nuevoLote) return;
-        
         const loteClonado = await this.loteRepository.getLoteById(pedido.id_nuevoLote);
         if (!loteClonado || loteClonado.eliminado) return;
         
@@ -78,12 +83,13 @@ export class DeletePedido implements DeletePedidoUseCase {
         if (!dto) throw new Error('Error generando DTO para restaurar lote original');
         await this.loteRepository.updateLote(loteOriginal.id_lote, dto);
       
-        // 3. Eliminar lote clonado si existe (id_nuevoLote)
+        // 3. Eliminar el nuevo lote hecho por el pedido
         if (pedido.id_nuevoLote) {
+          console.log(pedido.id_nuevoLote);
           const loteClonado = await this.loteRepository.getLoteById(pedido.id_nuevoLote);
           if (loteClonado && !loteClonado.eliminado) {
             // Descontar peso
-            const pesoRestante = loteClonado.peso - pedido.cantidad;
+            const pesoRestante = loteClonado.peso - pedido.cantidad * 1.15;
             const [, updateDtoClonado] = UpdateLoteDto.update({ peso: pesoRestante });
             if (!updateDtoClonado) throw new Error('Error generando DTO para lote clonado');
             await this.loteRepository.updateLote(loteClonado.id_lote, updateDtoClonado);

@@ -40,14 +40,19 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         if (!todosCompletados) {
             return null; 
         }
+
         //completar pedido
         await this.pedidoRepository.completarPedido(pedido.id_pedido);
-        const pesoTotal = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
+        const pesoTotalTostado = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
+        const pesoTotalVerde = tuestesDelPedido.reduce((total, t) => total + t.peso_entrada!, 0);
         
-        if (pedido.tipo_pedido === "Verde Tostado") {
-            const lote = await this.loteRepository.getLoteById(pedido.id_lote);
+        const lote = await this.loteRepository.getLoteById(pedido.id_lote);
+        if (lote?.tipo_lote === "Tostado Verde") {
+            console.log('checkpoint');
+            if (!lote) throw new Error("Lote no encontrado");
             const [e, dto] = UpdateLoteDto.update({
-                peso_tostado: lote?.peso_tostado!- pesoTotal,
+                peso: lote!.peso - pesoTotalVerde,
+                peso_tostado: lote?.peso_tostado!- pesoTotalTostado,
             });
            this.loteRepository.updateLote(pedido.id_lote ,dto!);
         }
@@ -57,7 +62,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
             id_lote_tostado: `${pedido.id_pedido}-T`,
             id_lote: pedido.id_lote,
             fecha_tostado: Date.now(),
-            peso: pesoTotal ,
+            peso: pesoTotalTostado ,
             perfil_tostado: pedido.comentario,
         })
         const nuevoLoteTostado = await this.loteTostadoRepository.createLoteTostado(dto!);

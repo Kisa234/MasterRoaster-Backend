@@ -10,6 +10,8 @@ import { GetLotes } from "../../domain/usecases/lote/lote/get-lotes";
 import { CreateLoteFromMuestra } from "../../domain/usecases/lote/lote/create-lote-muestra";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { MuestraRepository } from "../../domain/repository/muestra.repository";
+import { GetALLLotesTostados } from "../../domain/usecases/lote/lote/get-lotes-tostados";
+import { GetAllLotesVerdes } from "../../domain/usecases/lote/lote/get-lotes-verdes";
 
 export class LoteController {
 
@@ -62,11 +64,11 @@ export class LoteController {
 
     public getLotes = (req:Request , res : Response) => {
         new GetLotes(this.loteRepository)
-            .execute()
-            .then( lotes => res.json(lotes))
-            .catch( error => res.status(400).json({ error }));
+        .execute()
+        .then( lotes => res.json(lotes))
+        .catch( error => res.status(400).json({ error }));
     }
-
+    
     public createLoteFromMuestra = (req:Request , res : Response) => {
         const id_muestra = req.params.id;
         const peso = req.body.peso;
@@ -78,16 +80,28 @@ export class LoteController {
             this.muestraRepository,
             this.userRepository,
         )
-            .execute(id_muestra, peso)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+        .execute(id_muestra, peso)
+        .then( lote => res.json(lote))
+        .catch( error => res.status(400).json({ error }));
     }
-
+    
     public getLotesByUserId = (req:Request , res : Response) => {
         new GetLotes(this.loteRepository)
+        .execute()
+        .then( lotes => res.json(lotes))
+        .catch( error => res.status(400).json({ error }));
+    }
+    public getAllTostados = async (req: Request, res: Response) => {
+        new GetALLLotesTostados(this.loteRepository)
             .execute()
-            .then( lotes => res.json(lotes))
-            .catch( error => res.status(400).json({ error }));
+            .then( tuestes => res.json(tuestes))
+            .catch( error => res.status(400).json({ error}));
+    }
+    public getAllVerdes = async (req: Request, res: Response) => {
+        new GetAllLotesVerdes(this.loteRepository)
+            .execute()
+            .then( tuestes => res.json(tuestes))
+            .catch( error => res.status(400).json({ error}));
     }
 
 }

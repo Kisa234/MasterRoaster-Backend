@@ -12,13 +12,18 @@ import { CompleteTueste } from "../../domain/usecases/tueste/complete-tueste";
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
 import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
+import { LoteRepository } from "../../domain/repository/lote.repository";
+import { GetAllLoteTostado } from "../../domain/usecases/lote/lote-tostado/get-all-lote-tostado";
+import { GetAllLotesVerdes } from "../../domain/usecases/lote/lote/get-lotes-verdes";
+import { GetALLLotesTostados } from "../../domain/usecases/lote/lote/get-lotes-tostados";
 
 export class TuesteController {
 
     constructor(
         private readonly tuesteRepository: TuesteRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
-        private readonly pedidoRepository: PedidoRepository
+        private readonly pedidoRepository: PedidoRepository,
+        private readonly loteRepository: LoteRepository,
     ){}
 
     public createTueste = async (req: Request, res: Response) => {
@@ -54,7 +59,9 @@ export class TuesteController {
         new CompleteTueste(
             this.tuesteRepository,
             this.loteTostadoRepository,
-            this.pedidoRepository
+            this.pedidoRepository,
+            this.loteRepository
+            
             )
             .execute(id_tueste, completeTuesteDto!)
             .then( tueste => res.json(tueste))
@@ -88,6 +95,7 @@ export class TuesteController {
             .then( tuestes => res.json(tuestes))
             .catch( error => res.status(400).json({ error}));
     }
+   
 
     
 

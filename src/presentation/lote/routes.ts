@@ -26,6 +26,8 @@ export class LoteRoutes{
         router.post('/', loteController.createLote);
         router.post('/muestra/:id', loteController.createLoteFromMuestra);
         router.get('/', loteController.getLotes);
+        router.get('/tostados', loteController.getAllTostados);
+        router.get('/verdes', loteController.getAllVerdes);
         
         router.get('/:id', loteController.getLoteById);
         router.put('/:id', loteController.updateLote);

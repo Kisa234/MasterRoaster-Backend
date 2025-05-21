@@ -8,6 +8,7 @@ export class CreateLoteDto {
         public readonly region         : string,
         public readonly departamento   : string,
         public readonly peso           : number,
+        
         public readonly variedades     : string[],
         public readonly proceso        : string,
         public readonly tipo_lote   : string,

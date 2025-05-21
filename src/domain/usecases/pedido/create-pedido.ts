@@ -127,7 +127,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             }               
         }
 
-       //actualizar peso del lote 
+        //actualizar peso del lote 
         const newpeso = lote.peso-cantidadRequerida;   
         const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
         await this.loteRepository.updateLote(lote.id_lote, updateDto!);

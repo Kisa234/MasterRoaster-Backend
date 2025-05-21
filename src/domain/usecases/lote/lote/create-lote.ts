@@ -29,7 +29,8 @@ export class CreateLote implements CreateLoteUseCase {
             variedades   : createLoteDto.variedades,
             proceso      : createLoteDto.proceso,
             tipo_lote    : createLoteDto.tipo_lote,
-            id_user      : createLoteDto.id_user
+            id_user      : createLoteDto.id_user,
+            peso_tostado : createLoteDto.peso_tostado,
         });
 
         return this.loteRepository.createLote(dto!);

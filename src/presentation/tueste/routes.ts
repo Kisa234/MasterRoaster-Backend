@@ -26,7 +26,10 @@ export class TuesteRoutes {
         const pedidoDatasource = new PedidoDataSourceImpl();
         const pedidoRepository = new PedidoRepositoryImpl(pedidoDatasource);
 
-        const tuesteController = new TuesteController(tuesteRepository, loteTostadoDataSource, pedidoRepository);
+        const loteDatasource = new LoteDataSourceImpl();
+        const loteRepository = new LoteRepositoryImpl(loteDatasource);
+
+        const tuesteController = new TuesteController(tuesteRepository, loteTostadoDataSource, pedidoRepository,loteRepository);
         
         router.post('/', tuesteController.createTueste);
         router.get('/', tuesteController.getAllTuestes);
