@@ -48,13 +48,15 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         
         const lote = await this.loteRepository.getLoteById(pedido.id_lote);
         if (lote?.tipo_lote === "Tostado Verde") {
-            console.log('checkpoint');
             if (!lote) throw new Error("Lote no encontrado");
             const [e, dto] = UpdateLoteDto.update({
                 peso: lote!.peso - pesoTotalVerde,
                 peso_tostado: lote?.peso_tostado!- pesoTotalTostado,
             });
-           this.loteRepository.updateLote(pedido.id_lote ,dto!);
+            console.log("dto", dto);
+            console.log("lote", lote);
+            this.loteRepository.updateLote(pedido.id_lote ,dto!);
+            console.log("lote actualizado", lote);
         }
 
         // Crear lote tostado (puedes ajustar el dto según tu estructura)
@@ -64,7 +66,8 @@ export class CompleteTueste implements CompleteTuesteUseCase {
             fecha_tostado: Date.now(),
             peso: pesoTotalTostado ,
             perfil_tostado: pedido.comentario,
-        })
+        });
+
         const nuevoLoteTostado = await this.loteTostadoRepository.createLoteTostado(dto!);
 
         return nuevoLoteTostado;

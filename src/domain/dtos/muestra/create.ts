@@ -12,8 +12,6 @@ export class CreateMuestraDto {
         public readonly proceso        : string,
         public readonly id_user?       : string,
         public readonly id_analisis?   : string,
-
-        
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateMuestraDto?] {
@@ -31,7 +29,7 @@ export class CreateMuestraDto {
 
         return [undefined, new CreateMuestraDto(
             id_muestra,productor, finca, region, departamento,
-            peso, variedades, proceso, id_user , id_analisis
+            peso, variedades, proceso, id_user, id_analisis
         )];
     }
    

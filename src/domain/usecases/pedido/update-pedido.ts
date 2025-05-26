@@ -169,7 +169,6 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     //generar tuestes
     if (!dto.pesos) throw new Error('Los pesos son requeridos');
     for (let peso of dto.pesos) {
-      console.log('checkpoint');
       const [, createTuesteDto] = CreateTuesteDto.create({
         id_lote: loteOriginal.id_lote,
         fecha_tueste: dto.fecha_tueste,
@@ -180,7 +179,6 @@ export class UpdatePedido implements UpdatePedidoUseCase {
             peso_entrada: peso,
             id_pedido: pedido.id_pedido,
         });
-        console.log('checkpoint2');
         await this.tuesteRepository.createTueste(createTuesteDto!);
     }
 

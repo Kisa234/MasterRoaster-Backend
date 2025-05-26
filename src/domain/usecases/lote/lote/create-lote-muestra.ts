@@ -90,7 +90,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         if (dto.id_user) {
             user = await this.userRepository.getUserById(dto.id_user);
         } 
-        if (user?.rol === 'Cliente') {
+        if (user?.rol === 'cliente') {
             const partesNombre = user.nombre.trim().split(' ');
             const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
             const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';

@@ -168,36 +168,38 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
-        
+
         //validar cliente
         const user = await this.userRepository.getUserById(dto.id_user);
         if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
+
         
         if(lote.tipo_lote === 'Lote Verde'){
             //validar cantidad lote
             const cantidadRequerida = dto.cantidad;
-            if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
+            if (lote.peso <= cantidadRequerida) throw new Error('No hay suficiente cantidad');
             
             //actualizar peso del lote 
             const newpeso = lote.peso-cantidadRequerida;   
             const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
             await this.loteRepository.updateLote(lote.id_lote, updateDto!);
         }
+
         if(lote.tipo_lote === 'Tostado Verde'){
             //validar cantidad de tostado
             const cantidadRequerida = dto.cantidad;
-            if (lote.peso_tostado! < cantidadRequerida) throw new Error('No hay suficiente cantidad');
-
+            if (lote.peso_tostado! < (cantidadRequerida/1.15) ) throw new Error('No hay suficiente cantidad');
         }
 
-        
         //consegir analisis fisico
         if (!lote.id_analisis){console.log ('El lote no tiene analisis'); throw new Error('El lote no tiene analisis');}
+        
         const analisis = await this.AnalisisRepository.getAnalisisById(lote.id_analisis);
         if (!analisis) throw new Error('El analisis no existe');
+        
         const analisisFisico = await this.AnalisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
         if (!analisisFisico) throw new Error('El analisis fisico no existe');
-        
+
         //crear Pedido
         const pedido = await this.pedidoRepository.createPedido(dto);
         
@@ -214,7 +216,6 @@ export class CreatePedido implements CreatePedidoUseCase {
                 peso_entrada: peso,
                 id_pedido: pedido.id_pedido,
             });
-            console.log('createTuesteDto', createTuesteDto);
             await this.tuesteRepository.createTueste(createTuesteDto!);
         }
 
