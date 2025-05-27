@@ -41,7 +41,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             finca        : muestra.finca,
             region       : muestra.region,
             departamento : muestra.departamento,
-            peso         : muestra.peso,
+            peso         : peso,
             variedades   : muestra.variedades,
             proceso      : muestra.proceso,
             tipo_lote    : 'Lote Verde',

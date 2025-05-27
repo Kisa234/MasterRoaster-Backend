@@ -54,118 +54,148 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     private async ventaVerde(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
-        //validar cantidad lote
-        if (lote.peso < dto.cantidad) throw new Error('No hay suficiente cantidad en el lote');
-        //validar cliente
-        const user = await this.userRepository.getUserById(dto.id_user);
-        if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
-        //actualizar peso del lote 
-        const newpeso = lote.peso - dto.cantidad;    
-        const [a,updateDto] = UpdateLoteDto.update({ peso: newpeso });
-        await this.loteRepository.updateLote(lote.id_lote, updateDto!);
-        
-        
-        const lotes = await this.loteRepository.getLotesByUserId(user.id_user);
-        //validar si el usuario tiene un lote del mismo lote Origen
-        if (lotes.length > 0) {
-            const loteOrigen = lotes.find(l => l.id_lote === lote.id_lote);
-            if (loteOrigen) {
-                //actualizar peso del lote origen
-                const newpesoOrigen = loteOrigen.peso + dto.cantidad;    
-                const [,updateDto] = UpdateLoteDto.update({ peso: newpesoOrigen });
-                await this.loteRepository.updateLote(loteOrigen.id_lote, updateDto!);
-            }               
+        // 1. Verificar que hay suficiente peso en el lote original
+        if (lote.peso < dto.cantidad) {
+            throw new Error('No hay suficiente cantidad en el lote');
         }
-        
-        //crear Nuevo lote
-        const [, createLoteDto] = CreateLoteDto.create({
-            productor: lote.productor,
-            finca: lote.finca,
-            region: lote.region,
-            departamento: lote.departamento,
-            peso: dto.cantidad,
-            variedades: lote.variedades,
-            proceso: lote.proceso,
-            tipo_lote: 'Lote Verde',
-            id_user: user.id_user,
-            id_analisis: lote.id_analisis,
+
+        // 2. Validar que el cliente existe y no está eliminado
+        const user = await this.userRepository.getUserById(dto.id_user);
+        if (!user || user.eliminado) {
+            throw new Error('El cliente no existe o está eliminado');
+        }
+
+        // 3. Actualizar peso del lote original
+        const nuevoPesoLote = lote.peso - dto.cantidad;
+        const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
+        await this.loteRepository.updateLote(lote.id_lote, updateLoteDto!);
+
+        // 4. Verificar si el cliente ya tiene un lote nuevo creado desde este mismo lote original y del mismo tipo de pedido
+        const pedidos = await this.pedidoRepository.getPedidosByCliente(user.id_user);
+        const pedidoRelacionado = pedidos.find(p => p.id_lote === lote.id_lote && p.tipo_pedido === dto.tipo_pedido); ;
+        let nuevoLoteDestino: LoteEntity;
+
+        if (pedidoRelacionado) {
+          // Ya tiene un lote generado previamente desde este lote original
+          
+            if (!pedidoRelacionado.id_nuevoLote) {
+                throw new Error('El pedido relacionado no tiene un lote nuevo asociado');
+            }
+            const loteDestino = await this.loteRepository.getLoteById(pedidoRelacionado.id_nuevoLote);
+            if (!loteDestino) {
+              throw new Error('No se pudo encontrar el lote destino relacionado al pedido anterior');
+            }
+            nuevoLoteDestino = loteDestino;
+          
+            // Sumar la nueva cantidad al lote destino y actualizar
+            const nuevoPesoDestino = nuevoLoteDestino.peso + dto.cantidad;
+            const [, updateDestinoDto] = UpdateLoteDto.update({ peso: nuevoPesoDestino });
+            await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, updateDestinoDto!);
+        } else {
+          // No tiene lote nuevo generado → se crea uno desde este lote origen
+            const [, createLoteDto] = CreateLoteDto.create({
+              productor: lote.productor,
+              finca: lote.finca,
+              region: lote.region,
+              departamento: lote.departamento,
+              peso: dto.cantidad,
+              variedades: lote.variedades,
+              proceso: lote.proceso,
+              tipo_lote: 'Lote Origen',
+              id_user: user.id_user,
+              id_analisis: lote.id_analisis,
+            });
+          
+            nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, false, true, lote.id_lote);
+        }
+
+        // 5. Crear el nuevo pedido con referencia al lote original y al nuevo lote
+        const [, createPedidoDto] = CreatePedidoDto.create({
+          tipo_pedido: dto.tipo_pedido,
+          cantidad: dto.cantidad,
+          comentario: dto.comentario,
+          id_user: dto.id_user,
+          id_lote: lote.id_lote,
+          id_nuevoLote: nuevoLoteDestino.id_lote,
         });
 
-        const nuevoLote = await this.createLoteUseCase.execute(createLoteDto!,'',true, lote.id_lote);
-        // Crear el pedido
-
-        const [,newDto] = CreatePedidoDto.create({
-            tipo_pedido: dto.tipo_pedido,
-            cantidad: dto.cantidad,
-            comentario: dto.comentario,
-            id_user: dto.id_user,
-            id_lote: lote.id_lote,
-            id_nuevoLote: nuevoLote.id_lote,
-        });
-
-        const pedido = await this.pedidoRepository.createPedido(newDto!);
+        const pedido = await this.pedidoRepository.createPedido(createPedidoDto!);
         return PedidoEntity.fromObject(pedido);
     }
 
     private async tostadoVerde(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
-        //validar cantidad lote
         const cantidadRequerida = dto.cantidad * 1.15;
-        if (lote.peso < cantidadRequerida) throw new Error('No hay suficiente cantidad');
-       //validar cliente
-       const user = await this.userRepository.getUserById(dto.id_user);
-       if (!user || user.eliminado) throw new Error('El cliente no existe o está eliminado');
-       
-        //validar si el usuario tiene un lote del mismo lote Origen
-        const lotes = await this.loteRepository.getLotesByUserId(user.id_user);
-        if (lotes.length > 0) {
-            const loteOrigen = lotes.find(l => l.id_lote === lote.id_lote);
-            if (loteOrigen) {
-                //actualizar peso del lote origen
-                const newpesoOrigen = loteOrigen.peso + cantidadRequerida;    
-                const [,updateDto] = UpdateLoteDto.update({ peso: newpesoOrigen });
-                await this.loteRepository.updateLote(loteOrigen.id_lote, updateDto!);
-            }               
+        
+        // 1. Validar cantidad disponible en el lote original
+        if (lote.peso < cantidadRequerida) {
+            throw new Error('No hay suficiente cantidad en el lote');
         }
-
-        //actualizar peso del lote 
-        const newpeso = lote.peso-cantidadRequerida;   
-        const [,updateDto] = UpdateLoteDto.update({ peso: newpeso });
-        await this.loteRepository.updateLote(lote.id_lote, updateDto!);
-  
-        //crear Nuevo lote
-        const [,createLoteDto] = CreateLoteDto.create({
-            id_lote     : lote.id_lote,
-            productor   : lote.productor,
-            finca       : lote.finca,
-            region      : lote.region,
-            departamento: lote.departamento,
-            peso        : cantidadRequerida,
-            variedades  : lote.variedades,
-            proceso     : lote.proceso,
-            tipo_lote   : 'Tostado Verde',
-            peso_tostado: dto.cantidad,
-            id_user     : dto.id_user,
-            id_analisis : lote.id_analisis,
-        });
-        const nuevoLote = await this.createLoteUseCase.execute(createLoteDto!,'Tostado Verde');
-
-        //crear pedido
-
-
-
-        const [,newDto] = CreatePedidoDto.create({
+        
+        // 2. Validar cliente
+        const user = await this.userRepository.getUserById(dto.id_user);
+        if (!user || user.eliminado) {
+            throw new Error('El cliente no existe o está eliminado');
+        }
+        
+        // 3. Buscar si ya existe un pedido "Tostado Verde" del mismo lote origen
+        const pedidos = await this.pedidoRepository.getPedidosByCliente(user.id_user);
+        const pedidoExistente = pedidos.find(
+            (p) => p.id_lote === lote.id_lote && p.tipo_pedido === 'Tostado Verde'
+        );
+        
+        let loteTostado: LoteEntity;
+        
+        if (pedidoExistente) {
+            // 4A. Ya existe lote tostado → reutilizar y actualizar peso
+            const lote = await this.loteRepository.getLoteById(pedidoExistente.id_nuevoLote!);
+            if (!lote || lote.eliminado) {
+                throw new Error('El lote tostado relacionado no existe o fue eliminado');
+            }
+            loteTostado = lote;
+            // Actualizar peso en verde y tostado del lote tostado
+            const nuevoPesoVerde = loteTostado.peso + cantidadRequerida;
+            const nuevoPesoTostado = loteTostado.peso_tostado! + dto.cantidad;
+            const [, updateTostadoDto] = UpdateLoteDto.update({ peso: nuevoPesoVerde, peso_tostado: nuevoPesoTostado });
+            await this.loteRepository.updateLote(loteTostado.id_lote, updateTostadoDto!);
+        } else {
+            // 4B. No existe lote tostado → crear uno nuevo
+            const [, createLoteDto] = CreateLoteDto.create({
+                productor: lote.productor,
+                finca: lote.finca,
+                region: lote.region,
+                departamento: lote.departamento,
+                peso: cantidadRequerida,
+                variedades: lote.variedades,
+                proceso: lote.proceso,
+                tipo_lote: 'Tostado Verde',
+                peso_tostado: dto.cantidad,
+                id_user: dto.id_user,
+                id_analisis: lote.id_analisis,
+            });
+            
+            loteTostado = await this.createLoteUseCase.execute(createLoteDto!, true, true, lote.id_lote);
+        }
+        
+        // 5. Actualizar lote original (restar lo tostado)
+        const nuevoPesoOriginal = lote.peso - cantidadRequerida;
+        const [, updateOriginalDto] = UpdateLoteDto.update({ peso: nuevoPesoOriginal });
+        await this.loteRepository.updateLote(lote.id_lote, updateOriginalDto!);
+        
+        // 6. Crear nuevo pedido
+        const [, newPedidoDto] = CreatePedidoDto.create({
             tipo_pedido: dto.tipo_pedido,
             cantidad: dto.cantidad,
             comentario: dto.comentario,
             id_user: dto.id_user,
             id_lote: lote.id_lote,
-            id_nuevoLote: nuevoLote.id_lote,
+            id_nuevoLote: loteTostado.id_lote,
         });
-
-        const pedido = await this.pedidoRepository.createPedido(newDto!);
-  
+        
+        const pedido = await this.pedidoRepository.createPedido(newPedidoDto!);
+        
         return PedidoEntity.fromObject(pedido);
-    }
+}
+
 
     private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
 
@@ -192,7 +222,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         }
 
         //consegir analisis fisico
-        if (!lote.id_analisis){console.log ('El lote no tiene analisis'); throw new Error('El lote no tiene analisis');}
+        if (!lote.id_analisis){throw new Error('El lote no tiene analisis');}
         
         const analisis = await this.AnalisisRepository.getAnalisisById(lote.id_analisis);
         if (!analisis) throw new Error('El analisis no existe');

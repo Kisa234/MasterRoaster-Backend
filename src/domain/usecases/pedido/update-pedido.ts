@@ -53,42 +53,42 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   }
 
   private async actualizarVentaVerde(pedido: PedidoEntity, loteOriginal: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
-    const diferencia = dto.cantidad! - pedido.cantidad;
-  
+
+    const diferencia =  pedido.cantidad - dto.cantidad!;
+    // Validar si la cantidad ha cambiado
     if (diferencia === 0) throw new Error('La cantidad no ha cambiado');
   
+    //validar que el nuevo peso no sea 0 o negativo
+    if (dto.cantidad! <= 0) throw new Error('La cantidad del pedido debe ser mayor a 0');
+
     // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if (diferencia > 0 && loteOriginal.peso < diferencia) {
+    if ((loteOriginal.peso + pedido.cantidad) < dto.cantidad!) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
     }
   
     // 2. Actualizar peso en lote original
-    const nuevoPesoLote = loteOriginal.peso - diferencia;
+    const nuevoPesoLote = loteOriginal.peso + pedido.cantidad - dto.cantidad!;
     const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
     if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
     await this.loteRepository.updateLote(loteOriginal.id_lote, updateLoteDto);
-  
-    // 3. Actualizar o eliminar lote clonado
-    if (!pedido.id_nuevoLote) throw new Error('No se encontró lote clonado para este pedido');
-  
-    const loteClonado = await this.loteRepository.getLoteById(pedido.id_nuevoLote);
-    if (!loteClonado || loteClonado.eliminado) throw new Error('Lote clonado no válido');
-  
-    const nuevoPesoClonado = loteClonado.peso + diferencia;
-  
-    if (nuevoPesoClonado <= 0) {
-      await this.loteRepository.deleteLote(loteClonado.id_lote);
-    } else {
-      const [, updateDtoClonado] = UpdateLoteDto.update({ peso: nuevoPesoClonado });
-      if (!updateDtoClonado) throw new Error('Error generando DTO para lote clonado');
-      await this.loteRepository.updateLote(loteClonado.id_lote, updateDtoClonado);
-    }
+    
+
+    
+    // 3. Actualizar peso nuevo lote
+    const nuevoLote = await this.loteRepository.getLoteById(pedido.id_nuevoLote!);
+    if (!nuevoLote || nuevoLote.eliminado) throw new Error('Lote clonado no válido');
+    const nuevoPeso = nuevoLote.peso - pedido.cantidad + dto.cantidad!;
+    const [, updateNuevoLoteDto] = UpdateLoteDto.update({ peso: nuevoPeso });
+    await this.loteRepository.updateLote(nuevoLote.id_lote, updateNuevoLoteDto!);
+    
+   
   
     // 4. Actualizar pedido
     await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
+
   
   private async actualizarTostadoVerde(pedido: PedidoEntity, loteOriginal: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
     const pesoAnterior = pedido.cantidad * 1.15;
@@ -149,6 +149,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   
     //2. Actualizar pedido
     const newpedido = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+    
     
     //3. eliminar tuestes anteriores
     const tuestes = await this.tuesteRepository.getTostadosByPedido(pedido.id_pedido);

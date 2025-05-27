@@ -5,7 +5,7 @@ import { UserRepository } from "../../../repository/user.repository";
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto,tueste?:string, usuario?:boolean, id_c?:string): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto,tueste?:Boolean, usuario?:boolean, id_c?:string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
@@ -15,7 +15,7 @@ export class CreateLote implements CreateLoteUseCase {
         private readonly userRepository: UserRepository,
     ){}
 
-    async execute( createLoteDto: CreateLoteDto, tueste?:string,usuario?:boolean, id_c?:string): Promise<LoteEntity> {
+    async execute( createLoteDto: CreateLoteDto, tueste?:Boolean, usuario?:boolean, id_c?:string): Promise<LoteEntity> {
 
         const id= await this.generarId(createLoteDto, tueste,usuario, id_c);
         
@@ -31,15 +31,15 @@ export class CreateLote implements CreateLoteUseCase {
             tipo_lote    : createLoteDto.tipo_lote,
             id_user      : createLoteDto.id_user,
             peso_tostado : createLoteDto.peso_tostado,
+            id_analisis  : createLoteDto.id_analisis,
         });
 
         return this.loteRepository.createLote(dto!);
     }
 
-    generarId = async (dto: CreateLoteDto,tueste?:string,usuario?:boolean, id_c?:string): Promise<string> => {
+    generarId = async (dto: CreateLoteDto,tueste?:Boolean, usuario?:boolean, id_c?:string): Promise<string> => {
+        //  lOTE NUEVO
         const { productor, variedades, proceso } = dto;
-      
-    
         const nombres = productor.trim().split(' ');
         const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
         const inicialApellido = nombres[1]?.charAt(0).toUpperCase() || '';
@@ -75,17 +75,21 @@ export class CreateLote implements CreateLoteUseCase {
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
     
         // LOTE PARA CLIENTE
-        let user;if (usuario) {
+        let user;
+        if (usuario) {
             if (dto.id_user) {
                 user = await this.userRepository.getUserById(dto.id_user);
             } 
-            if (user?.rol === 'Cliente') {
+            if (user?.rol === 'cliente') {
                 const partesNombre = user.nombre.trim().split(' ');
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
                 idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
+                if (tueste) {
+                    idGenerado = `${idGenerado}-T`;
+                }
             }
-            else if (user?.rol !== 'Cliente') {
+            else if (user?.rol !== 'cliente') {
                 throw new Error('No se puede generar un Lote para un usuario que no es cliente');
             }
         }
