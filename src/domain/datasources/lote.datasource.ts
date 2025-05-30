@@ -12,4 +12,6 @@ export abstract class LoteDataSource {
     abstract getLotesVerdes(): Promise<LoteEntity[]>;
     abstract createLoteFromMuestra(id: string,peso:number,dto:CreateLoteDto): Promise<LoteEntity>;
     abstract getLotesByUserId(id: string): Promise<LoteEntity[]>;
+    abstract getUserByLote(id:string):Promise<string>;
+
   }

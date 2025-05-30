@@ -19,6 +19,7 @@ import { CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
 import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
+import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-pedidos-tueste-fecha";
 
 export class PedidoController {
 
@@ -123,6 +124,13 @@ export class PedidoController {
     public getPedidosOrdenTueste = async (req: Request, res: Response) => {
         new GetPedidosOrdenTueste(this.pedidoRepository)
             .execute()
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error }));
+    };
+    public getPedidosOrdenTuesteByFecha = async (req: Request, res: Response) => {
+        const fecha = new Date(req.params.fecha);
+        new GetPedidosOrdenTuesteByFecha(this.pedidoRepository)
+            .execute(fecha)
             .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));
     };

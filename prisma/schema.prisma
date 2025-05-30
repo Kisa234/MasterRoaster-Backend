@@ -79,17 +79,19 @@ model Lote {
 }
 
 model LoteTostado {
-  id_lote_tostado  String     @id 
+  id_lote_tostado  String       @id 
   id_lote          String     
   fecha_tostado    DateTime
   perfil_tostado   String
   peso             Float
-  fecha_registro   DateTime   @default(now())
-  eliminado        Boolean     @default(false)
+  fecha_registro   DateTime     @default(now())
+  eliminado        Boolean      @default(false)
 
 
-  lote             Lote        @relation(fields: [id_lote], references: [id_lote])
+  pedido           Pedido? @relation("PedidoLoteTostado")
+  lote             Lote         @relation(fields: [id_lote], references: [id_lote])
   tuestes          Tueste[]     
+
 }
 
 
@@ -107,30 +109,34 @@ model Historial {
 }
 
 model Pedido {
-  id_pedido        String    @id @default(uuid())
-  fecha_registro   DateTime  @default(now())
-  tipo_pedido      String
-  cantidad         Float
-  estado_pedido    String    @default("Pendiente")
-  id_user          String
-  id_lote          String
-  id_nuevoLote     String?
-  comentario       String?
-  pesos            Float[]
-  fecha_tueste     DateTime?
-  tostadora        String?
-  eliminado        Boolean   @default(false)
+  id_pedido             String    @id @default(uuid())
+  fecha_registro        DateTime  @default(now())
+  tipo_pedido           String
+  cantidad              Float
+  estado_pedido         String    @default("Pendiente")
+  id_user               String
+  id_lote               String
+  id_nuevoLote          String?
+  id_nuevoLote_tostado  String?   @unique  
+  comentario            String?
+  pesos                 Float[]
+  fecha_tueste          DateTime?
+  tostadora             String?
+  eliminado             Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
   cliente User @relation(fields: [id_user], references: [id_user])
-
   // Relación con lote original
   lote Lote @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
-
   // Relación con lote creado
   loteCreado Lote? @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
+  // Relación con lote tostado creado
+  loteTostado LoteTostado? @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
+
 
   tueste Tueste[]
+
+  
 }
 
 

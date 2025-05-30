@@ -2,13 +2,13 @@ import { Router } from "express";
 import { TuesteDataSourceImpl } from "../../infrastructure/datasources/tueste.datasource.impl";
 import { TuesteRepositoryImpl } from "../../infrastructure/repositories/tueste.repository.impl";
 import { TuesteController } from "./controller";
-import { LoteDataSource } from '../../domain/datasources/lote.datasource';
 import { LoteDataSourceImpl } from "../../infrastructure/datasources/lote.datasource.impl";
 import { LoteRepositoryImpl } from "../../infrastructure/repositories/lote.repository.impl";
 import PedidoRepositoryImpl from "../../infrastructure/repositories/pedido.repository.impl";
 import { PedidoDataSourceImpl } from "../../infrastructure/datasources/pedido.datasource.impl";
 import { LoteTostadoDataSourceImpl } from "../../infrastructure/datasources/loteTostado.datasource.impl";
 import { LoteTostadoRepositoryImpl } from "../../infrastructure/repositories/loteTostado.repository.impl";
+import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
 
 export class TuesteRoutes {
 
@@ -29,7 +29,9 @@ export class TuesteRoutes {
         const loteDatasource = new LoteDataSourceImpl();
         const loteRepository = new LoteRepositoryImpl(loteDatasource);
 
-        const tuesteController = new TuesteController(tuesteRepository, loteTostadoDataSource, pedidoRepository,loteRepository);
+        const c = new CreateLoteTostado(loteTostadoRepository)
+
+        const tuesteController = new TuesteController(tuesteRepository,c, pedidoRepository,loteRepository);
         
         router.post('/', tuesteController.createTueste);
         router.get('/', tuesteController.getAllTuestes);

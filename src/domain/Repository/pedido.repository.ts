@@ -12,4 +12,6 @@ export abstract class PedidoRepository {
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;
+    abstract GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]>;
+
 }

@@ -8,6 +8,7 @@ export class UpdatePedidoDto {
         public readonly id_user      ?:    string,
         public readonly id_lote      ?:    string,
         public readonly id_nuevoLote ?:    string,
+        public readonly id_nuevoLote_tostado ?: string,
         public readonly pesos        ?:    number[],
         public readonly tostadora    ?:    string,
         public readonly fecha_tueste ?:    Date,
@@ -19,6 +20,7 @@ export class UpdatePedidoDto {
         if (this.estado_pedido) returnObj.estado_pedido = this.estado_pedido;
         if (this.comentario) returnObj.comentario = this.comentario;
         if (this.id_nuevoLote) returnObj.id_nuevoLote = this.id_nuevoLote;
+        if (this.id_nuevoLote_tostado) returnObj.id_nuevoLote_tostado = this.id_nuevoLote_tostado;
         if (this.pesos) returnObj.pesos = this.pesos;
         if (this.tostadora) returnObj.tostadora = this.tostadora;
         if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
@@ -36,6 +38,7 @@ export class UpdatePedidoDto {
             id_user,
             id_lote,
             id_nuevoLote,
+            id_nuevoLote_tostado,
             pesos,
             tostadora,
             fecha_tueste,
@@ -53,9 +56,10 @@ export class UpdatePedidoDto {
                 id_user,
                 id_lote,
                 id_nuevoLote,
+                id_nuevoLote_tostado,
                 pesos,
                 tostadora,
-                fecha_tueste? new Date(fecha_tueste) : undefined
+                fecha_tueste ? new Date(`${fecha_tueste}T00:00:00`) : new Date()
             )
         ];
     }

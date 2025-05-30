@@ -13,7 +13,6 @@ import { CreatePedido } from '../../domain/usecases/pedido/create-pedido';
 export  class PedidoDataSourceImpl implements PedidoDatasource{
 
     
-    
     async createPedido(createPedidoDto:CreatePedidoDto): Promise<PedidoEntity> {
         const newPedido =  await prisma.pedido.create({
             data: createPedidoDto!
@@ -100,9 +99,6 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
 
     
     async getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0); // normaliza a medianoche UTC
-      
         const pedidos = await prisma.pedido.findMany({
           where: {
             eliminado: false,
@@ -115,8 +111,20 @@ export  class PedidoDataSourceImpl implements PedidoDatasource{
         });
       
         return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
-      }
-      
-       
-    
+    }
+
+    async GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+          where: {
+            eliminado: false,
+            tipo_pedido: {
+              equals: 'Orden Tueste',
+              mode: 'insensitive'
+            },
+            fecha_tueste: fecha,
+          }
+        });
+        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+    }
+
 }

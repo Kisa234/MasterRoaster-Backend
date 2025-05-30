@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-
 import { CreateTuesteDto } from "../../domain/dtos/tueste/create";
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { CreateTueste } from "../../domain/usecases/tueste/create-tueste";
@@ -9,19 +8,16 @@ import { DeleteTueste } from "../../domain/usecases/tueste/delete-tueste";
 import { GetTueste } from "../../domain/usecases/tueste/get-tueste";
 import { GetAllTueste } from "../../domain/usecases/tueste/get-all-tueste";
 import { CompleteTueste } from "../../domain/usecases/tueste/complete-tueste";
-import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
 import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 import { LoteRepository } from "../../domain/repository/lote.repository";
-import { GetAllLoteTostado } from "../../domain/usecases/lote/lote-tostado/get-all-lote-tostado";
-import { GetAllLotesVerdes } from "../../domain/usecases/lote/lote/get-lotes-verdes";
-import { GetALLLotesTostados } from "../../domain/usecases/lote/lote/get-lotes-tostados";
+import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
 
 export class TuesteController {
 
     constructor(
         private readonly tuesteRepository: TuesteRepository,
-        private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly createLoteTostado: CreateLoteTostado,
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
     ){}
@@ -58,9 +54,9 @@ export class TuesteController {
         }
         new CompleteTueste(
             this.tuesteRepository,
-            this.loteTostadoRepository,
             this.pedidoRepository,
-            this.loteRepository
+            this.loteRepository,
+            this.createLoteTostado
             
             )
             .execute(id_tueste, completeTuesteDto!)

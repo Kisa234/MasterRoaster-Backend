@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { LoteRepository } from "../../domain/repository/lote.repository";
-import { CreateLote } from "../../domain/usecases/lote/lote/create-lote";
+import { CreateLote, CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
 import { GetLoteById } from "../../domain/usecases/lote/lote/get-lote";
 import { UpdateLote } from '../../domain/usecases/lote/lote/update-lote';
 import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
@@ -12,6 +12,7 @@ import { UserRepository } from "../../domain/repository/user.repository";
 import { MuestraRepository } from "../../domain/repository/muestra.repository";
 import { GetALLLotesTostados } from "../../domain/usecases/lote/lote/get-lotes-tostados";
 import { GetAllLotesVerdes } from "../../domain/usecases/lote/lote/get-lotes-verdes";
+import { GetUserByLote } from "../../domain/usecases/lote/lote/get-user-lote";
 
 export class LoteController {
 
@@ -19,6 +20,7 @@ export class LoteController {
         private readonly loteRepository: LoteRepository,
         private readonly muestraRepository: MuestraRepository,
         private readonly userRepository: UserRepository,
+        private readonly createLoteUseCase: CreateLoteUseCase,
     ){}
 
     public createLote = (req:Request , res : Response) => {
@@ -76,9 +78,8 @@ export class LoteController {
             return res.status(400).json({ error: 'Peso is required' });
         }
         new CreateLoteFromMuestra(
-            this.loteRepository,
+            this.createLoteUseCase,
             this.muestraRepository,
-            this.userRepository,
         )
         .execute(id_muestra, peso)
         .then( lote => res.json(lote))
@@ -102,6 +103,14 @@ export class LoteController {
             .execute()
             .then( tuestes => res.json(tuestes))
             .catch( error => res.status(400).json({ error}));
+    }
+    public getUserByLote = async (req: Request, res: Response) => {
+        const id = req.params.id;
+        new GetUserByLote(this.loteRepository)
+            .execute(id)
+            .then(user => res.json(user))
+            .catch( error => res.status(400).json({ error}));
+
     }
 
 }

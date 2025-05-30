@@ -1,3 +1,4 @@
+import { GetPedidosOrdenTueste } from './../usecases/pedido/get-pedidos-tueste';
 import { CreatePedidoDto } from "../dtos/pedido/create";
 import { UpdatePedidoDto } from "../dtos/pedido/update";
 import { PedidoEntity } from "../entities/pedido.entity";
@@ -12,4 +13,5 @@ export abstract class PedidoDatasource {
     abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;
+    abstract GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]>;
 }

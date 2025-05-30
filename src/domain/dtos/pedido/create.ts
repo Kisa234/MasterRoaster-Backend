@@ -6,6 +6,7 @@ export class CreatePedidoDto {
         public readonly id_user         :    string,
         public readonly id_lote         :    string,
         public readonly id_nuevoLote?   :    string,
+        public readonly id_nuevoLote_tostado? : string,
         public readonly pesos?          :    number[],
         public readonly tostadora?      :    string,
         public readonly fecha_tueste?   :    Date,
@@ -19,6 +20,7 @@ export class CreatePedidoDto {
             id_user,
             id_lote,
             id_nuevoLote,
+            id_nuevoLote_tostado,
             pesos,
             tostadora,
             fecha_tueste,
@@ -41,9 +43,10 @@ export class CreatePedidoDto {
                 id_user,
                 id_lote,
                 id_nuevoLote,
+                id_nuevoLote_tostado,
                 pesos,
                 tostadora,
-                new Date(fecha_tueste ? fecha_tueste : Date.now())
+                fecha_tueste ? new Date(`${fecha_tueste}T00:00:00`) : new Date()
             )
             
         ];

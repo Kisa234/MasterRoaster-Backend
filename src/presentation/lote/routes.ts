@@ -1,3 +1,4 @@
+import { CreateLote, CreateLoteUseCase } from './../../domain/usecases/lote/lote/create-lote';
 import { Router } from "express";
 import { LoteDataSourceImpl } from "../../infrastructure/datasources/lote.datasource.impl";
 import { LoteRepositoryImpl } from "../../infrastructure/repositories/lote.repository.impl";
@@ -21,18 +22,20 @@ export class LoteRoutes{
         const muestraDatasource = new MuestraDataSourceImpl();
         const muestraRepository = new MuestraRepositoryImpl(muestraDatasource);
 
-        const loteController = new LoteController(loteRepository,muestraRepository,userRepository);
+        const cl = new CreateLote(loteRepository, userRepository)
+
+        const loteController = new LoteController(loteRepository,muestraRepository,userRepository, cl);
 
         router.post('/', loteController.createLote);
         router.post('/muestra/:id', loteController.createLoteFromMuestra);
         router.get('/', loteController.getLotes);
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
-        
         router.get('/:id', loteController.getLoteById);
         router.put('/:id', loteController.updateLote);
         router.delete('/:id', loteController.deleteLote);
         router.get('/user/:id', loteController.getLotesByUserId);
+        router.get('/byLote/:id',loteController.getUserByLote);
 
         return router;
     }

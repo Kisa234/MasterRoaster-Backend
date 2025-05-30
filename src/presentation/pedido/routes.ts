@@ -27,7 +27,7 @@ export class PedidoRoutes {
         const PedidoRepository = new PedidoRepositoryImpl(PedidoDatasource);
         // Lote
         const LoteDatasource = new LoteDataSourceImpl();
-        const LoteLoteRepository = new LoteRepositoryImpl(LoteDatasource);
+        const LoteRepository = new LoteRepositoryImpl(LoteDatasource);
         // Tueste
         const TuesteDatasource = new TuesteDataSourceImpl();
         const TuesteRepository = new TuesteRepositoryImpl(TuesteDatasource);
@@ -44,11 +44,11 @@ export class PedidoRoutes {
         const AnalisisFisicoRepository = new AnalisisFisicoRepositoryImpl(AnalisisFisicoDatasource);
 
         
-        const cl = new CreateLote(LoteLoteRepository, UserRepository)
+        const cl = new CreateLote(LoteRepository, UserRepository)
 
         const controller = new PedidoController(
             PedidoRepository,
-            LoteLoteRepository,
+            LoteRepository,
             UserRepository,
             TuesteRepository,
             cl,
@@ -63,6 +63,7 @@ export class PedidoRoutes {
         router.put('/:id', controller.updatePedido);
         router.delete('/:id', controller.deletePedido);
         router.get('/orden/tueste', controller.getPedidosOrdenTueste);
+        router.get('/orden/tueste/:fecha', controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', controller.getPedidosByEstado);
         router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
         router.put('/completar/:id', controller.completarPedido);

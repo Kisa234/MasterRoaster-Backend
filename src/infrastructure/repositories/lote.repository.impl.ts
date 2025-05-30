@@ -37,6 +37,9 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getLotesVerdes(): Promise<LoteEntity[]>{
         return this.datasource.getLotesVerdes();
     }
+    getUserByLote(id: string): Promise<string> {
+        return this.datasource.getUserByLote(id);
+    }
 
 
 }

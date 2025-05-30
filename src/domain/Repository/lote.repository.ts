@@ -13,5 +13,7 @@ export abstract class LoteRepository {
       abstract getLotesByUserId(id: string): Promise<LoteEntity[]>;
       abstract getLotesTostados(): Promise<LoteEntity[]>;
     abstract getLotesVerdes(): Promise<LoteEntity[]>;
+    abstract getUserByLote(id:string):Promise<string>;
+
     
 }

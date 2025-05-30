@@ -20,8 +20,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
   async getLoteById(id: string): Promise<LoteEntity | null> {
     const lote = await prisma.lote.findUnique({
       where: {
-        id_lote: id,
-        eliminado: false
+        id_lote: id
       }
     });
     if (!lote) return null;
@@ -32,7 +31,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lote =  await this.getLoteById(id);
     const updatedLote = await prisma.lote.update({ 
       where: { id_lote: id },
-      data: updateLoteDto.values
+      data: {...updateLoteDto.values, eliminado:false}
     });
     return LoteEntity.fromObject(updatedLote);
   }
@@ -115,6 +114,18 @@ export class LoteDataSourceImpl implements LoteDataSource {
     });
     return lotes.map(lote => LoteEntity.fromObject(lote));
   }
-  
+  async getUserByLote(id: string): Promise<string> {
+    const user = await prisma.user.findFirst({
+        where: {
+          lotes: {
+            some: {
+              id_lote: id,
+            },
+          },
+        },
+    });
+    if (!user) throw new Error("No se encontró el usuario para el lote");
+    return user.nombre;
+  }
   
 }

@@ -1,75 +1,84 @@
-import { Pedido } from './../../../../node_modules/.prisma/client/index.d';
-import { TuesteEntity } from "../../entities/tueste.entity";
+import  { CreateLoteTostado } from './../lote/lote-tostado/create-lote-tostado';
+import { CreateLoteTostadoDto } from './../../dtos/lotes/lote-tostado/create';
+import { UpdateLoteDto } from './../../dtos/lotes/lote/update';
 import { TuesteRepository } from '../../repository/tueste.repository';
-import { LoteTostadoEntity } from "../../entities/loteTostado.entity";
-import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
-import { CreateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/create";
 import { PedidoRepository } from '../../repository/pedido.repository';
 import { LoteRepository } from '../../repository/lote.repository';
 import { CompleteTuesteDto } from '../../dtos/tueste/complete';
-import { UpdateLoteDto } from '../../dtos/lotes/lote/update';
+import { UpdatePedidoDto } from '../../dtos/pedido/update';
+import { TuesteEntity } from '../../entities/tueste.entity';
 
 export interface CompleteTuesteUseCase {
-    execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<LoteTostadoEntity | null>;
+    execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;
 }
 
 export class CompleteTueste implements CompleteTuesteUseCase {
     constructor(
         private readonly tuesteRepository: TuesteRepository,
-        private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly createLoteTostado: CreateLoteTostado
     ) {}
 
-    async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<LoteTostadoEntity | null> {
-
+    async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
+        //1. verificar si el tueste existe
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
 
-        await this.tuesteRepository.completarTueste(tueste.id_tueste,completeTuesteDto);
+        //2. completar tueste
+        const tuesteCompletado = await this.tuesteRepository.completarTueste(tueste.id_tueste,completeTuesteDto);
         const tuestesDelPedido = await this.tuesteRepository.getTostadosByPedido(tueste.id_pedido);
 
+        //3. verificar si todos los tuestes del pedido estan completados
         const todosCompletados = tuestesDelPedido.every(t =>
             t.estado_tueste === "Completado"
         );
-        
+        if (!todosCompletados) {
+            return TuesteEntity.fromObject(tuesteCompletado);
+        }
+
+        // 4. si todos los tuestes estan completados, completar el pedido
         const pedido = await this.pedidoRepository.getPedidoById(tueste.id_pedido);
         if (!pedido) throw new Error("Pedido no encontrado");
+        this.pedidoRepository.completarPedido(pedido.id_pedido);
         
-        
-        if (!todosCompletados) {
-            return null; 
-        }
-
-        //completar pedido
-        await this.pedidoRepository.completarPedido(pedido.id_pedido);
-        const pesoTotalTostado = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
-        const pesoTotalVerde = tuestesDelPedido.reduce((total, t) => total + t.peso_entrada!, 0);
-        
+        //5. actualizar lote si es Tostado Verde
+        let pesoTotalTostado = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
         const lote = await this.loteRepository.getLoteById(pedido.id_lote);
-        if (lote?.tipo_lote === "Tostado Verde") {
-            if (!lote) throw new Error("Lote no encontrado");
-            const [e, dto] = UpdateLoteDto.update({
-                peso: lote!.peso - pesoTotalVerde,
-                peso_tostado: lote?.peso_tostado!- pesoTotalTostado,
+        if (!lote) throw new Error("Lote no encontrado");
+        if (lote.tipo_lote === "Tostado Verde") {
+            // sumar todos los pesos finales de los tuestes
+            const pesoFinalTostado = lote.peso_tostado! - pesoTotalTostado;
+            const pesoFinalVerde = lote.peso - pedido.cantidad;
+            const [,updateLoteDto] = UpdateLoteDto.update({
+                peso:pesoFinalVerde,
+                peso_tostado: pesoFinalTostado,
             });
-            console.log("dto", dto);
-            console.log("lote", lote);
-            this.loteRepository.updateLote(pedido.id_lote ,dto!);
-            console.log("lote actualizado", lote);
+            console.log(lote.id_lote,updateLoteDto);
+            if (!updateLoteDto) throw new Error("Error generando DTO para lote tostado");
+            await this.loteRepository.updateLote(lote.id_lote, updateLoteDto);
+            // eliminar lote si ambos pesos son 0 
+            if (pesoFinalTostado == 0 && pesoFinalVerde == 0){
+                await this.loteRepository.deleteLote(lote.id_lote);
+            }
         }
 
-        // Crear lote tostado (puedes ajustar el dto según tu estructura)
-        const [,dto]  = CreateLoteTostadoDto.create({
-            id_lote_tostado: `${pedido.id_pedido}-T`,
-            id_lote: pedido.id_lote,
-            fecha_tostado: Date.now(),
-            peso: pesoTotalTostado ,
+        // 6. crear lote tostado       
+        const [,dto] = CreateLoteTostadoDto.create({
+            id_lote: lote.id_lote,
+            fecha_tostado: new Date(),
+            peso: pesoTotalTostado,
             perfil_tostado: pedido.comentario,
+        })
+        if (!dto) throw new Error("Error generando DTO para lote tostado");
+        const loteTostado = await this.createLoteTostado.execute(dto);
+        
+        //7. actualizar nuevo lote en el pedido
+        const [, updatePedido] = UpdatePedidoDto.update({
+            id_nuevoLote_tostado: loteTostado.id_lote_tostado,
         });
-
-        const nuevoLoteTostado = await this.loteTostadoRepository.createLoteTostado(dto!);
-
-        return nuevoLoteTostado;
+        if (!updatePedido) throw new Error("Error generando DTO para lote tostado");
+        await this.pedidoRepository.updatePedido(pedido.id_pedido, updatePedido);
+        return TuesteEntity.fromObject(tuesteCompletado);
     }
 }

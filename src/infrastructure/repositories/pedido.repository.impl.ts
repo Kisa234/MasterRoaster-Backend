@@ -11,6 +11,7 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
         private readonly pedidoDataSource: PedidoDatasource
         
     ) { }
+   
     createPedido( dto:CreatePedidoDto): Promise<PedidoEntity> {
         return this.pedidoDataSource.createPedido( dto);
     }
@@ -37,6 +38,9 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     }
     getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosOrdenTueste();
+    }
+     GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.GetPedidosOrdenTuesteByFecha(fecha);
     }
 
 }

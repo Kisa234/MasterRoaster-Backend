@@ -18,7 +18,7 @@ export class CreateLote implements CreateLoteUseCase {
     async execute( createLoteDto: CreateLoteDto, tueste?:Boolean, usuario?:boolean, id_c?:string): Promise<LoteEntity> {
 
         const id= await this.generarId(createLoteDto, tueste,usuario, id_c);
-        
+
         const [,dto] = CreateLoteDto.create({
             id_lote      : id,
             productor    : createLoteDto.productor,
@@ -70,8 +70,20 @@ export class CreateLote implements CreateLoteUseCase {
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
 
         // NUMERO FINAL
-        const numeroLote = await this.loteRepository.getLotes();
-        const numeroLoteFinal = numeroLote.length + 1;
+        const lotes = await this.loteRepository.getLotes();
+
+        const lotesConUsuarios = await Promise.all(
+            lotes.map(async l => {
+                const user = await this.userRepository.getUserById(l.id_user!);
+                return { lote: l, user };
+            })
+        );
+
+        const lotesFiltrados = lotesConUsuarios
+            .filter(({ user }) => user?.rol === 'admin')
+            .map(({ lote }) => lote);
+
+        const numeroLoteFinal = lotesFiltrados.length + 1;
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
     
         // LOTE PARA CLIENTE
