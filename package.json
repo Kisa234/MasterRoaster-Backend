@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "seed": "ts-node src/scripts/seed.ts",
-    "dev": "npm run seed && tsnd --respawn --clear src/app.ts",
+    "dev": "tsnd --respawn --clear src/app.ts",
     "build": "rimraf ./dist && tsc",
     "start": "node dist/app.js"
   },
