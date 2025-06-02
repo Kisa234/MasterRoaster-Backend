@@ -7,6 +7,7 @@ import { UpdateAnalisisDto } from '../../domain/dtos/analisis/analisis/update';
 import { UpdateAnalisis } from '../../domain/usecases/analisis/analisis/update-analisis';
 import { DeleteAnalisis } from '../../domain/usecases/analisis/analisis/delete-analisis';
 import { GetAllAnalisis } from '../../domain/usecases/analisis/analisis/get-all-analisis';
+import { GetAnalisisByLoteId } from '../../domain/usecases/analisis/analisis/get-analisis-by-lote';
 
 export class AnalisisController {
 
@@ -57,6 +58,14 @@ export class AnalisisController {
     public getAllAnalisis = async (req: Request, res: Response) => {
         new GetAllAnalisis(this.analisisRepository)
             .execute()
+            .then( analisis => res.json(analisis))
+            .catch( error => res.status(400).json({ error }));
+    };
+
+    public getAnalisisByLoteId = async (req: Request, res: Response) => {
+        const id_lote = req.params.id_lote;
+        new GetAnalisisByLoteId(this.analisisRepository)
+            .execute(id_lote)
             .then( analisis => res.json(analisis))
             .catch( error => res.status(400).json({ error }));
     };

@@ -15,6 +15,7 @@ export class AnalisisRoutes{
         router.post('/',analisisController.createAnalisis);
         router.put('/:id',analisisController.updateAnalisis);
         router.get('/:id',analisisController.getAnalisisById);
+        router.get('/lote/:id_lote',analisisController.getAnalisisByLoteId);
         router.get('/',analisisController.getAllAnalisis);
         router.delete('/:id',analisisController.deleteAnalisis);
        

@@ -49,7 +49,22 @@ export  class AnalisisDataSourceImpl implements AnalisisDataSource {
         const analisis = await prisma.analisis.findMany();
         return analisis.map((analisis) => AnalisisEntity.fromObject(analisis));
     }
-   
+    
+    async getAnalisisByLoteId(id_lote: string): Promise<AnalisisEntity | null> {
+        const lote = await prisma.lote.findUnique({
+            where: {
+                id_lote: id_lote
+            },
+        });
+        if (!lote) throw new Error("Lote not found");
+        const analisis = await prisma.analisis.findUnique({
+            where:{
+                id_analisis: lote.id_analisis!
+            }
+        });
+        if (!analisis) throw new Error("El lote no tiene analisis");
+        return AnalisisEntity.fromObject(analisis);
+    }
 
     
     

@@ -1,0 +1,38 @@
+[
+  {
+    "id_lote_tostado": "RV-CHGE-1-T-2805-1",
+    "id_lote": "RV-CHGE-1-T",
+    "fecha_tostado": "2025-05-28 08:04:26.101",
+    "perfil_tostado": "Tueste Medio",
+    "peso": 6000,
+    "fecha_registro": "2025-05-28 08:04:26.107",
+    "eliminado": false
+  },
+  {
+    "id_lote_tostado": "RV-CHGE-1-T-2805-2",
+    "id_lote": "RV-CHGE-1-T",
+    "fecha_tostado": "2025-05-28 10:44:18.774",
+    "perfil_tostado": "Tueste Medio",
+    "peso": 6000,
+    "fecha_registro": "2025-05-28 10:44:18.777",
+    "eliminado": false
+  },
+  {
+    "id_lote_tostado": "RV-CHGE-1-T-0106-1",
+    "id_lote": "RV-CHGE-1-T",
+    "fecha_tostado": "2025-06-02 00:44:25.583",
+    "perfil_tostado": "Tueste Medio",
+    "peso": 5000,
+    "fecha_registro": "2025-06-02 00:44:25.587",
+    "eliminado": false
+  },
+  {
+    "id_lote_tostado": "RV-CHGE-1-T-0106-2",
+    "id_lote": "RV-CHGE-1-T",
+    "fecha_tostado": "2025-06-02 00:46:34.697",
+    "perfil_tostado": "Tueste Medio",
+    "peso": 6000,
+    "fecha_registro": "2025-06-02 00:46:34.699",
+    "eliminado": false
+  }
+]

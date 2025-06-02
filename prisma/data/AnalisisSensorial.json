@@ -1,0 +1,21 @@
+[
+  {
+    "id_analisis_sensorial": "fd63f06b-4b0d-4781-8bef-09e19c9ec62f",
+    "fragancia_aroma": 7.5,
+    "sabor": 8,
+    "sabor_residual": 7,
+    "acidez": 7.8,
+    "cuerpo": 8.1,
+    "uniformidad": 10,
+    "balance": 7.5,
+    "taza_limpia": 10,
+    "dulzor": 8.5,
+    "puntaje_catador": 8,
+    "taza_defecto_ligero": 0,
+    "tazas_defecto_rechazo": 0,
+    "puntaje_taza": 86.4,
+    "comentario": "Perfil limpio con notas frutales y acidez brillante",
+    "fecha_registro": "2025-05-21 08:20:14.165",
+    "eliminado": false
+  }
+]

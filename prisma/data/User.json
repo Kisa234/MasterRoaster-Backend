@@ -1,0 +1,24 @@
+[
+  {
+    "id_user": "fb845225-0774-4d62-81f3-0b705c487801",
+    "nombre": "Renato Martineti",
+    "email": "prueba@gmail.com",
+    "rol": "admin",
+    "password": "123",
+    "numero_telefono": "999999999",
+    "eliminado": false,
+    "fecha_registro": "2025-05-21 07:18:20.998",
+    "fecha_editado": null
+  },
+  {
+    "id_user": "fce8ea90-1a91-4c54-888d-d6d53370086f",
+    "nombre": "Renzo Vilchez",
+    "email": "renzonicolas3009@Gmail.com",
+    "rol": "cliente",
+    "password": "1234",
+    "numero_telefono": "999999999",
+    "eliminado": false,
+    "fecha_registro": "2025-05-21 07:18:20.998",
+    "fecha_editado": null
+  }
+]

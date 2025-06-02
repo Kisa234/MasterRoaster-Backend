@@ -1,0 +1,30 @@
+[
+  {
+    "id_analisis_fisico": "5981f8b9-58eb-4901-98ef-5c108d7d0c74",
+    "fecha_registro": "2025-05-21 08:19:46.937",
+    "peso_muestra": 350,
+    "peso_pergamino": 304.5,
+    "wa": 12.3,
+    "temperatura_wa": 25,
+    "humedad": 11.2,
+    "temperatura_humedad": 24.5,
+    "densidad": 0.72,
+    "color_grano_verde": "Verde",
+    "olor": "limpio",
+    "superior_malla_18": 15,
+    "superior_malla_16": 50,
+    "superior_malla_14": 20,
+    "menor_malla_16": 10,
+    "peso_defectos": 5,
+    "quaquers": 2,
+    "peso_muestra_tostada": 265,
+    "desarrollo": 75,
+    "pocentaje_caramelizcacion": 10.5,
+    "c_desarrollo": 1.2,
+    "grado": "Grado 1",
+    "comentario": "Buen desarrollo general",
+    "defectos_primarios": "{Negro,Vinagre}",
+    "defectos_secundarios": "{Partido,Concha}",
+    "eliminado": false
+  }
+]

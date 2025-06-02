@@ -27,6 +27,11 @@ export class AnalisisRepositoryImpl implements AnalisisRepository{
     getAllAnalisis(): Promise<AnalisisEntity[]> {
         return this.analisis.getAllAnalisis();
     }
+
+    getAnalisisByLoteId(id_lote: string): Promise<AnalisisEntity | null> {
+        return this.analisis.getAnalisisByLoteId(id_lote);
+    } 
+      
     // getAnalisisFSByLoteId(id: string): Promise<{ AnalisisFisicoEntity: AnalisisFisicoEntity, AnalisisSensorialEntity: AnalisisSensorialEntity }> {
     //     return this.analisis.getAnalisisFSByLoteId(id);
     // }

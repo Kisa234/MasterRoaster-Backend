@@ -50,11 +50,11 @@ export class CreateAnalisisFisicoDto {
         if (superior_malla_14 === undefined) return ['El superior malla 14 es requerido', undefined];
         if (menor_malla_16 === undefined) return ['El menor malla 16 es requerido', undefined];
         if (peso_defectos === undefined) return ['El peso de defectos es requerido', undefined];
-        if (quaquers === undefined) return ['El quaquers es requerido', undefined];
-        if (peso_muestra_tostada === undefined) return ['El peso de la muestra tostada es requerido', undefined];
-        if (desarrollo === undefined) return ['El desarrollo es requerido', undefined];
-        if (pocentaje_caramelizcacion === undefined) return ['El porcentaje de caramelización es requerido', undefined];
-        if (c_desarrollo === undefined) return ['El c desarrollo es requerido', undefined];
+        // if (quaquers === undefined) return ['El quaquers es requerido', undefined];
+        // if (peso_muestra_tostada === undefined) return ['El peso de la muestra tostada es requerido', undefined];
+        // if (desarrollo === undefined) return ['El desarrollo es requerido', undefined];
+        // if (pocentaje_caramelizcacion === undefined) return ['El porcentaje de caramelización es requerido', undefined];
+        // if (c_desarrollo === undefined) return ['El c desarrollo es requerido', undefined];
         if (grado === undefined) return ['El grado es requerido', undefined];
    
 

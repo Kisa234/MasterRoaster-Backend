@@ -1,0 +1,30 @@
+[
+  {
+    "id_muestra": "EHGE",
+    "productor": "Edwin Herrera",
+    "finca": "El Paraiso",
+    "region": "Calca",
+    "departamento": "Cusco",
+    "peso": 350,
+    "proceso": "Lavado",
+    "id_user": null,
+    "id_analisis": null,
+    "fecha_registro": "2025-05-26 22:49:39.542",
+    "eliminado": true,
+    "variedades": "{Geisha}"
+  },
+  {
+    "id_muestra": "MEBONA",
+    "productor": "Marisol Enrique",
+    "finca": "El Forestal",
+    "region": "Rio Tambo",
+    "departamento": "Junin",
+    "peso": 350,
+    "proceso": "Natural",
+    "id_user": null,
+    "id_analisis": null,
+    "fecha_registro": "2025-05-27 07:15:48.283",
+    "eliminado": true,
+    "variedades": "{Bourbon}"
+  }
+]

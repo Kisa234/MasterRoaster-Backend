@@ -67,15 +67,12 @@ model Lote {
   user User? @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
-
-   // pedidos que usan este lote como entrada
+  // pedidos que usan este lote como entrada
   pedidosOrigen  Pedido[] @relation("LoteOrigen")
-
   // pedidos que generaron este lote como nuevo
   pedidosDestino Pedido[] @relation("LoteCreado")
-
   LoteTostado LoteTostado[]
-
+  lotesHistoricos      Lote_Analisis[]
 }
 
 model LoteTostado {
@@ -139,8 +136,6 @@ model Pedido {
   
 }
 
-
-
 model Tueste {
   id_tueste                 String   @id @default(uuid())
   id_lote                   String
@@ -178,12 +173,25 @@ model Tueste {
   pedido                    Pedido        @relation(fields: [id_pedido], references: [id_pedido])
 }
 
+model Lote_Analisis {
+  id            String   @id @default(uuid())
+  id_lote       String
+  id_analisis   String
+  fecha_agregado DateTime @default(now())
+
+  lote          Lote     @relation(fields: [id_lote], references: [id_lote])
+  analisis      Analisis @relation(fields: [id_analisis], references: [id_analisis])
+
+  @@unique([id_lote, id_analisis]) 
+}
+
+
 model Analisis {
   id_analisis          String   @id @default(uuid())
   fecha_registro       DateTime @default(now())
   analisisFisico_id    String?  @unique 
   analisisSensorial_id String?  @unique
-  comentario           String 
+  comentario           String
   
   eliminado          Boolean  @default(false)
 
@@ -194,6 +202,7 @@ model Analisis {
 
   Muestra Muestra[]
   Lote    Lote[]
+  lotesHistoricos      Lote_Analisis[]
 }
 
 model AnalisisFisico {
@@ -213,12 +222,12 @@ model AnalisisFisico {
   superior_malla_14         Float
   menor_malla_16            Float
   peso_defectos             Float
-  quaquers                  Float
-  peso_muestra_tostada      Float
-  desarrollo                Float
-  pocentaje_caramelizcacion Float
-  c_desarrollo              Float
-  grado                     String
+  quaquers                  Float?
+  peso_muestra_tostada      Float?
+  desarrollo                Float?
+  pocentaje_caramelizcacion Float?
+  c_desarrollo              Float?
+  grado                     String?
   comentario                String
   defectos_primarios        String[]
   defectos_secundarios      String[]
