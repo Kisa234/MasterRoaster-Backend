@@ -8,21 +8,33 @@ import { UpdateAnalisisFisico } from "../../domain/usecases/analisis/fisico/upda
 import { UpdateAnalisisFisicoDto } from "../../domain/dtos/analisis/fisico/update";
 import { DeleteAnalisisFisico } from "../../domain/usecases/analisis/fisico/delete-analisisFisico";
 import { GetAllAnalisisFisico } from "../../domain/usecases/analisis/fisico/get-all-analisisFisico";
+import { LoteRepository } from "../../domain/repository/lote.repository";
+import { AnalisisRepository } from "../../domain/repository/analisis.repository";
+import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
 
 export class AnalisisFisicoController {
 
     constructor(
-        private readonly analisisFisicoRepository: AnalisisFisicoRepository
+        private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly LoteRepository: LoteRepository,
+        private readonly AnalisisRepository: AnalisisRepository,
+        private readonly LoteAnalisisRepository: LoteAnalisisRepository
     ){}
 
 
     public createAnalisisFisico = async (req: Request, res: Response) => {
+        const id_lote= req.params.id_lote;
         const [error, createAnalisisFisicoDto] = CreateAnalisisFisicoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
-        new CreateAnalisisFisico(this.analisisFisicoRepository)
-            .execute(createAnalisisFisicoDto!)
+        new CreateAnalisisFisico(
+            this.analisisFisicoRepository,
+            this.LoteRepository,
+            this.AnalisisRepository,
+            this.LoteAnalisisRepository
+        )
+            .execute(createAnalisisFisicoDto!, id_lote)
             .then( analisisFisico => res.json(analisisFisico))
             .catch( error => res.status(400).json({ error }));
     };

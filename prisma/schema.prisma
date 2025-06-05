@@ -191,7 +191,7 @@ model Analisis {
   fecha_registro       DateTime @default(now())
   analisisFisico_id    String?  @unique 
   analisisSensorial_id String?  @unique
-  comentario           String
+  comentario           String?
   
   eliminado          Boolean  @default(false)
 

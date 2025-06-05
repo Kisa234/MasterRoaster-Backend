@@ -18,12 +18,13 @@ export class AnalisisSensorialController {
     ){}
 
     public createAnalisisSensorial = async (req: Request, res: Response) => {
+        const id_lote= req.params.id_lote;
         const [error, createAnalisisSensorialDTO] = CreateAnalisisSensorialDTO.create(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
         new CreateAnalisisSensorial(this.analisisSensorialRepository)
-            .execute(createAnalisisSensorialDTO!)
+            .execute(createAnalisisSensorialDTO!, id_lote)
             .then( analisisSensorial => res.json(analisisSensorial))
             .catch( error => res.status(400).json({ error }));
     } ;

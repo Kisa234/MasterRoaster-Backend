@@ -3,7 +3,7 @@ import { AnalisisSensorialEntity } from "../../../entities/analisisSensorial.ent
 import { AnalisisSensorialRepository } from '../../../repository/analisisSensorial.repository';
 
 export interface CreateAnalisisSensorialUseCase {
-    execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO): Promise<AnalisisSensorialEntity>;
+    execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO,id_lote:string): Promise<AnalisisSensorialEntity>;
 }
 
 export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
@@ -11,8 +11,8 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         private readonly AnalisisSensorialRepository: AnalisisSensorialRepository
     ){}
 
-    async execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO): Promise<AnalisisSensorialEntity> {
-        return this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
+    async execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO,id_lote:string): Promise<AnalisisSensorialEntity> {
+        return this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO,id_lote);
     }
 }
 

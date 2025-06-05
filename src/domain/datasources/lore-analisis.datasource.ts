@@ -2,7 +2,7 @@ import { CreateLoteAnalisisDto } from '../dtos/lote-analisis/create';
 import { LoteAnalisisEntity } from '../entities/lote-analisis';
 
 
-export abstract class PrismaLoteAnalisisDatasource  {
+export abstract class LoteAnalisisDatasource  {
 
   abstract create(data: CreateLoteAnalisisDto): Promise<LoteAnalisisEntity> 
   abstract findByLote(id_lote: string): Promise<LoteAnalisisEntity[]> 

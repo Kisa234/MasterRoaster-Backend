@@ -12,6 +12,14 @@ export class UpdateAnalisisFisico implements UpdateAnalisisFisicoUseCase {
     ){}
 
     async execute(id: string, updateAnalisisFisicoDto: UpdateAnalisisFisicoDto): Promise<AnalisisFisicoEntity> {
+        // editar 
+        	// se consigue el analisis del lote
+        	// se consigue el analisis fisico del lote
+        	// se edita el analisis fisico del lote
+        
+
+
+
         return this.analisisFisicoRepository.updateAnalisisFisico(id, updateAnalisisFisicoDto);
     }
 }

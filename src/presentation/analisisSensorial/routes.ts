@@ -12,7 +12,7 @@ export class AnalisisSensorialRoutes {
         const analisisSensorialRepository = new AnalisisSensorialRepositoryImpl(datasource);
         const analisisSensorialController = new AnalisisSensorialController(analisisSensorialRepository);
 
-        router.post('/', analisisSensorialController.createAnalisisSensorial);
+        router.post('/:id', analisisSensorialController.createAnalisisSensorial);
         router.get('/:id', analisisSensorialController.getAnalisisSensorialById);
         router.put('/:id', analisisSensorialController.updateAnalisisSensorial);
         router.get('/', analisisSensorialController.getAllAnalisisSensorial);
