@@ -17,9 +17,9 @@ export interface CreateAnalisisFisicoUseCase {
 export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
     constructor(
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
-        private readonly LoteRepository: LoteRepository,
-        private readonly AnalisisRepository: AnalisisRepository,
-        private readonly LoteAnalisisRepository: LoteAnalisisRepository
+        private readonly loteRepository: LoteRepository,
+        private readonly analisisRepository: AnalisisRepository,
+        private readonly loteAnalisisRepository: LoteAnalisisRepository
     ){}
 
     async execute(createAnalisisFisicoDto: CreateAnalisisFisicoDto,id_lote:string): Promise<AnalisisFisicoEntity> {
@@ -40,23 +40,23 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
             // se agrega el analisis reporte al lote
             // se crea analisis fisico y se agrega a nuevo analisis reporte
 
-        const lote = await this.LoteRepository.getLoteById(id_lote);
+        const lote = await this.loteRepository.getLoteById(id_lote);
         if (!lote) {
             throw new Error(`Lote with id ${id_lote} not found`);
         }
-        let analisis = await this.AnalisisRepository.getAnalisisByLoteId(id_lote);
+        let analisis = await this.analisisRepository.getAnalisisByLoteId(id_lote);
         
         if (!analisis) {
             // se crea el analisis fisico
             const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto); 
             // si el lote no tiene analisis, se crea un nuevo analisis
             const [e, newAnalisisDto] = CreateAnalisisDto.create({
-                analisis_fisico_id: af.id_analisis_fisico
+                analisisFisico_id: af.id_analisis_fisico
             });
             if (e){
                 throw new Error(`Error creating new analisis: ${e}`);
             }
-            const newAnalisis = await this.AnalisisRepository.createAnalisis(newAnalisisDto!);
+            const newAnalisis = await this.analisisRepository.createAnalisis(newAnalisisDto!);
             // se crea un nuevo lote analisis historial
             const [a , newLoteAnalisis] = CreateLoteAnalisisDto.create({
                 id_lote: id_lote,
@@ -65,7 +65,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
             if (a) {
                 throw new Error(`Error creating new lote analisis: ${a}`);
             }
-            await this.LoteAnalisisRepository.create(newLoteAnalisis!);
+            await this.loteAnalisisRepository.create(newLoteAnalisis!);
             // se actualiza el lote con el nuevo analisis
             const [b, updateLote] = UpdateLoteDto.update({
                 id_analisis: (await newAnalisis).id_analisis
@@ -73,7 +73,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
             if (b) {
                 throw new Error(`Error updating lote with new analisis: ${b}`);
             }
-            await this.LoteRepository.updateLote(id_lote, updateLote!);
+            await this.loteRepository.updateLote(id_lote, updateLote!);
 
             return af;
 
@@ -84,12 +84,12 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);
                 // se agrega el analisis fisico al analisis reporte
                 const [e, updateAnalisisDto] = UpdateAnalisisDto.update({
-                    analisis_fisico_id: af.id_analisis_fisico
+                    analisisFisico_id: af.id_analisis_fisico
                 });
                 if (e){
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                await this.AnalisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
+                await this.analisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
                 return af;                
             }
             else if (analisis.analisisFisico_id){
@@ -99,12 +99,12 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);
                 // se crea un nuevo analisis reporte
                 const [e, newAnalisisDto] = CreateAnalisisDto.create({
-                    analisis_fisico_id: af.id_analisis_fisico
+                    analisisFisico_id: af.id_analisis_fisico
                 });
                 if (e){
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                const newAnalisis = await this.AnalisisRepository.createAnalisis(newAnalisisDto!);
+                const newAnalisis = await this.analisisRepository.createAnalisis(newAnalisisDto!);
                 // se crea un nuevo lote analisis historial
                 const [a , newLoteAnalisis] = CreateLoteAnalisisDto.create({
                     id_lote: id_lote,
@@ -113,7 +113,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 if (a) {
                     throw new Error(`Error al crear un nuevo lote analisis: ${a}`);
                 }
-                await this.LoteAnalisisRepository.create(newLoteAnalisis!);
+                await this.loteAnalisisRepository.create(newLoteAnalisis!);
                 // se actualiza el lote con el nuevo analisis
                 const [b, updateLote] = UpdateLoteDto.update({
                     id_analisis: (await newAnalisis).id_analisis
@@ -121,7 +121,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 if (b) {
                     throw new Error(`Error al actualizar el lote con el nuevo analisis: ${b}`);
                 }
-                await this.LoteRepository.updateLote(id_lote, updateLote!);
+                await this.loteRepository.updateLote(id_lote, updateLote!);
                 return af;
             }
             // If none of the above conditions are met, throw an error to ensure all code paths return or throw

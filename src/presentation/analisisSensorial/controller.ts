@@ -9,12 +9,18 @@ import { UpdateAnalisisSensorialDTO } from "../../domain/dtos/analisis/sensorial
 import { UpdateAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/update-analisisSensorial";
 import { DeleteAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/delete-analisisSensorial";
 import { GetAllAnalisisSensorial } from "../../domain/usecases/analisis/sensorial/get-all-analisisSensorial";
+import { LoteRepository } from "../../domain/repository/lote.repository";
+import { AnalisisRepository } from "../../domain/repository/analisis.repository";
+import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
 
 export class AnalisisSensorialController {
 
 
     constructor(
-        private readonly analisisSensorialRepository: AnalisisSensorialRepository 
+        private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly LoteRepository: LoteRepository,
+        private readonly AnalisisRepository: AnalisisRepository,
+        private readonly LoteAnalisisRepository: LoteAnalisisRepository
     ){}
 
     public createAnalisisSensorial = async (req: Request, res: Response) => {
@@ -23,7 +29,12 @@ export class AnalisisSensorialController {
         if (error) {
             return res.status(400).json({ error });
         }
-        new CreateAnalisisSensorial(this.analisisSensorialRepository)
+        new CreateAnalisisSensorial(
+            this.analisisSensorialRepository,
+            this.LoteRepository,
+            this.AnalisisRepository,
+            this.LoteAnalisisRepository
+            )
             .execute(createAnalisisSensorialDTO!, id_lote)
             .then( analisisSensorial => res.json(analisisSensorial))
             .catch( error => res.status(400).json({ error }));
@@ -38,13 +49,17 @@ export class AnalisisSensorialController {
     };
 
     public updateAnalisisSensorial = async (req: Request, res: Response) => {
-        const id_analisis_sensorial = req.params.id;
-        const [error, updateAnalisisSensorialDTO] = UpdateAnalisisSensorialDTO.update({...req.body, id: id_analisis_sensorial});
+        const id_lote= req.params.id_lote;
+        const [error, updateAnalisisSensorialDTO] = UpdateAnalisisSensorialDTO.update({...req.body});
         if (error) {
             return res.status(400).json({ error });
         }
-        new UpdateAnalisisSensorial(this.analisisSensorialRepository)
-            .execute(id_analisis_sensorial,updateAnalisisSensorialDTO!)
+        new UpdateAnalisisSensorial(
+            this.analisisSensorialRepository,
+            this.LoteRepository,
+            this.AnalisisRepository 
+            )
+            .execute(id_lote,updateAnalisisSensorialDTO!)
             .then( analisisSensorial => res.json(analisisSensorial))
             .catch( error => res.status(400).json({ error }
             ));

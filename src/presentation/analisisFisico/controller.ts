@@ -47,13 +47,18 @@ export class AnalisisFisicoController {
     };
 
     public updateAnalisisFisico = async (req: Request, res: Response) => {
-        const id_analisis_fisico = req.params.id;
-        const [error, createAnalisisFisicoDto] = UpdateAnalisisFisicoDto.update({...req.body,analisisFisico_id: id_analisis_fisico});
+        const id_lote = req.params.id;
+        const [error, createAnalisisFisicoDto] = UpdateAnalisisFisicoDto.update({...req.body});
         if (error) {
             return res.status(400).json({ error });
         }
-        new UpdateAnalisisFisico(this.analisisFisicoRepository)
-            .execute(id_analisis_fisico,createAnalisisFisicoDto!)
+        new UpdateAnalisisFisico(
+            this.analisisFisicoRepository,
+            this.LoteRepository,
+            this.AnalisisRepository
+
+        )
+            .execute(id_lote,createAnalisisFisicoDto!)
             .then( analisisFisico => res.json(analisisFisico))
             .catch( error => res.status(400).json({ error }
             ));
