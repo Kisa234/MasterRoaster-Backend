@@ -42,8 +42,7 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         if (!lote) {
             throw new Error(`Lote con id ${id_lote} no encontrado`);
         }
-        let analisis = await this.analisisRepository.getAnalisisByLoteId(id_lote);
-
+        let analisis = lote.id_analisis;
         if (!analisis) {
             // se crea el analisis sensorial
             const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
@@ -77,22 +76,26 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
 
         }
         else {
-            if (!analisis.analisisSensorial_id) {
+            const analisis2 = await this.analisisRepository.getAnalisisById(analisis);
+            if (!analisis2) {
+                throw new Error(`Analisis with id ${analisis} not found`);
+            }
+            if (!analisis2.analisisSensorial_id) {
                 //el reporte no esta completo
                 // se crea un nuevo analisis sensorial
                 const af = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
-                // se agrega el analisis fisico al analisis reporte
+                // se agrega el analisis sensorial al analisis reporte
                 const [e, updateAnalisisDto] = UpdateAnalisisDto.update({
                     analisisSensorial_id: af.id_analisis_sensorial
                 });
                 if (e) {
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                await this.analisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
+                await this.analisisRepository.updateAnalisis(analisis2.id_analisis, updateAnalisisDto!);
                 return af;
             }
-            else if (analisis.analisisSensorial_id) {
-                if (!analisis.analisisSensorial_id) throw new Error('El analisis reporte ya tiene un analisis fisico agregado, y le falta completar el analisis sensorial');
+            else if (analisis2.analisisSensorial_id) {
+                if (!analisis2.analisisFisico_id) throw new Error('El analisis reporte ya tiene un analisis sensorial agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis sensorial
                 const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);

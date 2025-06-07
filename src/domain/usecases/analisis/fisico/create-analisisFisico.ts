@@ -39,13 +39,11 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
             // se agrega el nuevo analisis reporte al historial
             // se agrega el analisis reporte al lote
             // se crea analisis fisico y se agrega a nuevo analisis reporte
-
         const lote = await this.loteRepository.getLoteById(id_lote);
         if (!lote) {
             throw new Error(`Lote with id ${id_lote} not found`);
         }
-        let analisis = await this.analisisRepository.getAnalisisByLoteId(id_lote);
-        
+        let analisis = lote.id_analisis;
         if (!analisis) {
             // se crea el analisis fisico
             const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto); 
@@ -79,7 +77,11 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
 
         }
         else{
-            if (!analisis.analisisFisico_id) {
+            const analisis2 = await this.analisisRepository.getAnalisisById(analisis);
+            if (!analisis2) {
+                throw new Error(`Analisis with id ${analisis} not found`);
+            }
+            if (!analisis2.analisisFisico_id) {
                 // se crea un nuevo analisis fisico
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);
                 // se agrega el analisis fisico al analisis reporte
@@ -89,11 +91,11 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 if (e){
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                await this.analisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
+                await this.analisisRepository.updateAnalisis(analisis2.id_analisis, updateAnalisisDto!);
                 return af;                
             }
-            else if (analisis.analisisFisico_id){
-                if (!analisis.analisisSensorial_id) throw new Error('El analisis reporte ya tiene un analisis fisico agregado, y le falta completar el analisis sensorial');
+            else if (analisis2.analisisFisico_id){
+                if (!analisis2.analisisSensorial_id) throw new Error('El analisis reporte ya tiene un analisis fisico agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis fisico
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);

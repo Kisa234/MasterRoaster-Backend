@@ -24,7 +24,7 @@ export class AnalisisSensorialController {
     ){}
 
     public createAnalisisSensorial = async (req: Request, res: Response) => {
-        const id_lote= req.params.id_lote;
+        const id_lote= req.params.id;
         const [error, createAnalisisSensorialDTO] = CreateAnalisisSensorialDTO.create(req.body);
         if (error) {
             return res.status(400).json({ error });
@@ -49,7 +49,7 @@ export class AnalisisSensorialController {
     };
 
     public updateAnalisisSensorial = async (req: Request, res: Response) => {
-        const id_lote= req.params.id_lote;
+        const id_lote= req.params.id;
         const [error, updateAnalisisSensorialDTO] = UpdateAnalisisSensorialDTO.update({...req.body});
         if (error) {
             return res.status(400).json({ error });

@@ -61,12 +61,12 @@ export class CreateAnalisisFisicoDto {
 
 
         return [undefined, new CreateAnalisisFisicoDto(
-            props.peso_muestra, props.peso_pergamino, props.wa, props.temperatura_wa,
-            props.humedad, props.temperatura_humedad, props.densidad, props.color_grano_verde,
-            props.olor, props.superior_malla_18, props.superior_malla_16, props.superior_malla_14,
-            props.menor_malla_16, props.peso_defectos, props.quaquers, props.peso_muestra_tostada,
-            props.desarrollo, props.pocentaje_caramelizcacion, props.c_desarrollo, props.grado,
-            props.comentario, props.defectos_primarios, props.defectos_secundarios
+            peso_muestra, peso_pergamino, wa, temperatura_wa,
+            humedad, temperatura_humedad, densidad, color_grano_verde,
+            olor, superior_malla_18, superior_malla_16, superior_malla_14,
+            menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
+            desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
+            comentario, defectos_primarios, defectos_secundarios
         )];
     }
 }

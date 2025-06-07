@@ -23,7 +23,7 @@ export class AnalisisFisicoController {
 
 
     public createAnalisisFisico = async (req: Request, res: Response) => {
-        const id_lote= req.params.id_lote;
+        const id_lote= req.params.id;
         const [error, createAnalisisFisicoDto] = CreateAnalisisFisicoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
