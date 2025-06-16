@@ -12,6 +12,7 @@ import { PedidoRepository } from "../../domain/repository/pedido.repository";
 import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
+import { GetTostadosByPedido } from "../../domain/usecases/tueste/get-by-pedido";
 
 export class TuesteController {
 
@@ -92,6 +93,13 @@ export class TuesteController {
             .catch( error => res.status(400).json({ error}));
     }
    
+    public getTostadosByPedido = async (req: Request, res: Response) => {
+        const id_pedido = req.params.id;
+        new GetTostadosByPedido(this.tuesteRepository)
+            .execute(id_pedido)
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
+    }
 
     
 

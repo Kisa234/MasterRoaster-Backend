@@ -28,7 +28,6 @@ export class LoteController {
         if (error) {
             return res.status(400).json({ error });
         }
-
         new CreateLote(
             this.loteRepository,
             this.userRepository,

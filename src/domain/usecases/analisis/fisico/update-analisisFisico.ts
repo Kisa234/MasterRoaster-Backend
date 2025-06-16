@@ -27,7 +27,7 @@ export class UpdateAnalisisFisico implements UpdateAnalisisFisicoUseCase {
             throw new Error(`Analisis del lote con el id ${id_lote} no encontrado`);  
         }
         // se consigue el analisis fisico del lote
-        const analisisFisico = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
+        const analisisFisico = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
         if (!analisisFisico) {
             throw new Error(`Analisis fisico del lote con el id ${id_lote} no encontrado`);
         }

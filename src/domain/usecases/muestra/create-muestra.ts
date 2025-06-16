@@ -14,8 +14,7 @@ export class CreateMuestra implements CreateMuestraUseCase {
     ){}
 
     async execute(createMuestraDto: CreateMuestraDto): Promise<MuestraEntity> {
-        
-        console.log('ID GENERADO');
+
         const id= await this.generarId(createMuestraDto);
         const [,dto] = CreateMuestraDto.create({
             id_muestra   : id,
@@ -64,6 +63,9 @@ export class CreateMuestra implements CreateMuestraUseCase {
         
             let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
         
+            const muestras = await this.muestraRepository.getAllMuestras();
+            const numeroMuestraFinal = muestras.length + 1;
+            idGenerado = `${idGenerado}-${numeroMuestraFinal}`;
             
             return idGenerado;
         }

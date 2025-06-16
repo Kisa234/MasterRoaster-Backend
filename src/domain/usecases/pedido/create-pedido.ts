@@ -1,3 +1,5 @@
+import { error } from 'console';
+import { envs } from './../../../config/envs';
 import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { CreatePedidoDto } from "../../dtos/pedido/create";
@@ -35,6 +37,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         const lote = await this.loteRepository.getLoteById(dto.id_lote);
         if (!lote || lote.eliminado) throw new Error('El lote no existe');
         const loteEntity = LoteEntity.fromObject(lote);
+        console.log(dto);
         //dependiendo del tipo de pedido 
         if (dto.tipo_pedido === 'Venta Verde') {
             return this.ventaVerde(loteEntity, dto);
@@ -97,7 +100,8 @@ export class CreatePedido implements CreatePedidoUseCase {
             await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, updateDestinoDto!);
         } else {
           // No tiene lote nuevo generado → se crea uno desde este lote origen
-            const [, createLoteDto] = CreateLoteDto.create({
+          console.log('Creando nuevo lote destino desde el lote origen');
+            const [error, createLoteDto] = CreateLoteDto.create({
               productor: lote.productor,
               finca: lote.finca,
               region: lote.region,
@@ -109,7 +113,8 @@ export class CreatePedido implements CreatePedidoUseCase {
               id_user: user.id_user,
               id_analisis: lote.id_analisis,
             });
-          
+            console.log(createLoteDto);
+            
             nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, false, true, lote.id_lote);
         }
 
@@ -211,6 +216,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             throw new Error('No hay suficiente cantidad en el lote');
         }
 
+        console.log('checkpoint 1');
         
         // 2. Validar que el cliente existe y no está eliminado
         const user = await this.userRepository.getUserById(dto.id_user);
@@ -219,9 +225,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         }
         
         // 3. Validar que el lote tiene un análisis asociado
-        const analisis = await this.AnalisisRepository.getAnalisisById(lote.id_analisis!);
-        if (!analisis) throw new Error('El analisis no existe');
-        const analisisFisico = await this.AnalisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
+        if (!lote.id_analisis) throw Error('El lote no tiene un análisis asociado');
+        console.log(lote.id_analisis);
+        const analisis = await this.AnalisisRepository.getAnalisisById(lote.id_analisis);
+        if (!analisis) throw new Error('El análisis no existe');
+        const analisisFisico = await this.AnalisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
         if (!analisisFisico) throw new Error('El analisis fisico no existe');
         
         // 4. Verificar si el tipo de lote es "Lote Verde"

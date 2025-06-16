@@ -2,7 +2,7 @@ import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repository/user.repository";
 
 export interface GetAllUserUseCase{
-    execute(): Promise<{id_user: string, name: string}[]>;
+    execute(): Promise<UserEntity[]>;
 };
 
 export class GetAllUsers implements GetAllUserUseCase{
@@ -10,7 +10,7 @@ export class GetAllUsers implements GetAllUserUseCase{
         private readonly userRepository: UserRepository
     ){}
 
-    async execute(): Promise<{id_user: string, name: string}[]>{ 
+    async execute(): Promise<UserEntity[]>{ 
         return this.userRepository.getAllUsers();
     }
 }

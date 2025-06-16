@@ -40,6 +40,7 @@ export class TuesteRoutes {
         // router.delete('/:id', tuesteController.deleteTueste);
         router.get('/fecha/:fecha', tuesteController.getTuesteByFecha);
         router.put('/c/:id', tuesteController.completarTostados);
+        router.get('/pedido/:id', tuesteController.getTostadosByPedido);   
 
         return router;
 

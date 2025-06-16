@@ -5,7 +5,6 @@ export class CreateUserDto {
         public readonly rol: string,
         public readonly password: string,
         public readonly numero_telefono: string,
-        public readonly fecha_editado?: Date | null,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateUserDto?] {

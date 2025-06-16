@@ -24,5 +24,8 @@ export class MuestraRepositoryImpl implements MuestraRepository{
     getMuestras(): Promise<MuestraEntity[]> {
         return this.muestraDataSource.getMuestras();
     }
+    getAllMuestras(): Promise<MuestraEntity[]> {
+        return this.muestraDataSource.getAllMuestras();
+    }
 
 }

@@ -29,7 +29,7 @@ export class UpdateAnalisisSensorial implements UpdateAnalisisSensorialUseCase {
             throw new Error(`Analisis del lote con el id ${id_lote} no encontrado`);  
         }
         // se consigue el analisis sensorial del lote
-        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisFisico_id);
+        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisFisico_id!);
         if (!analisisSensorial) {
             throw new Error(`Analisis fisico del lote con el id ${id_lote} no encontrado`);
         }

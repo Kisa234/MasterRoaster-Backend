@@ -18,7 +18,6 @@ export class CreateLote implements CreateLoteUseCase {
     async execute( createLoteDto: CreateLoteDto, tueste?:Boolean, usuario?:boolean, id_c?:string): Promise<LoteEntity> {
 
         const id= await this.generarId(createLoteDto, tueste,usuario, id_c);
-
         const [,dto] = CreateLoteDto.create({
             id_lote      : id,
             productor    : createLoteDto.productor,
@@ -43,7 +42,8 @@ export class CreateLote implements CreateLoteUseCase {
         const nombres = productor.trim().split(' ');
         const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
         const inicialApellido = nombres[1]?.charAt(0).toUpperCase() || '';
-    
+
+
         let inicialVariedad = '';
     
         if (variedades.length >= 3) {
@@ -85,6 +85,7 @@ export class CreateLote implements CreateLoteUseCase {
 
         const numeroLoteFinal = lotesFiltrados.length + 1;
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
+
     
         // LOTE PARA CLIENTE
         let user;

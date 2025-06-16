@@ -160,7 +160,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     if (!loteOriginal.id_analisis){console.log ('El lote no tiene analisis'); throw new Error('El lote no tiene analisis');}
     const analisis = await this.analisisRepository.getAnalisisById(loteOriginal.id_analisis);
     if (!analisis) throw new Error('El analisis no existe');
-    const analisisFisico = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id);
+    const analisisFisico = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
     if (!analisisFisico) throw new Error('El analisis fisico no existe');
     
     //generar tuestes
