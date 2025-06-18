@@ -1,10 +1,6 @@
-import { create } from 'domain';
 import express, { Router } from 'express'
-import path from 'path';
-import { text } from 'stream/consumers';
 import cookieParser from "cookie-parser";
 import cors from 'cors';
-import { setUserCookie } from '../infrastructure/middlewares/auth.middlewares';
 
 interface Options{
     port: number;
@@ -26,28 +22,24 @@ export class Server {
     }
 
 
-    async start(){
-
-        // CORS
-        this.app.use(cors());
-
+   async start() {
+        // CORS configurado correctamente
+        this.app.use(cors({
+          origin: 'http://localhost:4200',
+          credentials: true
+        }));
+    
         // Middlewares
-        this.app.use(express.json()); //raw json
-        this.app.use(express.urlencoded({extended: true})); // x-www-form-urlencoded
+        this.app.use(express.json());
+        this.app.use(express.urlencoded({ extended: true }));
         this.app.use(cookieParser());
-
-        this.app.use(setUserCookie); // Middleware global que añade cookie user_id
-       
-        // ROUTES
+    
+        // Rutas
         this.app.use(this.router);
-
-        
-        
-
-        this.app.listen(8080, () => {
-            console.log('Server is running on port 8080');
+    
+        this.app.listen(this.port, () => {
+          console.log(`Server is running on port ${this.port}`);
         });
-
     }
 
 }

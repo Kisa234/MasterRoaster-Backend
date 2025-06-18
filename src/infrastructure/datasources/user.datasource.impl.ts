@@ -61,15 +61,7 @@ export  class UserDataSourceImpl implements UserDataSource {
     return UserEntity.fromObject(user);
   }
 
-  async authUser(email: string, password: string): Promise<UserEntity | null> {
-    const user = await this.findByEmail(email);
-    if (!user) return null;
-
-    const isMatch = await Encryption.comparePassword(password, user.password);
-    if (!isMatch) return null;
-
-    return user;
-  }
+  
   async getAllUsers(): Promise<UserEntity[]>{
     const users = await prisma.user.findMany({
       where: {

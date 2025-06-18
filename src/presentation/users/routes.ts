@@ -12,13 +12,14 @@ export class UserRoutes{
         const userRepository = new UserRepositoryImpl(datasource);
         const userController = new UserController(userRepository);
 
+        router.post('/login', userController.login);
+        router.post('/refresh', userController.refresh);
         router.post('/', userController.createUser);
         router.get('/:id', userController.getUserById);
         router.get('/role/:role', userController.getUsersByRole);
         router.put('/:id', userController.updateUser);
         router.delete('/:id', userController.deleteUser);
         router.get('/', userController.getAllUsers);
-
 
         return router;
     }

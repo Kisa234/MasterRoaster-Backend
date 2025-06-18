@@ -9,6 +9,5 @@ export abstract class UserDataSource {
     abstract deleteUser(id: string): Promise<UserEntity>;
     abstract getUsersByRole(role: string): Promise<UserEntity[]>;
     abstract findByEmail(email: string): Promise<UserEntity | null>;
-    abstract authUser(email: string, password: string): Promise<UserEntity | null>;
     abstract getAllUsers(): Promise<UserEntity[]>;
   }

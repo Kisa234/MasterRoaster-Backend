@@ -1,6 +1,7 @@
 import { UserEntity } from "../../entities/user.entity";
 import { UserRepository } from "../../repository/user.repository";
 import { CreateUserDto } from '../../dtos/user/create';
+import { Encryption } from "../../../config/bcrypt";
 
 export interface CreateUserUseCase {
     execute(createUserDto: CreateUserDto): Promise<UserEntity>;
@@ -12,6 +13,17 @@ export class CreateUser implements CreateUserUseCase {
     ){}
 
     async execute( createUserDto: CreateUserDto): Promise<UserEntity> {
-        return this.userRepository.createUser(createUserDto);
+        const hashedPassword = await Encryption.hashPassword(createUserDto.password);
+        const [,dto] = CreateUserDto.create({
+            ...createUserDto,
+            password: hashedPassword
+        });
+        if (!dto) {
+            throw new Error('Invalid user data');
+        }
+        
+        return this.userRepository.createUser(dto);
     }
+
+
 }
