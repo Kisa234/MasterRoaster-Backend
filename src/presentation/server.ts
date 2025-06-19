@@ -1,12 +1,18 @@
 import express, { Router } from 'express'
 import cookieParser from "cookie-parser";
 import cors from 'cors';
+import { envs } from '../config/envs'
 
 interface Options{
     port: number;
     router:Router;
     public_path: string;
 }
+
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://masterroaster.onrender.com'
+];
 
 export class Server {
     private app = express();
@@ -25,7 +31,13 @@ export class Server {
    async start() {
         // CORS configurado correctamente
         this.app.use(cors({
-          origin: 'http://localhost:4200',
+          origin: (origin, callback) => {
+            if (!origin || envs.CORS_ORIGINS.includes(origin)) {
+              callback(null, true);
+            } else {
+              callback(new Error('Not allowed by CORS'));
+            }
+          },
           credentials: true
         }));
     
