@@ -4,3 +4,4 @@ postgres/
 .DS_Store
 coverage/
 .env
+dist/
