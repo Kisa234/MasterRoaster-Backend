@@ -11,7 +11,7 @@ interface Options{
 
 const allowedOrigins = [
   'http://localhost:4200',
-  'https://masterroaster.onrender.com'
+  'https://roastsync-upkm.onrender.com'
 ];
 
 export class Server {
