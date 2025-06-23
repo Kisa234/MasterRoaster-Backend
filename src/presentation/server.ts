@@ -1,7 +1,5 @@
 import express, { Router } from 'express'
-import cookieParser from "cookie-parser";
 import cors from 'cors';
-import { envs } from '../config/envs'
 
 interface Options{
     port: number;
@@ -32,13 +30,12 @@ export class Server {
         // CORS configurado correctamente
         this.app.use(cors({
           origin: allowedOrigins,
-          credentials: true,
+          allowedHeaders: ['Content-Type','Authorization'],
         }));
     
         // Middlewares
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        this.app.use(cookieParser());
     
         // Rutas
         this.app.use(this.router);

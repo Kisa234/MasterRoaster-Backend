@@ -20,131 +20,117 @@ import { RefreshAccessToken } from '../../domain/usecases/user/refresh-token';
 export class UserController {
 
 
-    // DI
-    constructor(
-        private readonly userRepository: UserRepository
-    ) { }
+  // DI
+  constructor(
+    private readonly userRepository: UserRepository
+  ) { }
 
-    public createUser = async (req: Request, res: Response) => {
-        const [error, createUserDto] = CreateUserDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error });
-        }
-        new CreateUser(this.userRepository)
-            .execute(createUserDto!)
-            .then(user => res.json(user))
-            .catch(error => res.status(400).json({ error }));
+  public createUser = async (req: Request, res: Response) => {
+    const [error, createUserDto] = CreateUserDto.create(req.body);
+    if (error) {
+      return res.status(400).json({ error });
     }
+    new CreateUser(this.userRepository)
+      .execute(createUserDto!)
+      .then(user => res.json(user))
+      .catch(error => res.status(400).json({ error }));
+  }
 
-    public getUserById = async (req: Request, res: Response) => {
-        new GetUserById(this.userRepository)
-            .execute(req.params.id)
-            .then(user => res.json(user))
-            .catch(error => res.status(400).json('error aqui'));
+  public getUserById = async (req: Request, res: Response) => {
+    new GetUserById(this.userRepository)
+      .execute(req.params.id)
+      .then(user => res.json(user))
+      .catch(error => res.status(400).json('error aqui'));
 
+  }
+
+  public updateUser = async (req: Request, res: Response) => {
+    const user_id = req.params.id;
+    const [error, createUserDto] = UpdateUserDto.update({ ...req.body, user_id });
+    if (error) {
+      return res.status(400).json({ error });
     }
+    new UpdateUser(this.userRepository)
+      .execute(user_id, createUserDto!)
+      .then(user => res.json(user))
+      .catch(error => res.status(400).json({ error }));
 
-    public updateUser = async (req: Request, res: Response) => {
-        const user_id = req.params.id;
-        const [error, createUserDto] = UpdateUserDto.update({ ...req.body, user_id });
-        if (error) {
-            return res.status(400).json({ error });
-        }
-        new UpdateUser(this.userRepository)
-            .execute(user_id, createUserDto!)
-            .then(user => res.json(user))
-            .catch(error => res.status(400).json({ error }));
+  }
 
-    }
+  public deleteUser = async (req: Request, res: Response) => {
+    const user_id = req.params.id;
+    new DeleteUser(this.userRepository)
+      .execute(user_id)
+      .then(user => res.json(user))
+      .catch(error => res.status(400).json({ error }));
+  }
 
-    public deleteUser = async (req: Request, res: Response) => {
-        const user_id = req.params.id;
-        new DeleteUser(this.userRepository)
-            .execute(user_id)
-            .then(user => res.json(user))
-            .catch(error => res.status(400).json({ error }));
-    }
+  public getUsersByRole = async (req: Request, res: Response) => {
+    const role = req.params.role;
+    new GetUsersRol(this.userRepository)
+      .execute(role)
+      .then(users => res.json(users))
+      .catch(error => res.status(400).json({ error }));
+  }
 
-    public getUsersByRole = async (req: Request, res: Response) => {
-        const role = req.params.role;
-        new GetUsersRol(this.userRepository)
-            .execute(role)
-            .then(users => res.json(users))
-            .catch(error => res.status(400).json({ error }));
-    }
+  public getAllUsers = async (req: Request, res: Response) => {
+    this.userRepository.getAllUsers()
+      .then(users => res.json(users))
+      .catch(error => res.status(400).json({ error }));
+  }
 
-    public getAllUsers = async (req: Request, res: Response) => {
-        this.userRepository.getAllUsers()
-            .then(users => res.json(users))
-            .catch(error => res.status(400).json({ error }));
-    }
+  public login = async (req: Request, res: Response) => {
+    console.log('Login request received');
+    const { email, password } = req.body;
 
-    public login = async (req: Request, res: Response) => {
-        console.log('Login request received');
-        const email = req.body.email;
-        const password = req.body.password;
+    try {
+      const { accessToken, refreshToken, user } = await new AuthUser(this.userRepository)
+        .execute(email, password);
 
-        new AuthUser(this.userRepository)
-            .execute(email, password)
-            .then(({ accessToken, refreshToken, user }) => {
-                res
-                .cookie('accessToken', accessToken, {
-                  httpOnly: true,
-                  secure: process.env.NODE_ENV === 'production',
-                  sameSite: 'lax', // <-- importante para permitir cookies entre localhost:4200 y 3000
-                  maxAge: 15 * 60 * 1000 // 15 minutos
-                })
-                .cookie('refreshToken', refreshToken, {
-                  httpOnly: true,
-                  secure: process.env.NODE_ENV === 'production',
-                  sameSite: 'lax',
-                  maxAge: 1 * 24 * 60 * 60 * 1000
-                })
-                .json({
-                  user: {
-                    id_user: user.id_user,
-                    email: user.email,
-                    rol: user.rol
-                  }
-                });
-            })
-            .catch(error => res.status(400).json({ error: error.message }));
-    }
-
-    public refresh = async (req: Request, res: Response) => {
-      console.log('Refresh token request received');
-      const token = req.cookies?.refreshToken;
-      if (!token) return res.status(401).json({ error: 'Refresh token no presente' });
-        
-      try {
-        const accessToken = new RefreshAccessToken().execute(token);
-    
-        res.cookie('accessToken', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: 15 * 60 * 1000 // 15 minutos
-        });
-    
-        return res.json({ ok: true }); // ya no es necesario devolver el token
-      } catch (error: any) {
-        return res.status(403).json({ error: error.message });
-      }
-    };
-
-    public getSessionInfo = async (req: Request, res: Response) => {
-      const user = req.user as { id: string; email: string; rol: string };
-    
-      if (!user) {
-        return res.status(401).json({ message: 'No autenticado' });
-      }
-    
+     
       return res.json({
-        id: user.id,
-        email: user.email,
-        rol: user.rol
+        accessToken,
+        refreshToken,
+        user: {
+          id_user: user.id_user,
+          email: user.email,
+          rol: user.rol
+        }
       });
-    };
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
+
+  public refresh = async (req: Request, res: Response) => {
+    console.log('Refresh token request received');
+    // Ahora esperamos el refreshToken en el body
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(401).json({ error: 'Refresh token no presente' });
+    }
+
+    try {
+      const newAccessToken = await new RefreshAccessToken().execute(refreshToken);
+      // Opcional: también emitir un nuevo refreshToken si así lo quieres
+      return res.json({ accessToken: newAccessToken });
+    } catch (error: any) {
+      return res.status(403).json({ error: error.message });
+    }
+  };
+
+  public getSessionInfo = async (req: Request, res: Response) => {
+    // authMiddleware ya habrá leído el Bearer token y rellenado req.user
+    const user = req.user as { id: string; email: string; rol: string };
+    if (!user) {
+      return res.status(401).json({ message: 'No autenticado' });
+    }
+    return res.json({
+      id: user.id,
+      email: user.email,
+      rol: user.rol
+    });
+  };
 
 
 }
