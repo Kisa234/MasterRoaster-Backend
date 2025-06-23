@@ -8,19 +8,27 @@ import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { DeleteLote } from "../../domain/usecases/lote/lote/delete.lote";
 import { GetLotes } from "../../domain/usecases/lote/lote/get-lotes";
 import { CreateLoteFromMuestra } from "../../domain/usecases/lote/lote/create-lote-muestra";
-import { UserRepository } from "../../domain/repository/user.repository";
 import { MuestraRepository } from "../../domain/repository/muestra.repository";
 import { GetALLLotesTostados } from "../../domain/usecases/lote/lote/get-lotes-tostados";
 import { GetAllLotesVerdes } from "../../domain/usecases/lote/lote/get-lotes-verdes";
 import { GetUserByLote } from "../../domain/usecases/lote/lote/get-user-lote";
+import { AnalisisRepository } from "../../domain/repository/analisis.repository";
+import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
+import { AnalisisSensorialRepository } from "../../domain/repository/analisisSensorial.repository";
+import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
+import { UserRepository } from "../../domain/repository/user.repository";
 
 export class LoteController {
 
     constructor (
-        private readonly loteRepository: LoteRepository,
-        private readonly muestraRepository: MuestraRepository,
-        private readonly userRepository: UserRepository,
         private readonly createLoteUseCase: CreateLoteUseCase,
+        private readonly loteAnalisisRepository: LoteAnalisisRepository,
+        private readonly muestraRepository: MuestraRepository,
+        private readonly analisisRepository: AnalisisRepository,
+        private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly loteRepository: LoteRepository,
+        private readonly userRepository: UserRepository,
     ){}
 
     public createLote = (req:Request , res : Response) => {
@@ -90,7 +98,12 @@ export class LoteController {
         }
         new CreateLoteFromMuestra(
             this.createLoteUseCase,
+            this.loteAnalisisRepository,
             this.muestraRepository,
+            this.analisisRepository,
+            this.analisisFisicoRepository,
+            this.analisisSensorialRepository,
+            this.loteRepository
         )
         .execute(id_muestra, peso)
         .then( lote => res.json(lote))
