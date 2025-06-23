@@ -171,7 +171,7 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         if (!muestra) {
             throw new Error(`Muestra con id ${id_lote} no encontrado`);
         }
-        let analisis = muestra.analisis_id;
+        let analisis = muestra.id_analisis;
         if (!analisis) {
             // se crea el analisis sensorial
             const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);

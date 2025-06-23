@@ -169,7 +169,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
         if (!muestra) {
             throw new Error(`Muestra with id ${id_muestra} not found`);
         }
-        let analisis = muestra.analisis_id;
+        let analisis = muestra.id_analisis;
         if (!analisis) {
             // se crea el analisis fisico
             const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto); 

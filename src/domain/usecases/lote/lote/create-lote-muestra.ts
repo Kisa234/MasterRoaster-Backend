@@ -32,7 +32,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             proceso      : muestra.proceso,
             tipo_lote    : 'Lote Verde',
             id_user      : muestra.id_user,
-            id_analisis  : muestra.analisis_id,
+            id_analisis  : muestra.id_analisis,
         })
         // eliminar muestra 
         await this.muestraRepository.deleteMuestra(muestra.id_muestra);
