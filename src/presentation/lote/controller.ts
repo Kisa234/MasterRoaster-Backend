@@ -93,6 +93,13 @@ export class LoteController {
     public createLoteFromMuestra = (req:Request , res : Response) => {
         const id_muestra = req.params.id;
         const peso = req.body.peso;
+
+          // 1. Verifica que req.user esté presente
+        if (!req.user?.id) {
+          return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+        const id_user = req.user.id;
+
         if (!peso) {
             return res.status(400).json({ error: 'Peso is required' });
         }
@@ -105,7 +112,7 @@ export class LoteController {
             this.analisisSensorialRepository,
             this.loteRepository
         )
-        .execute(id_muestra, peso)
+        .execute(id_muestra, peso,id_user)
         .then( lote => res.json(lote))
         .catch( error => res.status(400).json({ error }));
     }

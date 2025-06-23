@@ -15,6 +15,7 @@ import { AnalisisFisicoRepositoryImpl } from '../../infrastructure/repositories/
 import { AnalisisFisicoDataSourceImpl } from '../../infrastructure/datasources/analisisFisico.datasource.impl';
 import { AnalisisSensorialDataSourceImpl } from '../../infrastructure/datasources/analisisSensorial.datasource.impl';
 import { AnalisisSensorialRepositoryImpl } from '../../infrastructure/repositories/analisisSensorial.repository.impl';
+import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
 
 export class LoteRoutes{
 
@@ -63,7 +64,7 @@ export class LoteRoutes{
         );
 
         router.post('/', loteController.createLote);
-        router.post('/muestra/:id', loteController.createLoteFromMuestra);
+        router.post('/muestra/:id',authMiddleware ,loteController.createLoteFromMuestra);
         router.get('/', loteController.getLotes);
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
