@@ -31,6 +31,7 @@ export class Server {
         this.app.use(cors({
           origin: allowedOrigins,
           allowedHeaders: ['Content-Type','Authorization'],
+          credentials: true,
         }));
     
         // Middlewares
