@@ -8,6 +8,10 @@ import { LoteRepositoryImpl } from "../../infrastructure/repositories/lote.repos
 import { AnalisisDataSourceImpl } from '../../infrastructure/datasources/analisis.datasource.impl';
 import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lote-analisis.datasource.impl';
 import { LoteAnalisisRepositoryImpl } from '../../infrastructure/repositories/lote-analisis.repository.impl';
+import { MuestraRepositoryImpl } from '../../infrastructure/repositories/muestra.repository.impl';
+import { MuestraDataSourceImpl } from '../../infrastructure/datasources/muestra.datasource.impl';
+import { MuestraAnalisisRespositoryImpl } from '../../infrastructure/repositories/muestra-analisis.repository.impl';
+import { MuestraAnalisisDatasourceImpl } from '../../infrastructure/datasources/muestra-analisis.datasource.impl';
 
 
 export class AnalisisFisicoRoutes {
@@ -27,19 +31,24 @@ export class AnalisisFisicoRoutes {
         const LoteAnalisisDataSource = new LoteAnalisisDataSourceImpl();
         const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDataSource);
 
+        const MuestraDataSource = new MuestraDataSourceImpl();  
+        const MuestraRepository = new MuestraRepositoryImpl(MuestraDataSource);
 
-
+        const MuestraAnalisisDataSource = new MuestraAnalisisDatasourceImpl();
+        const MuestraAnalisisRepository = new MuestraAnalisisRespositoryImpl(MuestraAnalisisDataSource);
 
         const analisisFisicoController = new AnalisisFisicoController(
             AnalisisFisicoRepository,
             LoteRepository,
             AnalisisRepository,
-            LoteAnalisisRepository
+            LoteAnalisisRepository,
+            MuestraRepository,
+            MuestraAnalisisRepository
         );
 
-        router.post('/:id', analisisFisicoController.createAnalisisFisico);
+        router.post('/:id/:type', analisisFisicoController.createAnalisisFisico);
         router.get('/:id', analisisFisicoController.getAnalisisFisicoById);
-        router.put('/:id', analisisFisicoController.updateAnalisisFisico);
+        router.put('/:id/:type', analisisFisicoController.updateAnalisisFisico);
         router.get('/', analisisFisicoController.getAllAnalisisFisico);
         router.delete('/:id', analisisFisicoController.deleteAnalisisFisico);
 

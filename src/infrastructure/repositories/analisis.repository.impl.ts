@@ -31,6 +31,10 @@ export class AnalisisRepositoryImpl implements AnalisisRepository{
     getAnalisisByLoteId(id_lote: string): Promise<AnalisisEntity | null> {
         return this.analisis.getAnalisisByLoteId(id_lote);
     } 
+
+    getAnalisisByMuestraId(id_muestra: string): Promise<AnalisisEntity | null> {
+        return this.analisis.getAnalisisByMuestraId(id_muestra);
+    }
       
     // getAnalisisFSByLoteId(id: string): Promise<{ AnalisisFisicoEntity: AnalisisFisicoEntity, AnalisisSensorialEntity: AnalisisSensorialEntity }> {
     //     return this.analisis.getAnalisisFSByLoteId(id);

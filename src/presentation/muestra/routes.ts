@@ -4,6 +4,7 @@ import { MuestraRepositoryImpl } from "../../infrastructure/repositories/muestra
 import { MuestraController } from "./controller";
 import { UserDataSourceImpl } from "../../infrastructure/datasources/user.datasource.impl";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository.impl";
+import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
 
 
 export class MuestraRoutes {
@@ -22,7 +23,7 @@ export class MuestraRoutes {
 
 
 
-        router.post('/', muestraController.createMuestra);
+        router.post('/',authMiddleware, muestraController.createMuestra);
         router.get('/:id', muestraController.getMuestraById);
         router.put('/:id', muestraController.updateMuestra);
         router.delete('/:id', muestraController.deleteMuestra);

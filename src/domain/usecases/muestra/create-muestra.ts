@@ -17,15 +17,8 @@ export class CreateMuestra implements CreateMuestraUseCase {
 
         const id= await this.generarId(createMuestraDto);
         const [,dto] = CreateMuestraDto.create({
+            ...createMuestraDto,
             id_muestra   : id,
-            productor    : createMuestraDto.productor,
-            finca        : createMuestraDto.finca,
-            region       : createMuestraDto.region,
-            departamento : createMuestraDto.departamento,
-            peso         : createMuestraDto.peso,
-            variedades   : createMuestraDto.variedades,
-            proceso      : createMuestraDto.proceso,
-
         });
         
         return this.muestraRepository.createMuestra(dto!);

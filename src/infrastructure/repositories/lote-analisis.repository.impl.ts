@@ -1,4 +1,4 @@
-import { LoteAnalisisDatasource } from "../../domain/datasources/lore-analisis.datasource";
+import { LoteAnalisisDatasource } from "../../domain/datasources/lote-analisis.datasource";
 import { CreateLoteAnalisisDto } from "../../domain/dtos/lote-analisis/create";
 import { LoteAnalisisEntity } from "../../domain/entities/lote-analisis";
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";

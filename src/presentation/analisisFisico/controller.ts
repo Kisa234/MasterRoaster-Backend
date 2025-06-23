@@ -11,6 +11,8 @@ import { GetAllAnalisisFisico } from "../../domain/usecases/analisis/fisico/get-
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
+import { MuestraAnalisisRepository } from "../../domain/repository/muestra-analisis.repository";
+import { MuestraRepository } from "../../domain/repository/muestra.repository";
 
 export class AnalisisFisicoController {
 
@@ -18,12 +20,15 @@ export class AnalisisFisicoController {
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly LoteRepository: LoteRepository,
         private readonly AnalisisRepository: AnalisisRepository,
-        private readonly LoteAnalisisRepository: LoteAnalisisRepository
+        private readonly LoteAnalisisRepository: LoteAnalisisRepository,
+        private readonly muestraRepository: MuestraRepository,
+        private readonly muestraAnalisisRepository: MuestraAnalisisRepository
     ){}
 
 
     public createAnalisisFisico = async (req: Request, res: Response) => {
         const id_lote= req.params.id;
+        const type = req.params.type;
         const [error, createAnalisisFisicoDto] = CreateAnalisisFisicoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
@@ -32,9 +37,11 @@ export class AnalisisFisicoController {
             this.analisisFisicoRepository,
             this.LoteRepository,
             this.AnalisisRepository,
-            this.LoteAnalisisRepository
+            this.LoteAnalisisRepository,
+            this.muestraAnalisisRepository,
+            this.muestraRepository,
         )
-            .execute(createAnalisisFisicoDto!, id_lote)
+            .execute(createAnalisisFisicoDto!, id_lote, type)
             .then( analisisFisico => res.json(analisisFisico))
             .catch( error => res.status(400).json({ error }));
     };
@@ -48,6 +55,7 @@ export class AnalisisFisicoController {
 
     public updateAnalisisFisico = async (req: Request, res: Response) => {
         const id_lote = req.params.id;
+        const type = req.params.type;
         const [error, createAnalisisFisicoDto] = UpdateAnalisisFisicoDto.update({...req.body});
         if (error) {
             return res.status(400).json({ error });
@@ -55,10 +63,10 @@ export class AnalisisFisicoController {
         new UpdateAnalisisFisico(
             this.analisisFisicoRepository,
             this.LoteRepository,
-            this.AnalisisRepository
-
+            this.AnalisisRepository,
+            this.muestraRepository
         )
-            .execute(id_lote,createAnalisisFisicoDto!)
+            .execute(id_lote,createAnalisisFisicoDto!, type)
             .then( analisisFisico => res.json(analisisFisico))
             .catch( error => res.status(400).json({ error }
             ));

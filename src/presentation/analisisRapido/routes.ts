@@ -2,6 +2,8 @@ import { Router } from "express";
 import { AnalisisRapidoDataSourceImpl } from "../../infrastructure/datasources/analisisRapido.datasource.impl";
 import { AnalisisRapidoRepositoryImpl } from "../../infrastructure/repositories/analisisRapido.repository.impl";
 import { AnalisisRapidoController } from "./controller";
+import { LoteTostadoDataSourceImpl } from "../../infrastructure/datasources/loteTostado.datasource.impl";
+import { LoteTostadoRepositoryImpl } from "../../infrastructure/repositories/loteTostado.repository.impl";
 
 export class AnalisisRapidoRoutes{
 
@@ -10,9 +12,13 @@ export class AnalisisRapidoRoutes{
 
         const datasource = new AnalisisRapidoDataSourceImpl();
         const analisisRapidoRepository = new AnalisisRapidoRepositoryImpl(datasource);
-        const analisisRapidoController = new AnalisisRapidoController(analisisRapidoRepository);
 
-        router.post('/',analisisRapidoController.createAnalisisRapido);
+        const loteTostadoDatasource = new LoteTostadoDataSourceImpl();
+        const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteTostadoDatasource);
+
+        const analisisRapidoController = new AnalisisRapidoController(analisisRapidoRepository, loteTostadoRepository);
+
+        router.post('/lote/:id',analisisRapidoController.createAnalisisRapido);
         router.get('/:id',analisisRapidoController.getAnalisisRapidoById);
         router.put('/:id',analisisRapidoController.updateAnalisisRapido);
         router.get('/',analisisRapidoController.getAllAnalisisRapido);

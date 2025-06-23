@@ -8,6 +8,10 @@ import { AnalisisDataSourceImpl } from "../../infrastructure/datasources/analisi
 import { AnalisisRepositoryImpl } from "../../infrastructure/repositories/analisis.repository.impl";
 import { LoteAnalisisDataSourceImpl } from "../../infrastructure/datasources/lote-analisis.datasource.impl";
 import { LoteAnalisisRepositoryImpl } from "../../infrastructure/repositories/lote-analisis.repository.impl";
+import { MuestraDataSourceImpl } from "../../infrastructure/datasources/muestra.datasource.impl";
+import { MuestraRepositoryImpl } from "../../infrastructure/repositories/muestra.repository.impl";
+import { MuestraAnalisisDatasourceImpl } from "../../infrastructure/datasources/muestra-analisis.datasource.impl";
+import { MuestraAnalisisRespositoryImpl } from "../../infrastructure/repositories/muestra-analisis.repository.impl";
 
 export class AnalisisSensorialRoutes {
 
@@ -26,18 +30,25 @@ export class AnalisisSensorialRoutes {
         const LoteAnalisisDataSource = new LoteAnalisisDataSourceImpl();
         const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDataSource);
 
+        const MuestraDataSource = new MuestraDataSourceImpl();
+        const MuestraRepository = new MuestraRepositoryImpl(MuestraDataSource);
+
+        const MuestraAnalisisDataSource = new MuestraAnalisisDatasourceImpl();
+        const MuestraAnalisisRepository = new MuestraAnalisisRespositoryImpl(MuestraAnalisisDataSource);
 
 
         const analisisSensorialController = new AnalisisSensorialController(
             AnalisisSensorialRepository,
             LoteRepository,
             AnalisisRepository,
-            LoteAnalisisRepository  
+            LoteAnalisisRepository,
+            MuestraRepository,
+            MuestraAnalisisRepository
         );
 
-        router.post('/:id', analisisSensorialController.createAnalisisSensorial);
+        router.post('/:id/:type', analisisSensorialController.createAnalisisSensorial);
         router.get('/:id', analisisSensorialController.getAnalisisSensorialById);
-        router.put('/:id', analisisSensorialController.updateAnalisisSensorial);
+        router.put('/:id/:type', analisisSensorialController.updateAnalisisSensorial);
         router.get('/', analisisSensorialController.getAllAnalisisSensorial);
         router.delete('/:id', analisisSensorialController.deleteAnalisisSensorial);
 

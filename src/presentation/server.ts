@@ -31,14 +31,8 @@ export class Server {
    async start() {
         // CORS configurado correctamente
         this.app.use(cors({
-          origin: (origin, callback) => {
-            if (!origin || envs.CORS_ORIGINS.includes(origin)) {
-              callback(null, true);
-            } else {
-              callback(new Error('Not allowed by CORS'));
-            }
-          },
-          credentials: true
+          origin: allowedOrigins,
+          credentials: true,
         }));
     
         // Middlewares

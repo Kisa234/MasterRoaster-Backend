@@ -8,22 +8,26 @@ import { UpdateAnalisisRapidoDto } from '../../domain/dtos/analisis/rapido/updat
 import { UpdateAnalisisRapido } from "../../domain/usecases/analisis/rapido/update-analisisRapido";
 import { DeleteAnalisisRapido } from "../../domain/usecases/analisis/rapido/delete-analisisRapido";
 import { GetAllAnalisisRapido } from "../../domain/usecases/analisis/rapido/get-all-analisisRapido";
+import { LoteTostadoRepository } from "../../domain/repository/loteTostado.repository";
 
 
 export class AnalisisRapidoController {
 
     constructor(
-        private readonly analisisRapidoRepository: AnalisisRapidoRepository
+        private readonly analisisRapidoRepository: AnalisisRapidoRepository,
+        private readonly loteTostadoRepository: LoteTostadoRepository
     ){}
 
 
     public createAnalisisRapido = async (req: Request, res: Response) => {
+        console.log('Creating Analisis Rapido');
+        const id_lote_tostado = req.params.id;
         const [error, createAnalisisRapidoDto] = CreateAnalisisRapidoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
-        new CreateAnalisisRapido(this.analisisRapidoRepository)
-            .execute(createAnalisisRapidoDto!)
+        new CreateAnalisisRapido(this.analisisRapidoRepository, this.loteTostadoRepository)
+            .execute(createAnalisisRapidoDto!, id_lote_tostado)
             .then( analisisRapido => res.json(analisisRapido))
             .catch( error => res.status(400).json({ error }));
     };

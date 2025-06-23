@@ -24,6 +24,18 @@ export class LoteController {
     ){}
 
     public createLote = (req:Request , res : Response) => {
+        // 1. Verifica que req.user esté presente
+        if (!req.user?.id) {
+          return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+      
+        // 2. Inyecta id_user en el body antes de construir el DTO
+        const bodyWithUser = {
+          ...req.body,
+          id_user: req.user.id, // ← Viene del token, no del cliente
+        };
+      
+        // 3. Construye el DTO ya con id_user inyectado
         const [error, createLoteDto] = CreateLoteDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });

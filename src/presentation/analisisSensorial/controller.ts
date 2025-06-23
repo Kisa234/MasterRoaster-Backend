@@ -12,6 +12,8 @@ import { GetAllAnalisisSensorial } from "../../domain/usecases/analisis/sensoria
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
+import { MuestraRepository } from "../../domain/repository/muestra.repository";
+import { MuestraAnalisisRepository } from "../../domain/repository/muestra-analisis.repository";
 
 export class AnalisisSensorialController {
 
@@ -20,11 +22,14 @@ export class AnalisisSensorialController {
         private readonly analisisSensorialRepository: AnalisisSensorialRepository,
         private readonly LoteRepository: LoteRepository,
         private readonly AnalisisRepository: AnalisisRepository,
-        private readonly LoteAnalisisRepository: LoteAnalisisRepository
+        private readonly LoteAnalisisRepository: LoteAnalisisRepository,
+        private readonly muestraRepository: MuestraRepository,
+        private readonly muestraAnalisisRepository: MuestraAnalisisRepository
     ){}
 
     public createAnalisisSensorial = async (req: Request, res: Response) => {
         const id_lote= req.params.id;
+        const type = req.params.type;
         const [error, createAnalisisSensorialDTO] = CreateAnalisisSensorialDTO.create(req.body);
         if (error) {
             return res.status(400).json({ error });
@@ -33,9 +38,11 @@ export class AnalisisSensorialController {
             this.analisisSensorialRepository,
             this.LoteRepository,
             this.AnalisisRepository,
-            this.LoteAnalisisRepository
+            this.LoteAnalisisRepository,
+            this.muestraRepository,
+            this.muestraAnalisisRepository
             )
-            .execute(createAnalisisSensorialDTO!, id_lote)
+            .execute(createAnalisisSensorialDTO!, id_lote, type)
             .then( analisisSensorial => res.json(analisisSensorial))
             .catch( error => res.status(400).json({ error }));
     } ;
@@ -50,6 +57,7 @@ export class AnalisisSensorialController {
 
     public updateAnalisisSensorial = async (req: Request, res: Response) => {
         const id_lote= req.params.id;
+        const type = req.params.type;
         const [error, updateAnalisisSensorialDTO] = UpdateAnalisisSensorialDTO.update({...req.body});
         if (error) {
             return res.status(400).json({ error });
@@ -57,9 +65,10 @@ export class AnalisisSensorialController {
         new UpdateAnalisisSensorial(
             this.analisisSensorialRepository,
             this.LoteRepository,
-            this.AnalisisRepository 
+            this.AnalisisRepository,
+            this.muestraRepository
             )
-            .execute(id_lote,updateAnalisisSensorialDTO!)
+            .execute(id_lote,updateAnalisisSensorialDTO!, type)
             .then( analisisSensorial => res.json(analisisSensorial))
             .catch( error => res.status(400).json({ error }
             ));

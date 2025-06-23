@@ -88,36 +88,48 @@ export class UserController {
             .execute(email, password)
             .then(({ accessToken, refreshToken, user }) => {
                 res
+                .cookie('accessToken', accessToken, {
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: 'lax', // <-- importante para permitir cookies entre localhost:4200 y 3000
+                  maxAge: 15 * 60 * 1000 // 15 minutos
+                })
                 .cookie('refreshToken', refreshToken, {
-                      httpOnly: true,
-                      secure: process.env.NODE_ENV === 'production',
-                      sameSite: 'strict',
-                      maxAge: 1 * 24 * 60 * 60 * 1000 // 1 día
-                    })                   
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: 'lax',
+                  maxAge: 1 * 24 * 60 * 60 * 1000
+                })
                 .json({
-                    accessToken,
-                    refreshToken,
-                    user: {
-                        id_user: user.id_user,
-                        email: user.email,
-                        rol: user.rol
-                    }
+                  user: {
+                    id_user: user.id_user,
+                    email: user.email,
+                    rol: user.rol
+                  }
                 });
             })
             .catch(error => res.status(400).json({ error: error.message }));
     }
 
     public refresh = async (req: Request, res: Response) => {
-        console.log('Refresh token request received');
-        const token = req.cookies?.refreshToken;
-        if (!token) return res.status(401).json({ error: 'Refresh token no presente' });
-
-        try {
-          const accessToken = new RefreshAccessToken().execute(token);
-          return res.json({ accessToken });
-        } catch (error: any) {
-          return res.status(403).json({ error: error.message });
-        }
+      console.log('Refresh token request received');
+      const token = req.cookies?.refreshToken;
+      if (!token) return res.status(401).json({ error: 'Refresh token no presente' });
+        
+      try {
+        const accessToken = new RefreshAccessToken().execute(token);
+    
+        res.cookie('accessToken', accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 15 * 60 * 1000 // 15 minutos
+        });
+    
+        return res.json({ ok: true }); // ya no es necesario devolver el token
+      } catch (error: any) {
+        return res.status(403).json({ error: error.message });
+      }
     };
 
 

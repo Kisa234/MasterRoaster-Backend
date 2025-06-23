@@ -45,6 +45,7 @@ model Muestra {
   user     User?     @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
   analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
+  muestrasHistoricas Muestra_Analisis[]
 }
 
 model Lote {
@@ -83,8 +84,10 @@ model LoteTostado {
   peso             Float
   fecha_registro   DateTime     @default(now())
   eliminado        Boolean      @default(false)
+  id_analisis_rapido        String?  @unique
 
 
+  analisisRapido            AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
   pedido           Pedido? @relation("PedidoLoteTostado")
   lote             Lote         @relation(fields: [id_lote], references: [id_lote])
   tuestes          Tueste[]     
@@ -162,13 +165,11 @@ model Tueste {
   agtrom_comercial          Float?
   agtrom_gourmet            Float?
   estado_tueste             String   @default("Pendiente")
-  id_analisis_rapido        String?  @unique
   id_lote_tostado           String?  
   eliminado                 Boolean  @default(false)
   
 
   // Relación con Analisis Rapido
-  analisisRapido            AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
   loteTostado               LoteTostado?     @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
   pedido                    Pedido        @relation(fields: [id_pedido], references: [id_pedido])
 }
@@ -183,6 +184,18 @@ model Lote_Analisis {
   analisis      Analisis @relation(fields: [id_analisis], references: [id_analisis])
 
   @@unique([id_lote, id_analisis]) 
+}
+
+model Muestra_Analisis {
+  id            String   @id @default(uuid())
+  id_muestra    String
+  id_analisis   String
+  fecha_agregado DateTime @default(now())
+
+  muestra       Muestra  @relation(fields: [id_muestra], references: [id_muestra])
+  analisis      Analisis @relation(fields: [id_analisis], references: [id_analisis])
+
+  @@unique([id_muestra, id_analisis]) 
 }
 
 
@@ -203,6 +216,7 @@ model Analisis {
   Muestra Muestra[]
   Lote    Lote[]
   lotesHistoricos      Lote_Analisis[]
+  muestrasHistoricas Muestra_Analisis[]
 }
 
 model AnalisisFisico {
@@ -271,5 +285,5 @@ model AnalisisRapido {
   comentario         String?
   eliminado          Boolean  @default(false)
 
-  Tueste Tueste?
+  loteTostado        LoteTostado[]
 }

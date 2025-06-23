@@ -28,7 +28,6 @@ export class TuesteEntity {
         public merma                     ?:number,
         public agtrom_comercial          ?:number,
         public agtrom_gourmet            ?:number,
-        public id_analisis_rapido        ?:number,
         public id_lote_tostado           ?:number,
         public eliminado                 ?:number,   
         
@@ -61,7 +60,6 @@ export class TuesteEntity {
             merma                    ,
             agtrom_comercial         ,
             agtrom_gourmet           ,
-            id_analisis_rapido       ,
             id_lote_tostado          ,
             eliminado                
         } = obj;
@@ -98,7 +96,6 @@ export class TuesteEntity {
             merma                    ,
             agtrom_comercial         ,
             agtrom_gourmet           ,
-            id_analisis_rapido       ,
             id_lote_tostado          ,
             eliminado                
         );

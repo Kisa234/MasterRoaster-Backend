@@ -5,11 +5,12 @@ export class CreateLoteTostadoDto {
         public fecha_tostado: Date,
         public peso: number ,
         public perfil_tostado: string,
+        public id_analisis_rapido?: string,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateLoteTostadoDto?] {
-        const {  id_lote, fecha_tostado, perfil_tostado, peso, id_lote_tostado } = props;
-        
+        const {  id_lote, fecha_tostado, perfil_tostado, peso, id_lote_tostado, id_analisis_rapido } = props;
+
         if (!id_lote) return ['El id_lote es requerido', undefined];
         if (!perfil_tostado) return ['El perfil_tostado es requerido', undefined];
         if (!peso) return ['El peso es requerido', undefined];
@@ -25,7 +26,9 @@ export class CreateLoteTostadoDto {
                 id_lote, 
                 newFechaTostado,
                 peso, 
-                perfil_tostado)];
+                perfil_tostado,
+                id_analisis_rapido
+            )];
     }
 
 }

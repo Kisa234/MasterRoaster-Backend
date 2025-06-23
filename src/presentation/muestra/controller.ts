@@ -18,18 +18,30 @@ export class MuestraController {
     ) {}
 
     public createMuestra = (req: Request, res: Response) => {
-        const [error, createMuestraDto] = CreateMuestraDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error });
-        }
-        new CreateMuestra(
-            this.muestraRepository,
-            this.userRepository,
-            )
-            .execute(createMuestraDto!)
-            .then( muestra => res.json(muestra))
-            .catch( error => res.status(400).json({ error }));
-    }
+      // 1. Verifica que req.user esté presente
+      if (!req.user?.id) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+      }
+    
+      // 2. Inyecta id_user en el body antes de construir el DTO
+      const bodyWithUser = {
+        ...req.body,
+        id_user: req.user.id, // ← Viene del token, no del cliente
+      };
+    
+      // 3. Construye el DTO ya con id_user inyectado
+      const [error, createMuestraDto] = CreateMuestraDto.create(bodyWithUser);
+    
+      if (error) {
+        return res.status(400).json({ error });
+      }
+    
+      new CreateMuestra(this.muestraRepository, this.userRepository)
+        .execute(createMuestraDto!)
+        .then((muestra) => res.json(muestra))
+        .catch((error) => res.status(400).json({ error }));
+    };
+
 
     public getMuestraById = (req: Request, res: Response) =>  {
         new GetMuestra(this.muestraRepository)

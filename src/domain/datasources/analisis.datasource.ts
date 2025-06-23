@@ -11,5 +11,6 @@ export abstract class AnalisisDataSource {
     abstract deleteAnalisis(id: string): Promise<AnalisisEntity>;
     abstract getAllAnalisis(): Promise<AnalisisEntity[]>;
     abstract getAnalisisByLoteId(id_lote: string): Promise<AnalisisEntity | null>;
+    abstract getAnalisisByMuestraId(id_muestra: string): Promise<AnalisisEntity | null>;
     // abstract getAnalisisFSByLoteId(id:string) : Promise<{ AnalisisFisicoEntity: AnalisisFisicoEntity, AnalisisSensorialEntity: AnalisisSensorialEntity }>;
 }

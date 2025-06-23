@@ -70,4 +70,12 @@ export class AnalisisController {
             .catch( error => res.status(400).json({ error }));
     };
 
+    public getAnalisisByMuestraId = async (req: Request, res: Response) => {
+        const id_muestra = req.params.id_muestra;
+        new GetAnalisisByLoteId(this.analisisRepository)
+            .execute(id_muestra)
+            .then( analisis => res.json(analisis))
+            .catch( error => res.status(400).json({ error }));
+    }
+
 }

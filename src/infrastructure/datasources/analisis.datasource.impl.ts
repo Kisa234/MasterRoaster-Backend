@@ -66,6 +66,22 @@ export  class AnalisisDataSourceImpl implements AnalisisDataSource {
         return AnalisisEntity.fromObject(analisis);
     }
 
+    async getAnalisisByMuestraId(id_muestra: string): Promise<AnalisisEntity | null> {
+        const muestra = await prisma.muestra.findUnique({
+            where: {
+                id_muestra: id_muestra
+            },
+        });
+        if (!muestra) throw new Error("Muestra not found");
+        const analisis = await prisma.analisis.findUnique({
+            where:{
+                id_analisis: muestra.id_analisis!
+            }
+        });
+        if (!analisis) throw new Error("La muestra no tiene analisis");
+        return AnalisisEntity.fromObject(analisis);
+    }
+
     
     
     
