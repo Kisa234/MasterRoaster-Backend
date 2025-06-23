@@ -132,5 +132,19 @@ export class UserController {
       }
     };
 
+    public getSessionInfo = async (req: Request, res: Response) => {
+      const user = req.user as { id: string; email: string; rol: string };
+    
+      if (!user) {
+        return res.status(401).json({ message: 'No autenticado' });
+      }
+    
+      return res.json({
+        id: user.id,
+        email: user.email,
+        rol: user.rol
+      });
+    };
+
 
 }
