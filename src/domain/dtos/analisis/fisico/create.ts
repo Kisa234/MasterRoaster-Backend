@@ -22,8 +22,6 @@ export class CreateAnalisisFisicoDto {
         public readonly c_desarrollo: number,
         public readonly grado: string,
         public readonly comentario: string,
-        public readonly defectos_primarios: string[],
-        public readonly defectos_secundarios: string[],
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateAnalisisFisicoDto?] {
@@ -66,7 +64,7 @@ export class CreateAnalisisFisicoDto {
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
-            comentario, defectos_primarios, defectos_secundarios
+            comentario
         )];
     }
 }

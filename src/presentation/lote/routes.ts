@@ -16,6 +16,7 @@ import { AnalisisFisicoDataSourceImpl } from '../../infrastructure/datasources/a
 import { AnalisisSensorialDataSourceImpl } from '../../infrastructure/datasources/analisisSensorial.datasource.impl';
 import { AnalisisSensorialRepositoryImpl } from '../../infrastructure/repositories/analisisSensorial.repository.impl';
 import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
+import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
 
 export class LoteRoutes{
 
@@ -45,9 +46,12 @@ export class LoteRoutes{
         
         const userDatasource = new UserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasource);
+
+        const pedidoDatasource = new  PedidoDataSourceImpl();
+        const pedidoRepository = new PedidoDataSourceImpl();
         
         // Use cases
-        const createLoteUseCase = new CreateLote(loteRepository, userRepository);
+        const createLoteUseCase = new CreateLote(loteRepository, userRepository, pedidoRepository);
 
 
 
@@ -60,14 +64,19 @@ export class LoteRoutes{
             analisisFisicoRepository,
             analisisSensorialRepository,
             loteRepository,
-            userRepository
+            userRepository,
+            pedidoRepository
         );
 
         router.post('/', loteController.createLote);
+        router.post('/rapido', loteController.createLoteRapido);
         router.post('/muestra/:id',authMiddleware ,loteController.createLoteFromMuestra);
+        router.post('/fusionar', loteController.FusionarLotes);
+        router.post('/blend', loteController.blendLotes);
         router.get('/', loteController.getLotes);
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
+        router.get('/roaster', loteController.getLotesRoaster);
         router.get('/:id', loteController.getLoteById);
         router.put('/:id', loteController.updateLote);
         router.delete('/:id', loteController.deleteLote);

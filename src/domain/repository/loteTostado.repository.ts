@@ -9,5 +9,4 @@ export abstract class LoteTostadoRepository {
     abstract deleteLoteTostado(id: string): Promise<LoteTostadoEntity>;
     abstract getLoteTostados(): Promise<LoteTostadoEntity[]>;
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
-    
 }

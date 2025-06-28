@@ -36,6 +36,9 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
         return this.tuesteDataSource.completarTueste(id,completeTuesteDto);
     }
+    getTostadosByLoteTostado(id_lote_tostado: string): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getTostadosByLoteTostado(id_lote_tostado);
+    }
     
     
     

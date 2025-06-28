@@ -1,3 +1,5 @@
+import { FusionarLotes } from './../../domain/usecases/lote/lote/fusionar-lote';
+import { error } from 'console';
 import { Request, Response } from "express";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { LoteRepository } from "../../domain/repository/lote.repository";
@@ -17,6 +19,13 @@ import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico
 import { AnalisisSensorialRepository } from "../../domain/repository/analisisSensorial.repository";
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
 import { UserRepository } from "../../domain/repository/user.repository";
+import { CreateLoteRapidoDto } from '../../domain/dtos/lotes/lote/create-rapido';
+import { CreateLoteRapido } from '../../domain/usecases/lote/lote/create-lote-rapido';
+import { PedidoRepository } from '../../domain/repository/pedido.repository';
+import { BlendLotes } from '../../domain/usecases/lote/lote/blend-lotes';
+import { BlendLotesDto } from '../../domain/dtos/lotes/lote/blend-lotes';
+import { FusionarLotesDto } from '../../domain/dtos/lotes/lote/fusionar-lotes';
+import { GetLoteRoaster } from '../../domain/usecases/lote/lote/get-lote-roaster';
 
 export class LoteController {
 
@@ -29,6 +38,7 @@ export class LoteController {
         private readonly analisisSensorialRepository: AnalisisSensorialRepository,
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
+        private readonly pedidoRepository: PedidoRepository
     ){}
 
     public createLote = (req:Request , res : Response) => {
@@ -51,8 +61,25 @@ export class LoteController {
         new CreateLote(
             this.loteRepository,
             this.userRepository,
+            this.pedidoRepository
+
         )
             .execute(createLoteDto!)
+            .then( lote => res.json(lote))
+            .catch( error => res.status(400).json({ error }));
+    }
+
+    public createLoteRapido = (req:Request , res : Response) => {
+        const [error , createLoteRapidoDto] = CreateLoteRapidoDto.create(req.body);
+        if (error) {
+            return res.status(400).json({ error });``
+        }
+
+        new CreateLoteRapido(
+            this.loteRepository,
+            this.userRepository,
+            this.pedidoRepository
+        )   .execute(createLoteRapidoDto!)
             .then( lote => res.json(lote))
             .catch( error => res.status(400).json({ error }));
     }
@@ -142,6 +169,44 @@ export class LoteController {
             .then(user => res.json(user))
             .catch( error => res.status(400).json({ error}));
 
+    }
+    public blendLotes = async (req: Request, res: Response) => {
+        console.log('hola');
+        const [error, dto] = BlendLotesDto.create(req.body);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+        new BlendLotes(
+            this.loteRepository,
+            this.pedidoRepository,
+            this.userRepository
+        )
+            .execute(dto!)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
+    }
+    public FusionarLotes = async (req: Request, res: Response) => {
+        const [error, dto] = FusionarLotesDto.create(req.body);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
+        new FusionarLotes(
+            this.loteRepository
+        )
+            .execute(dto!)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
+    }
+    public getLotesRoaster = async (req: Request, res: Response) => {
+        new GetLoteRoaster(
+            this.loteRepository,
+            this.userRepository
+        )
+            .execute()
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error })
+        )
     }
 
 }

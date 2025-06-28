@@ -25,8 +25,6 @@ export class UpdateAnalisisFisicoDto {
         public readonly c_desarrollo?: number,
         public readonly grado?: string,
         public readonly comentario?: string,
-        public readonly defectos_primarios?: string[],
-        public readonly defectos_secundarios?: string[],
     ) {}
 
     get values() {
@@ -52,8 +50,6 @@ export class UpdateAnalisisFisicoDto {
         if(this.c_desarrollo) returnObj.c_desarrollo = this.c_desarrollo;
         if(this.grado) returnObj.grado = this.grado;
         if(this.comentario) returnObj.comentario = this.comentario;
-        if(this.defectos_primarios) returnObj.defectos_primarios = this.defectos_primarios;
-        if(this.defectos_secundarios) returnObj.defectos_secundarios = this.defectos_secundarios;
         return returnObj;
     }
 
@@ -67,7 +63,6 @@ export class UpdateAnalisisFisicoDto {
             comentario, defectos_primarios, defectos_secundarios
          } = props;
 
-        if (!id_analisis_fisico) return ['El ID del análisis fisico es requerido', undefined];
 
         return [undefined, new UpdateAnalisisFisicoDto(
             id_analisis_fisico,fecha_registro,peso_muestra, peso_pergamino, wa, temperatura_wa,
@@ -75,7 +70,7 @@ export class UpdateAnalisisFisicoDto {
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
-            comentario, defectos_primarios, defectos_secundarios
+            comentario
         )];      
         
     }

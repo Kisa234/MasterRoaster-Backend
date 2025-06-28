@@ -1,5 +1,6 @@
 import { LoteDataSource } from "../../domain/datasources/lote.datasource";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
+import { CreateLoteRapidoDto } from "../../domain/dtos/lotes/lote/create-rapido";
 import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 import { LoteRepository } from "../../domain/repository/lote.repository";
@@ -10,8 +11,10 @@ export class LoteRepositoryImpl  implements LoteRepository {
     ){}
 
     createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
-        
         return this.datasource.createLote(createLoteDto);
+    }
+    createLoteRapido(dto: CreateLoteRapidoDto): Promise<LoteEntity> {
+        return this.datasource.createLoteRapido(dto);
     }
     getLoteById(id: string): Promise<LoteEntity | null> {
         return this.datasource.getLoteById(id);

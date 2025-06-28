@@ -13,6 +13,7 @@ import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
 import { GetTostadosByPedido } from "../../domain/usecases/tueste/get-by-pedido";
+import { GetReferenceTueste } from "../../domain/usecases/tueste/reference-tueste";
 
 export class TuesteController {
 
@@ -101,6 +102,17 @@ export class TuesteController {
             .catch(error => res.status(400).json({ error }));
     }
 
+    public getReferenceTueste = async (req: Request, res: Response) => {
+        const id_lote = req.params.id;
+        console.log("ID LOTE", id_lote);
+        new GetReferenceTueste(
+            this.tuesteRepository,
+            this.pedidoRepository,
+        ).execute(id_lote)
+            .then(avgTueste => res.json(avgTueste))
+            .catch(error => res.status(400).json({ error }));
+    
+    }
     
 
 }

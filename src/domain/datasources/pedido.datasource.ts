@@ -14,4 +14,7 @@ export abstract class PedidoDatasource {
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;
     abstract GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]>;
+    abstract getPedidosByLote(id_lote: string): Promise<PedidoEntity[]>;
+    abstract getLotesCreados(): Promise<string[]>;
+    abstract getLotesTostadoCreados(): Promise<string[]>;
 }

@@ -1,6 +1,7 @@
 import { prisma } from "../../data/postgres";
 import { LoteDataSource } from "../../domain/datasources/lote.datasource";
 import { CreateLoteDto } from '../../domain/dtos/lotes/lote/create';
+import { CreateLoteRapidoDto } from "../../domain/dtos/lotes/lote/create-rapido";
 import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 
@@ -12,6 +13,14 @@ export class LoteDataSourceImpl implements LoteDataSource {
     
     const lote = await prisma.lote.create({
       data: createLoteDto!
+    });
+    
+    return LoteEntity.fromObject(lote);
+  }
+
+  async createLoteRapido(dto: CreateLoteRapidoDto): Promise<LoteEntity> {
+    const lote = await prisma.lote.create({
+      data: dto
     });
     
     return LoteEntity.fromObject(lote);
@@ -114,6 +123,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     });
     return lotes.map(lote => LoteEntity.fromObject(lote));
   }
+  
   async getUserByLote(id: string): Promise<string> {
     const user = await prisma.user.findFirst({
         where: {
@@ -127,5 +137,10 @@ export class LoteDataSourceImpl implements LoteDataSource {
     if (!user) throw new Error("No se encontró el usuario para el lote");
     return user.nombre;
   }
+
+
+  
+
+
   
 }

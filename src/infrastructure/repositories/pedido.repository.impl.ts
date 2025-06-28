@@ -42,5 +42,14 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
      GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.GetPedidosOrdenTuesteByFecha(fecha);
     }
+    getPedidosByLote(id_lote: string): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getPedidosByLote(id_lote);
+    }
+    getLotesCreados(): Promise<string[]> {
+        return this.pedidoDataSource.getLotesCreados();
+    }
+    getLotesTostadoCreados(): Promise<string[]> {
+        return this.pedidoDataSource.getLotesTostadoCreados();
+    }
 
 }

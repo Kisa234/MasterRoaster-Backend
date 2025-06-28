@@ -49,8 +49,6 @@ export class AnalisisFisicoEntity {
       public c_desarrollo: number,
       public grado: string,
       public comentario: string,
-      public defectos_primarios: string[],
-      public defectos_secundarios: string[],
       public eliminado?: boolean,
   ) {}
 
@@ -85,8 +83,6 @@ export class AnalisisFisicoEntity {
       if (c_desarrollo === undefined) throw new Error('c_desarrollo es requerido');
       if (grado === undefined) throw new Error('grado es requerido');
       if (!comentario) throw new Error('comentario es requerido');
-      if (!defectos_primarios) throw new Error('defectos_primarios es requerido');
-      if (!defectos_secundarios) throw new Error('defectos_secundarios es requerido');
 
       const newFechaRegistro = new Date(fecha_registro);
       if (isNaN(newFechaRegistro.getTime())) {
@@ -117,8 +113,6 @@ export class AnalisisFisicoEntity {
           c_desarrollo,
           grado,
           comentario,
-          defectos_primarios,
-          defectos_secundarios
       );
   }
 }

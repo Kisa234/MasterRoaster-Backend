@@ -26,6 +26,8 @@ export class UpdateTuesteDto {
         if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
         if (this.tostadora) returnObj.tostadora = this.tostadora;
         if (this.peso_entrada !== undefined) returnObj.peso_entrada = this.peso_entrada;
+        if (this.densidad !== undefined) returnObj.densidad = this.densidad;
+        if (this.humedad !== undefined) returnObj.humedad = this.humedad;
         if (this.temperatura_entrada !== undefined) returnObj.temperatura_entrada = this.temperatura_entrada;
         if (this.llama_inicial !== undefined) returnObj.llama_inicial = this.llama_inicial;
         if (this.aire_inicial !== undefined) returnObj.aire_inicial = this.aire_inicial;

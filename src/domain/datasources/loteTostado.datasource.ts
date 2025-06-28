@@ -1,6 +1,7 @@
 import { LoteTostadoEntity } from "../entities/loteTostado.entity";
 import { CreateLoteTostadoDto } from '../dtos/lotes/lote-tostado/create';
 import { UpdateLoteTostadoDto } from "../dtos/lotes/lote-tostado/update";
+import { FichaTueste } from "../entities/ficha-tueste.entity";
 
 export abstract class LoteTostadoDataSource {
     abstract createLoteTostado(createLoteTostadoDto:CreateLoteTostadoDto): Promise<LoteTostadoEntity>;

@@ -1,6 +1,5 @@
 import { MuestraRepositoryImpl } from './../../../../infrastructure/repositories/muestra.repository.impl';
 import { CreateAnalisisDto } from "../../../dtos/analisis/analisis/create";
-import { UpdateAnalisisDto } from "../../../dtos/analisis/analisis/update";
 import { CreateAnalisisSensorialDTO } from "../../../dtos/analisis/sensorial/create";
 import { CreateLoteAnalisisDto } from "../../../dtos/lote-analisis/create";
 import { UpdateLoteDto } from "../../../dtos/lotes/lote/update";
@@ -14,6 +13,7 @@ import { CreateMuestraAnalisisDto } from '../../../dtos/muestra-analisis/create'
 import { UpdateMuestra } from '../../muestra/update-muestra';
 import { UpdateMuestraDto } from '../../../dtos/muestra/update';
 import { MuestraRepository } from '../../../repository/muestra.repository';
+import { UpdateAnalisisDto } from '../../../dtos/analisis/analisis/update';
 
 export interface CreateAnalisisSensorialUseCase {
     execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO, id: string, type: string): Promise<AnalisisSensorialEntity>;
@@ -29,11 +29,12 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         private readonly muestraAnalisisRepository: MuestraAnalisisRepository
     ) { }
 
-    async execute(createAnalisisSensorialDTO: CreateAnalisisSensorialDTO, id: string, type: string): Promise<AnalisisSensorialEntity> {
-        if (type === 'lote') {
-            return this.analisisxlote(createAnalisisSensorialDTO, id);
-        } else if (type === 'muestra') {
-            return this.analisisxmuestra(createAnalisisSensorialDTO, id);
+    async execute(dto: CreateAnalisisSensorialDTO, id: string, type: string): Promise<AnalisisSensorialEntity> {
+        console.log('CreateAnalisisSensorial UseCase - execute called with:', dto, id, type);
+        if (type.toLowerCase() === 'lote') {
+            return this.analisisxlote(dto, id);
+        } else if (type.toLowerCase() === 'muestra') {
+            return this.analisisxmuestra(dto, id);
         } else {
             throw new Error('Tipo de analisis no soportado');
         }
@@ -61,8 +62,8 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         if (!lote) {
             throw new Error(`Lote con id ${id_lote} no encontrado`);
         }
-        let analisis = lote.id_analisis;
-        if (!analisis) {
+
+        if (!lote.id_analisis) {
             // se crea el analisis sensorial
             const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
             // si el lote no tiene analisis, se crea un nuevo analisis
@@ -95,14 +96,17 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
 
         }
         else {
-            const analisis2 = await this.analisisRepository.getAnalisisById(analisis);
-            if (!analisis2) {
-                throw new Error(`Analisis with id ${analisis} not found`);
+            const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
+            console.log('analisis', analisis);
+            if (!analisis) {
+                throw new Error(`Analisis with id ${lote.id_analisis} not found`);
             }
-            if (!analisis2.analisisSensorial_id) {
+            if (!analisis.analisisSensorial_id) {
+                console.log('checkpoint 1');    
                 //el reporte no esta completo
                 // se crea un nuevo analisis sensorial
                 const af = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
+                console.log('checkpoint 2');
                 // se agrega el analisis sensorial al analisis reporte
                 const [e, updateAnalisisDto] = UpdateAnalisisDto.update({
                     analisisSensorial_id: af.id_analisis_sensorial
@@ -110,11 +114,12 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
                 if (e) {
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                await this.analisisRepository.updateAnalisis(analisis2.id_analisis, updateAnalisisDto!);
+                console.log('checkpoint 3');
+                await this.analisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
                 return af;
             }
-            else if (analisis2.analisisSensorial_id) {
-                if (!analisis2.analisisFisico_id) throw new Error('El analisis reporte ya tiene un analisis sensorial agregado, y le falta completar el analisis sensorial');
+            else if (analisis.analisisSensorial_id) {
+                if (!analisis.analisisFisico_id || !analisis.analisisDefectos_id) throw new Error('El analisis reporte ya tiene un analisis sensorial y/o defectos agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis sensorial
                 const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
@@ -171,8 +176,7 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
         if (!muestra) {
             throw new Error(`Muestra con id ${id_lote} no encontrado`);
         }
-        let analisis = muestra.id_analisis;
-        if (!analisis) {
+        if (!muestra.id_analisis) {
             // se crea el analisis sensorial
             const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
             // si la muestra no tiene analisis, se crea un nuevo analisis
@@ -205,11 +209,11 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
 
         }
         else {
-            const analisis2 = await this.analisisRepository.getAnalisisById(analisis);
-            if (!analisis2) {
+            const analisis = await this.analisisRepository.getAnalisisById(muestra.id_analisis);
+            if (!analisis) {
                 throw new Error(`Analisis with id ${analisis} not found`);
             }
-            if (!analisis2.analisisSensorial_id) {
+            if (!analisis.analisisSensorial_id) {
                 //el reporte no esta completo
                 // se crea un nuevo analisis sensorial
                 const af = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);
@@ -220,11 +224,11 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
                 if (e) {
                     throw new Error(`Error al crear un nuevo analisis: ${e}`);
                 }
-                await this.analisisRepository.updateAnalisis(analisis2.id_analisis, updateAnalisisDto!);
+                await this.analisisRepository.updateAnalisis(analisis.id_analisis, updateAnalisisDto!);
                 return af;
             }
-            else if (analisis2.analisisSensorial_id) {
-                if (!analisis2.analisisFisico_id) throw new Error('El analisis reporte ya tiene un analisis sensorial agregado, y le falta completar el analisis sensorial');
+            else if (analisis.analisisSensorial_id) {
+                if (!analisis.analisisFisico_id || !analisis.analisisDefectos_id) throw new Error('El analisis reporte ya tiene un analisis sensorial y/o defectos agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis sensorial
                 const as = await this.AnalisisSensorialRepository.createAnalisisSensorial(createAnalisisSensorialDTO);

@@ -35,12 +35,13 @@ export class TuesteRoutes {
         
         router.post('/', tuesteController.createTueste);
         router.get('/', tuesteController.getAllTuestes);
+        router.get('/ref/:id', tuesteController.getReferenceTueste);
         router.get('/:id', tuesteController.getTuesteById);
+        router.get('/fecha/:fecha', tuesteController.getTuesteByFecha);
+        router.get('/pedido/:id', tuesteController.getTostadosByPedido);   
         router.put('/:id', tuesteController.updateTueste);
         // router.delete('/:id', tuesteController.deleteTueste);
-        router.get('/fecha/:fecha', tuesteController.getTuesteByFecha);
         router.put('/c/:id', tuesteController.completarTostados);
-        router.get('/pedido/:id', tuesteController.getTostadosByPedido);   
 
         return router;
 

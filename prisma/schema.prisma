@@ -19,124 +19,118 @@ model User {
   fecha_editado   DateTime?
 
   // Relación con lote
-  lotes             Lote[]
+  lotes     Lote[]
   // Relación con muestra
-  muestras          Muestra[]
+  muestras  Muestra[]
   // Relación con pedidos de cliente
-  pedidos           Pedido[] 
+  pedidos   Pedido[]
   // Relación con Historial
   Historial Historial[]
 }
 
 model Muestra {
-  id_muestra      String   @id 
-  productor       String
-  finca           String
-  region          String
-  departamento    String
-  peso            Float
-  variedades      String[]
-  proceso         String
-  id_user         String?
-  id_analisis     String?  
-  fecha_registro  DateTime @default(now())
-  eliminado       Boolean  @default(false)
+  id_muestra         String             @id
+  productor          String?
+  finca              String?
+  region             String?
+  departamento       String?
+  peso               Float
+  variedades         String[]
+  proceso            String
+  id_user            String?
+  id_analisis        String?
+  fecha_registro     DateTime           @default(now())
+  eliminado          Boolean            @default(false)
   // Relación con Usuario
-  user     User?     @relation(fields: [id_user], references: [id_user])
+  user               User?              @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
-  analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
+  analisis           Analisis?          @relation(fields: [id_analisis], references: [id_analisis])
   muestrasHistoricas Muestra_Analisis[]
 }
 
 model Lote {
-  id_lote         String   @id
-  productor       String
-  finca           String
-  region          String
-  departamento    String
-  peso            Float
-  peso_tostado    Float?
-  variedades      String[]
-  proceso         String
-  tipo_lote       String
-  id_user         String?
-  id_analisis     String?  
-  fecha_registro  DateTime @default(now())
-  eliminado       Boolean  @default(false)
-  
+  id_lote        String   @id
+  productor      String
+  finca          String
+  region         String
+  departamento   String
+  peso           Float
+  peso_tostado   Float?
+  variedades     String[]
+  proceso        String
+  tipo_lote      String
+  id_user        String?
+  id_analisis    String?
+  fecha_registro DateTime @default(now())
+  eliminado      Boolean  @default(false)
+
   // Relación con Usuario
-  user User? @relation(fields: [id_user], references: [id_user])
+  user            User?           @relation(fields: [id_user], references: [id_user])
   // Relación con Analisis
-  analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
+  analisis        Analisis?       @relation(fields: [id_analisis], references: [id_analisis])
   // pedidos que usan este lote como entrada
-  pedidosOrigen  Pedido[] @relation("LoteOrigen")
+  pedidosOrigen   Pedido[]        @relation("LoteOrigen")
   // pedidos que generaron este lote como nuevo
-  pedidosDestino Pedido[] @relation("LoteCreado")
-  LoteTostado LoteTostado[]
-  lotesHistoricos      Lote_Analisis[]
+  pedidosDestino  Pedido[]        @relation("LoteCreado")
+  LoteTostado     LoteTostado[]
+  lotesHistoricos Lote_Analisis[]
 }
 
 model LoteTostado {
-  id_lote_tostado  String       @id 
-  id_lote          String     
-  fecha_tostado    DateTime
-  perfil_tostado   String
-  peso             Float
-  fecha_registro   DateTime     @default(now())
-  eliminado        Boolean      @default(false)
-  id_analisis_rapido        String?  @unique
+  id_lote_tostado    String   @id
+  id_lote            String
+  fecha_tostado      DateTime
+  perfil_tostado     String
+  peso               Float
+  fecha_registro     DateTime @default(now())
+  eliminado          Boolean  @default(false)
+  id_analisis_rapido String?  @unique
 
-
-  analisisRapido            AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
-  pedido           Pedido? @relation("PedidoLoteTostado")
-  lote             Lote         @relation(fields: [id_lote], references: [id_lote])
-  tuestes          Tueste[]     
-
+  analisisRapido AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
+  pedido         Pedido?         @relation("PedidoLoteTostado")
+  lote           Lote            @relation(fields: [id_lote], references: [id_lote])
+  tuestes        Tueste[]
 }
 
-
 model Historial {
-  id_historial     String   @id @default(uuid())
-  entidad          String   // "Lote", "Pedido", "Usuario"
-  id_entidad       String   // ID del lote, pedido o usuario
-  id_user          String   
-  accion           String
-  comentario       String
-  fecha_registro   DateTime @default(now())
-  cambios          Json
+  id_historial   String   @id @default(uuid())
+  entidad        String // "Lote", "Pedido", "Usuario"
+  id_entidad     String // ID del lote, pedido o usuario
+  id_user        String
+  accion         String
+  comentario     String
+  fecha_registro DateTime @default(now())
+  cambios        Json
 
   user User @relation(fields: [id_user], references: [id_user])
 }
 
 model Pedido {
-  id_pedido             String    @id @default(uuid())
-  fecha_registro        DateTime  @default(now())
-  tipo_pedido           String
-  cantidad              Float
-  estado_pedido         String    @default("Pendiente")
-  id_user               String
-  id_lote               String
-  id_nuevoLote          String?
-  id_nuevoLote_tostado  String?   @unique  
-  comentario            String?
-  pesos                 Float[]
-  fecha_tueste          DateTime?
-  tostadora             String?
-  eliminado             Boolean   @default(false)
+  id_pedido            String    @id @default(uuid())
+  fecha_registro       DateTime  @default(now())
+  tipo_pedido          String
+  cantidad             Float
+  estado_pedido        String    @default("Pendiente")
+  id_user              String
+  id_lote              String
+  id_nuevoLote         String?
+  id_nuevoLote_tostado String?   @unique
+  comentario           String?
+  pesos                Float[]
+  fecha_tueste         DateTime?
+  tostadora            String?
+  eliminado            Boolean   @default(false)
 
   // Relación con Usuario como Cliente 
-  cliente User @relation(fields: [id_user], references: [id_user])
+  cliente     User         @relation(fields: [id_user], references: [id_user])
   // Relación con lote original
-  lote Lote @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
+  lote        Lote         @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
   // Relación con lote creado
-  loteCreado Lote? @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
+  loteCreado  Lote?        @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
   // Relación con lote tostado creado
   loteTostado LoteTostado? @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
 
-
   tueste Tueste[]
-
-  
 }
 
 model Tueste {
@@ -146,7 +140,7 @@ model Tueste {
   id_cliente                String
   id_pedido                 String
   densidad                  Float
-  humedad                   Float    
+  humedad                   Float
   peso_entrada              Float
   fecha_tueste              DateTime
   temperatura_entrada       Float?
@@ -165,57 +159,58 @@ model Tueste {
   agtrom_comercial          Float?
   agtrom_gourmet            Float?
   estado_tueste             String   @default("Pendiente")
-  id_lote_tostado           String?  
+  id_lote_tostado           String?
   eliminado                 Boolean  @default(false)
-  
 
   // Relación con Analisis Rapido
-  loteTostado               LoteTostado?     @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
-  pedido                    Pedido        @relation(fields: [id_pedido], references: [id_pedido])
+  loteTostado LoteTostado? @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
+  pedido      Pedido       @relation(fields: [id_pedido], references: [id_pedido])
 }
 
 model Lote_Analisis {
-  id            String   @id @default(uuid())
-  id_lote       String
-  id_analisis   String
+  id             String   @id @default(uuid())
+  id_lote        String
+  id_analisis    String
   fecha_agregado DateTime @default(now())
 
-  lote          Lote     @relation(fields: [id_lote], references: [id_lote])
-  analisis      Analisis @relation(fields: [id_analisis], references: [id_analisis])
+  lote     Lote     @relation(fields: [id_lote], references: [id_lote])
+  analisis Analisis @relation(fields: [id_analisis], references: [id_analisis])
 
-  @@unique([id_lote, id_analisis]) 
+  @@unique([id_lote, id_analisis])
 }
 
 model Muestra_Analisis {
-  id            String   @id @default(uuid())
-  id_muestra    String
-  id_analisis   String
+  id             String   @id @default(uuid())
+  id_muestra     String
+  id_analisis    String
   fecha_agregado DateTime @default(now())
 
-  muestra       Muestra  @relation(fields: [id_muestra], references: [id_muestra])
-  analisis      Analisis @relation(fields: [id_analisis], references: [id_analisis])
+  muestra  Muestra  @relation(fields: [id_muestra], references: [id_muestra])
+  analisis Analisis @relation(fields: [id_analisis], references: [id_analisis])
 
-  @@unique([id_muestra, id_analisis]) 
+  @@unique([id_muestra, id_analisis])
 }
-
 
 model Analisis {
   id_analisis          String   @id @default(uuid())
   fecha_registro       DateTime @default(now())
-  analisisFisico_id    String?  @unique 
+  analisisFisico_id    String?  @unique
   analisisSensorial_id String?  @unique
+  analisisDefectos_id  String?  @unique
   comentario           String?
-  
-  eliminado          Boolean  @default(false)
+
+  eliminado Boolean @default(false)
 
   // Relación con Analisis Fisico
   analisisFisico    AnalisisFisico?    @relation(fields: [analisisFisico_id], references: [id_analisis_fisico])
   //  Relación con Analisis Sensorial
   analisisSensorial AnalisisSensorial? @relation(fields: [analisisSensorial_id], references: [id_analisis_sensorial])
+  // Relación con Analisis Defectos
+  analisisDefectos  AnalisisDefectos?  @relation(fields: [analisisDefectos_id], references: [id_analisis_defecto])
 
-  Muestra Muestra[]
-  Lote    Lote[]
-  lotesHistoricos      Lote_Analisis[]
+  Muestra            Muestra[]
+  Lote               Lote[]
+  lotesHistoricos    Lote_Analisis[]
   muestrasHistoricas Muestra_Analisis[]
 }
 
@@ -241,14 +236,37 @@ model AnalisisFisico {
   desarrollo                Float?
   pocentaje_caramelizcacion Float?
   c_desarrollo              Float?
-  grado                     String?
   comentario                String
-  defectos_primarios        String[]
-  defectos_secundarios      String[]
-  eliminado          Boolean  @default(false)
+  eliminado                 Boolean  @default(false)
 
   Analisis Analisis?
 }
+
+model AnalisisDefectos {
+  id_analisis_defecto     String   @id @default(uuid())
+  grano_negro             Int
+  grano_agrio             Int
+  grano_con_hongos        Int
+  cereza_seca             Int
+  materia_estrana         Int
+  broca_severa            Int
+  negro_parcial           Int
+  agrio_parcial           Int
+  pergamino               Int
+  flotadores              Int
+  inmaduro                Int
+  averanado               Int
+  conchas                 Int
+  cascara_pulpa_seca      Int
+  partido_mordido_cortado Int
+  broca_leva              Int
+  grado                   String
+  fecha_registro          DateTime @default(now())
+  eliminado               Boolean  @default(false)
+
+  analisis                Analisis?
+}
+
 
 model AnalisisSensorial {
   id_analisis_sensorial String   @id @default(uuid())
@@ -267,15 +285,15 @@ model AnalisisSensorial {
   puntaje_taza          Float
   comentario            String
   fecha_registro        DateTime @default(now())
-  
-  eliminado          Boolean  @default(false)
+
+  eliminado Boolean @default(false)
 
   Analisis Analisis?
 }
 
 model AnalisisRapido {
   id_analisis_rapido String   @id @default(uuid())
-  fecha_registro      DateTime @default(now())
+  fecha_registro     DateTime @default(now())
   horneado           Boolean
   humo               Boolean
   uniforme           Boolean
@@ -285,5 +303,5 @@ model AnalisisRapido {
   comentario         String?
   eliminado          Boolean  @default(false)
 
-  loteTostado        LoteTostado[]
+  loteTostado LoteTostado[]
 }

@@ -2,6 +2,8 @@ import { CreateLoteDto } from "../../../dtos/lotes/lote/create";
 import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteEntity } from "../../../entities/lote.entity";
 import { UserRepository } from "../../../repository/user.repository";
+import { Pedido } from "@prisma/client";
+import { PedidoRepository } from "../../../repository/pedido.repository";
 
 
 export interface CreateLoteUseCase {
@@ -13,6 +15,7 @@ export class CreateLote implements CreateLoteUseCase {
     constructor(
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
+        private readonly pedidoRepository: PedidoRepository
     ) { }
 
     async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity> {
@@ -73,29 +76,12 @@ export class CreateLote implements CreateLoteUseCase {
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
 
         // NUMERO FINAL
-        const lotes = await this.loteRepository.getLotes();
+        const lotes = await this.loteRepository.getLotes();               // Todos los lotes existentes
+        const lotesPedidos = await this.pedidoRepository.getLotesCreados(); // Todos los id_nuevoLote de pedidos
+        const uniquePedidos = new Set(lotesPedidos);                      // Elimina duplicados
 
-        const lotesConUsuarios = await Promise.all(
-            lotes.map(async l => {
-                let user = null;
-                if (l.id_user) {
-                    try {
-                        user = await this.userRepository.getUserById(l.id_user);
-                    } catch (err) {
-                        console.warn(`No encontré user for id ${l.id_user}:`, err);
-                    }
-                }
-                return { lote: l, user };
-            })
-        );
-
-
-
-        const lotesFiltrados = lotesConUsuarios
-            .filter(({ user }) => user?.rol === 'admin')
-            .map(({ lote }) => lote);
-
-        const numeroLoteFinal = lotesFiltrados.length + 1;
+        // Calcular: total lotes menos lotes ya “usados” por pedidos, +1 para el siguiente
+        const numeroLoteFinal = lotes.length - uniquePedidos.size + 1;
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
 
         // LOTE PARA CLIENTE

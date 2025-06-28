@@ -7,6 +7,7 @@ import { LoteRepository } from '../../repository/lote.repository';
 import { CompleteTuesteDto } from '../../dtos/tueste/complete';
 import { UpdatePedidoDto } from '../../dtos/pedido/update';
 import { TuesteEntity } from '../../entities/tueste.entity';
+import { UpdateTuesteDto } from '../../dtos/tueste/update';
 
 export interface CompleteTuesteUseCase {
     execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;
@@ -73,11 +74,22 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         if (!dto) throw new Error("Error generando DTO para lote tostado");
         const loteTostado = await this.createLoteTostado.execute(dto);
         
-        //7. actualizar nuevo lote en el pedido
+        
+        //7. actualizar lote tostado en los tuestes
+        const [, updateTueste] = UpdateTuesteDto.update({
+            id_tueste: tuesteCompletado.id_tueste
+        });
+        if (!updateTueste) throw new Error("Error generando DTO para tueste");
+        for (const tueste of tuestesDelPedido) {
+            await this.tuesteRepository.updateTueste(tueste.id_tueste, updateTueste);
+        }
+        
+        //8. actualizar nuevo lote en el pedido
         const [, updatePedido] = UpdatePedidoDto.update({
             id_nuevoLote_tostado: loteTostado.id_lote_tostado,
         });
         if (!updatePedido) throw new Error("Error generando DTO para lote tostado");
+
         await this.pedidoRepository.updatePedido(pedido.id_pedido, updatePedido);
         return TuesteEntity.fromObject(tuesteCompletado);
     }

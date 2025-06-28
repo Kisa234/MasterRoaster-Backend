@@ -112,7 +112,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 return af;                
             }
             else if (analisis2.analisisFisico_id){
-                if (!analisis2.analisisSensorial_id) throw new Error('El analisis reporte ya tiene un analisis fisico agregado, y le falta completar el analisis sensorial');
+                if (!analisis2.analisisSensorial_id || !analisis2.analisisDefectos_id) throw new Error('El analisis reporte ya tiene un analisis fisico y/o defectos agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis fisico
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);
@@ -221,7 +221,7 @@ export class CreateAnalisisFisico implements CreateAnalisisFisicoUseCase {
                 return af;                
             }
             else if (analisis2.analisisFisico_id){
-                if (!analisis2.analisisSensorial_id) throw new Error('El analisis reporte ya tiene un analisis fisico agregado, y le falta completar el analisis sensorial');
+                if (!analisis2.analisisSensorial_id || !analisis2.analisisDefectos_id) throw new Error('El analisis reporte ya tiene un analisis fisico y/o defectos agregado, y le falta completar el analisis sensorial');
                 //el reporte esta completo
                 // se crea un nuevo analisis fisico
                 const af = await this.analisisFisicoRepository.createAnalisisFisico(createAnalisisFisicoDto);

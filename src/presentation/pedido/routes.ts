@@ -44,7 +44,7 @@ export class PedidoRoutes {
         const AnalisisFisicoRepository = new AnalisisFisicoRepositoryImpl(AnalisisFisicoDatasource);
 
         
-        const cl = new CreateLote(LoteRepository, UserRepository)
+        const cl = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
 
         const controller = new PedidoController(
             PedidoRepository,

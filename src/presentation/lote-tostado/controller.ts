@@ -9,10 +9,15 @@ import { UpdateLoteTostado } from "../../domain/usecases/lote/lote-tostado/updat
 import { DeleteLoteTostado } from "../../domain/usecases/lote/lote-tostado/delete-lote-tostado";
 import { GetLotesTostadoByLote } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-lote";
 import { GetAllLoteTostado } from "../../domain/usecases/lote/lote-tostado/get-all-lote-tostado";
+import { GetFichaTueste } from "../../domain/usecases/lote/lote-tostado/ficha-tueste";
+import { TuesteRepository } from "../../domain/repository/tueste.repository";
+import { PedidoRepository } from "../../domain/repository/pedido.repository";
 
 export class LoteTostadoController {
     constructor(
-        private readonly loteTostadoRepository: LoteTostadoRepository
+        private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly tuesteRepository: TuesteRepository,
+        private readonly pedidoRepository: PedidoRepository
     ){}
 
     public createLoteTostado = (req:Request , res : Response) => {
@@ -67,6 +72,18 @@ export class LoteTostadoController {
         new GetLotesTostadoByLote(this.loteTostadoRepository)
             .execute(id_lote)
             .then( lotes => res.json(lotes))
+            .catch( error => res.status(400).json({ error }));
+    }
+
+    public getFichaTueste = (req:Request , res : Response) => {
+        const id_lote_tostado = req.params.id;
+
+        new GetFichaTueste(
+            this.loteTostadoRepository,
+            this.tuesteRepository,
+            this.pedidoRepository)
+            .execute(id_lote_tostado)
+            .then( ficha => res.json(ficha))
             .catch( error => res.status(400).json({ error }));
     }
 

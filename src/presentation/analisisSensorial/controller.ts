@@ -30,6 +30,7 @@ export class AnalisisSensorialController {
     public createAnalisisSensorial = async (req: Request, res: Response) => {
         const id_lote= req.params.id;
         const type = req.params.type;
+        
         const [error, createAnalisisSensorialDTO] = CreateAnalisisSensorialDTO.create(req.body);
         if (error) {
             return res.status(400).json({ error });
