@@ -18,9 +18,8 @@ export class CreateAnalisisFisicoDto {
         public readonly quaquers: number,
         public readonly peso_muestra_tostada: number,
         public readonly desarrollo: number,
-        public readonly pocentaje_caramelizcacion: number,
+        public readonly porcentaje_caramelizacion: number,
         public readonly c_desarrollo: number,
-        public readonly grado: string,
         public readonly comentario: string,
     ) {}
 
@@ -30,8 +29,8 @@ export class CreateAnalisisFisicoDto {
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
-            desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
-            comentario, defectos_primarios, defectos_secundarios
+            desarrollo, porcentaje_caramelizcacion, c_desarrollo,
+            comentario
          } = props;
 
         if (peso_muestra === undefined) return ['El peso de la muestra es requerido', undefined];
@@ -48,12 +47,6 @@ export class CreateAnalisisFisicoDto {
         if (superior_malla_14 === undefined) return ['El superior malla 14 es requerido', undefined];
         if (menor_malla_16 === undefined) return ['El menor malla 16 es requerido', undefined];
         if (peso_defectos === undefined) return ['El peso de defectos es requerido', undefined];
-        // if (quaquers === undefined) return ['El quaquers es requerido', undefined];
-        // if (peso_muestra_tostada === undefined) return ['El peso de la muestra tostada es requerido', undefined];
-        // if (desarrollo === undefined) return ['El desarrollo es requerido', undefined];
-        // if (pocentaje_caramelizcacion === undefined) return ['El porcentaje de caramelización es requerido', undefined];
-        // if (c_desarrollo === undefined) return ['El c desarrollo es requerido', undefined];
-        if (grado === undefined) return ['El grado es requerido', undefined];
    
 
 
@@ -63,7 +56,7 @@ export class CreateAnalisisFisicoDto {
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
-            desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
+            desarrollo, porcentaje_caramelizcacion, c_desarrollo,
             comentario
         )];
     }

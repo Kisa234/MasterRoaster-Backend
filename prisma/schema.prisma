@@ -234,7 +234,7 @@ model AnalisisFisico {
   quaquers                  Float?
   peso_muestra_tostada      Float?
   desarrollo                Float?
-  pocentaje_caramelizcacion Float?
+  porcentaje_caramelizacion Float?
   c_desarrollo              Float?
   comentario                String
   eliminado                 Boolean  @default(false)

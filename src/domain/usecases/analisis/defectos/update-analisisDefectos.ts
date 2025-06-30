@@ -37,6 +37,7 @@ export class UpdateAnalisisDefectos implements UpdateAnalisisDefectosUsecase {
                 throw new Error(`Lote with id ${id} not found`);
             }
             // se consigue el analisis del lote
+          
             let analisis = await this.analisisRepository.getAnalisisByLoteId(id);
             if (!analisis) {
                 throw new Error(`Analisis del lote con el id ${id} no encontrado`);  

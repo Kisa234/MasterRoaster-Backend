@@ -41,7 +41,7 @@ export class UpdateAnalisisSensorial implements UpdateAnalisisSensorialUseCase {
             throw new Error(`Analisis del lote con el id ${id} no encontrado`);  
         }
         // se consigue el analisis sensorial del lote
-        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisFisico_id!);
+        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisSensorial_id!);
         if (!analisisSensorial) {
             throw new Error(`Analisis fisico del lote con el id ${id} no encontrado`);
         }
@@ -61,7 +61,7 @@ export class UpdateAnalisisSensorial implements UpdateAnalisisSensorialUseCase {
             throw new Error(`Analisis de la muestra con el id ${id} no encontrado`);  
         }
         // se consigue el analisis sensorial de la muestra
-        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisFisico_id!);
+        const analisisSensorial = await this.AnalisisSensorialRepository.getAnalisisSensorialById(analisis.analisisSensorial_id!);
         if (!analisisSensorial) {
             throw new Error(`Analisis fisico de la muestra con el id ${id} no encontrado`);
         }

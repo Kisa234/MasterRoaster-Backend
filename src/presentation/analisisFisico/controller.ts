@@ -30,6 +30,7 @@ export class AnalisisFisicoController {
         const id_lote= req.params.id;
         const type = req.params.type;
         const [error, createAnalisisFisicoDto] = CreateAnalisisFisicoDto.create(req.body);
+        console.log(error);
         if (error) {
             return res.status(400).json({ error });
         }

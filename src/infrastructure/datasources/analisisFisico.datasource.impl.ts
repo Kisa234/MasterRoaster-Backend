@@ -28,7 +28,7 @@ export  class AnalisisFisicoDataSourceImpl implements AnalisisFisicoDataSource {
             where: {
                 id_analisis_fisico: id
             },
-            data: updateAnalisisFisicoDto!
+            data: updateAnalisisFisicoDto
         });
         return AnalisisFisicoEntity.fromObject(updateAnalisisFisico);
     }

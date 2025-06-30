@@ -53,6 +53,7 @@ export class AnalisisDefectosController {
         const id = req.params.id;
         const type = req.params.type;
         const [error, updateAnalisisDefectosDto] = UpdateAnalisisDefectosDto.update({...req.body});
+        
         if (error) {
             return res.status(400).json({ error });
         }

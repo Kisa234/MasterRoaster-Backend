@@ -28,7 +28,7 @@ export  class AnalisisRapidoDataSourceImpl implements AnalisisRapidoDataSource {
       where: {
         id_analisis_rapido: id
       },
-      data: updateAnalisisRapidoDto!
+      data: updateAnalisisRapidoDto.values!
     });
     return AnalisisRapidoEntity.fromObject(updateAnalisisRapido);
   }

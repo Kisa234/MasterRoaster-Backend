@@ -13,7 +13,6 @@ export class UpdateAnalisisRapidoDto {
 
     get values() {
         const returnObj: { [key: string]: any } = {};
-        if (this.fecha_registro) returnObj.fecha = this.fecha_registro;
         if (this.horneado !== undefined) returnObj.horneado = this.horneado;
         if (this.humo !== undefined) returnObj.humo = this.humo;
         if (this.uniforme !== undefined) returnObj.uniforme = this.uniforme;
@@ -26,10 +25,9 @@ export class UpdateAnalisisRapidoDto {
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateAnalisisRapidoDto?] {
-        const { id_analisis_rapido, fecha_registro, horneado, humo, uniforme, verde, arrebatado, oscuro, comentario } = props;
+        const { id_analisis_rapido, horneado, humo, uniforme, verde, arrebatado, oscuro, comentario } = props;
 
-        if (!id_analisis_rapido) return ['ID del análisis rápido es requerido', undefined];
 
-        return [undefined, new UpdateAnalisisRapidoDto(id_analisis_rapido, fecha_registro ? new Date(fecha_registro) : undefined, horneado, humo, uniforme, verde, arrebatado, oscuro, comentario)];
+        return [undefined, new UpdateAnalisisRapidoDto(id_analisis_rapido, horneado, humo, uniforme, verde, arrebatado, oscuro, comentario)];
     }
 }

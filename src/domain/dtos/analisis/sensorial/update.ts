@@ -52,7 +52,6 @@ export class UpdateAnalisisSensorialDTO {
             comentario, fecha_registro 
         } = props;
 
-        if (!id_analisis_sensorial) return ['El ID del análisis sensorial es requerido', undefined];
 
         return [undefined, new UpdateAnalisisSensorialDTO(
             id_analisis_sensorial,

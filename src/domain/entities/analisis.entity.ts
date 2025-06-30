@@ -14,7 +14,7 @@ export class AnalisisEntity {
     ){}
 
     static fromObject(obj: { [key: string]: any }): AnalisisEntity {
-        const { id_analisis, analisisFisico_id, analisisSensorial_id,analisisDefecto_id, fecha_registro, comentario } = obj;
+        const { id_analisis, analisisFisico_id, analisisSensorial_id,analisisDefectos_id, fecha_registro, comentario } = obj;
 
         if (!id_analisis) throw new Error('id_analisis es requerido');
         if (!fecha_registro) throw new Error('fecha_registro es requerida');
@@ -29,7 +29,7 @@ export class AnalisisEntity {
             newFechaRegistro,
             analisisFisico_id,
             analisisSensorial_id,
-            analisisDefecto_id, 
+            analisisDefectos_id, 
             comentario
         );
     }

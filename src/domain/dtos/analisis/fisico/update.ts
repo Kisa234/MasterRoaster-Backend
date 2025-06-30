@@ -3,7 +3,6 @@
 export class UpdateAnalisisFisicoDto {
     private constructor(
         public readonly id_analisis_fisico: string,
-        public readonly fecha_registro: Date,
         public readonly peso_muestra?: number,
         public readonly peso_pergamino?: number,
         public readonly wa?: number,
@@ -55,7 +54,7 @@ export class UpdateAnalisisFisicoDto {
 
     static update(props: { [key: string]: any }): [string?, UpdateAnalisisFisicoDto?] {
         const {
-            id_analisis_fisico,fecha_registro,peso_muestra, peso_pergamino, wa, temperatura_wa,
+            id_analisis_fisico,peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
@@ -65,7 +64,7 @@ export class UpdateAnalisisFisicoDto {
 
 
         return [undefined, new UpdateAnalisisFisicoDto(
-            id_analisis_fisico,fecha_registro,peso_muestra, peso_pergamino, wa, temperatura_wa,
+            id_analisis_fisico,peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
             menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,

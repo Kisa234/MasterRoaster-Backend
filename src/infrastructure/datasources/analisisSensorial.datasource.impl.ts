@@ -29,7 +29,7 @@ export  class AnalisisSensorialDataSourceImpl implements AnalisisSensorialDataSo
       where: {
         id_analisis_sensorial: id
       },
-      data: updateAnalisisSensorialDTO!
+      data: updateAnalisisSensorialDTO
     });
     return AnalisisSensorialEntity.fromObject(updateAnalisisSensorial);
   }
