@@ -31,8 +31,7 @@ export class UserRepositoryImpl implements UserRepository {
   findByEmail(email: string): Promise<UserEntity | null> {
     return this.datasource.findByEmail(email);
   }
-  
-  
-  
-    
+  getRole(id: string): Promise<string> {
+    return this.datasource.getRole(id);
+  }   
 }

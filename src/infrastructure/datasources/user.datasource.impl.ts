@@ -70,6 +70,14 @@ export  class UserDataSourceImpl implements UserDataSource {
     });
     return users.map(UserEntity.fromObject);
   }
+
+  async getRole(id:string): Promise<string> {
+    const user = await prisma.user.findUnique({
+      where: { id_user: id }
+    });
+    if (!user) throw new Error("Usuario no encontrado");
+    return user.rol;
+  }
   
     
 }
