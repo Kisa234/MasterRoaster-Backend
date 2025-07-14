@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE "Muestra" ALTER COLUMN "productor" DROP NOT NULL,
-ALTER COLUMN "finca" DROP NOT NULL,
-ALTER COLUMN "region" DROP NOT NULL,
-ALTER COLUMN "departamento" DROP NOT NULL;
