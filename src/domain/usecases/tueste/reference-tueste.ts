@@ -18,14 +18,17 @@ export class GetReferenceTueste implements GetReferenceTuesteUseCase {
   ) {}
 
   async execute(id_lote: string): Promise<AvgTuesteEntity> {
+    console.log("ID LOTE", id_lote);
     const pedidos = await this.pedidoRepository.getPedidosByLote(id_lote);
     if (!pedidos?.length) {
       throw new Error(`No se encontraron pedidos para el lote ${id_lote}`);
     }
 
+    
     const roastArrays = await Promise.all(
       pedidos.map(p => this.tuesteRepository.getTostadosByPedido(p.id_pedido))
     );
+    
     const allRoasts = roastArrays.flat();
     if (!allRoasts.length) {
       throw new Error(`No hay tuestes para los pedidos del lote ${id_lote}`);

@@ -77,8 +77,9 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         
         //7. actualizar lote tostado en los tuestes
         const [, updateTueste] = UpdateTuesteDto.update({
-            id_tueste: tuesteCompletado.id_tueste
+            id_lote_tostado: loteTostado.id_lote_tostado,
         });
+        console.log(updateTueste);
         if (!updateTueste) throw new Error("Error generando DTO para tueste");
         for (const tueste of tuestesDelPedido) {
             await this.tuesteRepository.updateTueste(tueste.id_tueste, updateTueste);

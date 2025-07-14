@@ -210,14 +210,22 @@ export class CreatePedido implements CreatePedidoUseCase {
         return PedidoEntity.fromObject(pedido);
     }
 
-
     private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
         // 1. Verificar que hay suficiente peso en el lote 
         if (lote.peso < dto.cantidad) {
             throw new Error('No hay suficiente cantidad en el lote');
         }
+        // actualizar peso del lote original si es lote verde
+        if (lote.tipo_lote === 'Lote Verde') {
+            const nuevoPesoLote = lote.peso - dto.cantidad;
+            const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
+            await this.loteRepository.updateLote(lote.id_lote, updateLoteDto!);
+            //eliminar lote si el nuevo peso es  0 
+            if (nuevoPesoLote == 0) {
+                await this.loteRepository.deleteLote(lote.id_lote);
+            }
+        }
 
-        console.log('checkpoint 1');
 
         // 2. Validar que el cliente existe y no está eliminado
         const user = await this.userRepository.getUserById(dto.id_user);
@@ -226,7 +234,6 @@ export class CreatePedido implements CreatePedidoUseCase {
         }
 
         // 3. Validar que el lote tiene un análisis asociado
-
         let analisisFisico: AnalisisFisicoEntity | null = null;
 
         if (!lote.id_analisis) {

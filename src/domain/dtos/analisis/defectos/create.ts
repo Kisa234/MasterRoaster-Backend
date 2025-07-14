@@ -1,3 +1,4 @@
+
 export class CreateAnalisisDefectosDto {
   constructor(
     public grano_negro: number,
@@ -16,8 +17,8 @@ export class CreateAnalisisDefectosDto {
     public cascara_pulpa_seca: number,
     public partido_mordido_cortado: number,
     public broca_leva: number,
-    public grado:string,
-  ) {}
+    public grado: string,
+  ) { }
 
   static create(props: { [key: string]: any }): [string?, CreateAnalisisDefectosDto?] {
     const {
@@ -40,7 +41,6 @@ export class CreateAnalisisDefectosDto {
       grado
     } = props;
 
-    // Aquí podrías añadir validaciones por defecto, p.ej. que no sean undefined.
     return [
       undefined,
       new CreateAnalisisDefectosDto(

@@ -1,25 +1,95 @@
 export class CreateAnalisisRapidoDto {
-    private constructor(
+  constructor(
+    public fragancia: string,
+    public aroma: string,
+    public floral: boolean,
+    public afrutado: boolean,
+    public bayas: boolean,
+    public frutos_secos: boolean,
+    public citricos: boolean,
+    public acido_fermentado: boolean,
+    public acido: boolean,
+    public fermentado: boolean,
+    public verde_vegetal: boolean,
+    public otros: boolean,
+    public quimico: boolean,
+    public rancio: boolean,
+    public tierra: boolean,
+    public papel: boolean,
+    public tostado: boolean,
+    public nueces_cacao: boolean,
+    public nueces: boolean,
+    public cocoa: boolean,
+    public especias: boolean,
+    public dulce: boolean,
+    public vainilla: boolean,
+    public azucar_morena: boolean,
+    public comentario?: string,
+  ) {}
 
-        public readonly horneado: boolean,
-        public readonly humo: boolean,
-        public readonly uniforme: boolean,
-        public readonly verde: boolean,
-        public readonly arrebatado: boolean,
-        public readonly oscuro: boolean,
-        public readonly comentario?: string,
-    ) {}
+  static create(props: { [key: string]: any }): [string?, CreateAnalisisRapidoDto?] {
+    const {
+      fragancia,
+      aroma,
+      floral,
+      afrutado,
+      bayas,
+      frutos_secos,
+      citricos,
+      acido_fermentado,
+      acido,
+      fermentado,
+      verde_vegetal,
+      otros,
+      quimico,
+      rancio,
+      tierra,
+      papel,
+      tostado,
+      nueces_cacao,
+      nueces,
+      cocoa,
+      especias,
+      dulce,
+      vainilla,
+      azucar_morena,
+      comentario,
+    } = props;
 
-    static create(props: { [key: string]: any }): [string?, CreateAnalisisRapidoDto?] {
-        const {  horneado, humo, uniforme, verde, arrebatado, oscuro, comentario } = props;
-
-        if (horneado === undefined) return ['Horneado es requerido', undefined];
-        if (humo === undefined) return ['Humo es requerido', undefined];
-        if (uniforme === undefined) return ['Uniforme es requerido', undefined];
-        if (verde === undefined) return ['Verde es requerido', undefined];
-        if (arrebatado === undefined) return ['Arrebatado es requerido', undefined];
-        if (oscuro === undefined) return ['Oscuro es requerido', undefined];
-
-        return [undefined, new CreateAnalisisRapidoDto( horneado, humo, uniforme, verde, arrebatado, oscuro, comentario)];
+    if(fragancia === undefined || aroma === undefined) {
+      return ["Fragancia y aroma son obligatorios"];
     }
+    
+
+    return [
+      undefined,
+      new CreateAnalisisRapidoDto(
+        fragancia,
+        aroma,
+        floral,
+        afrutado,
+        bayas,
+        frutos_secos,
+        citricos,
+        acido_fermentado,
+        acido,
+        fermentado,
+        verde_vegetal,
+        otros,
+        quimico,
+        rancio,
+        tierra,
+        papel,
+        tostado,
+        nueces_cacao,
+        nueces,
+        cocoa,
+        especias,
+        dulce,
+        vainilla,
+        azucar_morena,
+        comentario,
+      ),
+    ];
+  }
 }

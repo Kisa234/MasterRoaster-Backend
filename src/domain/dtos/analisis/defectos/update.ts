@@ -16,8 +16,8 @@ export class UpdateAnalisisDefectosDto {
     public cascara_pulpa_seca?: number,
     public partido_mordido_cortado?: number,
     public broca_leva?: number,
-    public grado?:string
-  ) {}
+    public grado?: string
+  ) { }
 
   get values() {
     const returnObj: { [key: string]: any } = {};
@@ -37,7 +37,7 @@ export class UpdateAnalisisDefectosDto {
     if (this.cascara_pulpa_seca !== undefined) returnObj.cascara_pulpa_seca = this.cascara_pulpa_seca;
     if (this.partido_mordido_cortado !== undefined) returnObj.partido_mordido_cortado = this.partido_mordido_cortado;
     if (this.broca_leva !== undefined) returnObj.broca_leva = this.broca_leva;
-    if (this.grado!==undefined)returnObj.grado =this.grado;
+    if (this.grado !== undefined) returnObj.grado = this.grado;
     return returnObj;
   }
 

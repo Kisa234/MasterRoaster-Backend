@@ -36,6 +36,7 @@ export class AnalisisDefectosController {
             this.analisisRepository,
             this.loteAnalisisRepository,
             this.muestraAnalisisRepository,
+            this.muestraRepository 
 
         )
             .execute(id_lote,createAnalisisDefectosDto!,type)

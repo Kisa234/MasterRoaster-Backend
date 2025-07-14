@@ -12,6 +12,7 @@ import { AnalisisDefectosRespository } from "../../../repository/analisisDefecto
 import { LoteAnalisisRepository } from "../../../repository/lote-analisis.repository";
 import { LoteRepository } from "../../../repository/lote.repository";
 import { MuestraAnalisisRepository } from "../../../repository/muestra-analisis.repository";
+import { MuestraRepository } from "../../../repository/muestra.repository";
 import { CreateAnalisis } from "../analisis/create-analisis";
 
 
@@ -20,13 +21,13 @@ export interface CreateAnalisisDefectosUsecase {
 }
 
 export class CreateAnalisisDefectos implements CreateAnalisisDefectosUsecase {
-    muestraRepository: any;
     constructor(
         private readonly analisisDefectosRepository: AnalisisDefectosRespository,
         private readonly loteRepository: LoteRepository,
         private readonly analisisRepository: AnalisisRepository,
         private readonly loteAnalisisRepository: LoteAnalisisRepository,
         private readonly muestraAnalisisRepository: MuestraAnalisisRepository,
+        private readonly muestraRepository: MuestraRepository,
 
     ) { }
 
@@ -166,10 +167,13 @@ export class CreateAnalisisDefectos implements CreateAnalisisDefectosUsecase {
         // se agrega el nuevo analisis reporte al historial
         // se agrega el analisis reporte al lote
         // se crea analisis fisico y se agrega a nuevo analisis reporte
+        console.log('Creating analisis defectos for muestra with id:', id_muestra);
+        console.log('DTO:', dto);
         const muestra = await this.muestraRepository.getMuestraById(id_muestra);
         if (!muestra) {
             throw new Error(`Muestra with id ${id_muestra} not found`);
         }
+        
         if (!muestra.id_analisis) {
             // se crea el analisis defectos
             const ad = await this.analisisDefectosRepository.createAnalisisDefectos(dto);

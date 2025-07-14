@@ -104,7 +104,6 @@ export class TuesteController {
 
     public getReferenceTueste = async (req: Request, res: Response) => {
         const id_lote = req.params.id;
-        console.log("ID LOTE", id_lote);
         new GetReferenceTueste(
             this.tuesteRepository,
             this.pedidoRepository,

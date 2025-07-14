@@ -19,6 +19,7 @@ export class UpdateTuesteDto {
         public readonly porcentaje_caramelizacion:number,
         public readonly desarrollo               :number,
         public readonly grados_desarrollo        :number,
+        public readonly id_lote_tostado          :string
     ) {}
 
     get values() {
@@ -39,6 +40,7 @@ export class UpdateTuesteDto {
         if (this.porcentaje_caramelizacion !== undefined) returnObj.porcentaje_caramelizacion = this.porcentaje_caramelizacion;
         if (this.desarrollo !== undefined) returnObj.desarrollo = this.desarrollo;
         if (this.grados_desarrollo !== undefined) returnObj.grados_desarrollo = this.grados_desarrollo;
+        if (this.id_lote_tostado) returnObj.id_lote_tostado = this.id_lote_tostado;
         return returnObj;
     }
 
@@ -61,11 +63,8 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
+            id_lote_tostado
         } = props;
-
-        if (!id_tueste) return ['ID de tueste es requerido', undefined];
-
-        
 
         return [undefined, new UpdateTuesteDto(
             id_tueste,
@@ -85,6 +84,7 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
+            id_lote_tostado
         )];
     }
 }

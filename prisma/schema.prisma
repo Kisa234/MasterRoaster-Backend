@@ -264,9 +264,8 @@ model AnalisisDefectos {
   fecha_registro          DateTime @default(now())
   eliminado               Boolean  @default(false)
 
-  analisis                Analisis?
+  analisis Analisis?
 }
-
 
 model AnalisisSensorial {
   id_analisis_sensorial String   @id @default(uuid())
@@ -294,12 +293,30 @@ model AnalisisSensorial {
 model AnalisisRapido {
   id_analisis_rapido String   @id @default(uuid())
   fecha_registro     DateTime @default(now())
-  horneado           Boolean
-  humo               Boolean
-  uniforme           Boolean
-  verde              Boolean
-  arrebatado         Boolean
-  oscuro             Boolean
+  fragancia          String   
+  aroma              String
+  floral             Boolean  
+  afrutado           Boolean
+  bayas              Boolean
+  frutos_secos       Boolean
+  citricos           Boolean
+  acido_fermentado   Boolean
+  acido              Boolean
+  fermentado         Boolean
+  verde_vegetal      Boolean
+  otros              Boolean
+  quimico            Boolean
+  rancio             Boolean
+  tierra             Boolean
+  papel              Boolean
+  tostado            Boolean
+  nueces_cacao       Boolean
+  nueces             Boolean
+  cocoa              Boolean
+  especias           Boolean
+  dulce              Boolean
+  vainilla           Boolean
+  azucar_morena      Boolean
   comentario         String?
   eliminado          Boolean  @default(false)
 

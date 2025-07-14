@@ -77,7 +77,6 @@ export class LoteTostadoController {
 
     public getFichaTueste = (req:Request , res : Response) => {
         const id_lote_tostado = req.params.id;
-
         new GetFichaTueste(
             this.loteTostadoRepository,
             this.tuesteRepository,
