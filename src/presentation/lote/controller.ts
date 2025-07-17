@@ -54,7 +54,7 @@ export class LoteController {
         };
       
         // 3. Construye el DTO ya con id_user inyectado
-        const [error, createLoteDto] = CreateLoteDto.create(req.body);
+        const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
         if (error) {
             return res.status(400).json({ error });
         }

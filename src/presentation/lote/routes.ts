@@ -68,7 +68,7 @@ export class LoteRoutes{
             pedidoRepository
         );
 
-        router.post('/', loteController.createLote);
+        router.post('/', authMiddleware, loteController.createLote);
         router.post('/rapido', loteController.createLoteRapido);
         router.post('/muestra/:id',authMiddleware ,loteController.createLoteFromMuestra);
         router.post('/fusionar', loteController.FusionarLotes);
