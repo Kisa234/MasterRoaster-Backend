@@ -15,7 +15,7 @@ export class UpdateAnalisisFisicoDto {
         public readonly superior_malla_18?: number,
         public readonly superior_malla_16?: number,
         public readonly superior_malla_14?: number,
-        public readonly menor_malla_16?: number,
+        public readonly menor_malla_14?: number,
         public readonly peso_defectos?: number,
         public readonly quaquers?: number,
         public readonly peso_muestra_tostada?: number,
@@ -40,7 +40,7 @@ export class UpdateAnalisisFisicoDto {
         if(this.superior_malla_18) returnObj.superior_malla_18 = this.superior_malla_18;
         if(this.superior_malla_16) returnObj.superior_malla_16 = this.superior_malla_16;
         if(this.superior_malla_14) returnObj.superior_malla_14 = this.superior_malla_14;
-        if(this.menor_malla_16) returnObj.menor_malla_16 = this.menor_malla_16;
+        if(this.menor_malla_14) returnObj.menor_malla_14 = this.menor_malla_14;
         if(this.peso_defectos) returnObj.peso_defectos = this.peso_defectos;
         if(this.quaquers) returnObj.quaquers = this.quaquers;
         if(this.peso_muestra_tostada) returnObj.peso_muestra_tostada = this.peso_muestra_tostada;
@@ -57,7 +57,7 @@ export class UpdateAnalisisFisicoDto {
             id_analisis_fisico,peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
+            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
             comentario, defectos_primarios, defectos_secundarios
          } = props;
@@ -67,10 +67,9 @@ export class UpdateAnalisisFisicoDto {
             id_analisis_fisico,peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
+            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, pocentaje_caramelizcacion, c_desarrollo, grado,
             comentario
-        )];      
-        
+        )];
     }
 }

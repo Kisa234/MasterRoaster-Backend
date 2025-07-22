@@ -14,7 +14,7 @@ export class AnalisisFisicoEntity {
     public superior_malla_18: number,
     public superior_malla_16: number,
     public superior_malla_14: number,
-    public menor_malla_16: number,
+    public menor_malla_14: number,
     public peso_defectos: number,
     public comentario: string,
     public quaquers?: number,
@@ -41,7 +41,7 @@ export class AnalisisFisicoEntity {
       superior_malla_18,
       superior_malla_16,
       superior_malla_14,
-      menor_malla_16,
+      menor_malla_14,
       peso_defectos,
       quaquers,
       peso_muestra_tostada,
@@ -66,7 +66,7 @@ export class AnalisisFisicoEntity {
     if (superior_malla_18 === undefined) throw new Error('superior_malla_18 es requerido');
     if (superior_malla_16 === undefined) throw new Error('superior_malla_16 es requerido');
     if (superior_malla_14 === undefined) throw new Error('superior_malla_14 es requerido');
-    if (menor_malla_16 === undefined) throw new Error('menor_malla_16 es requerido');
+    if (menor_malla_14 === undefined) throw new Error('menor_malla_16 es requerido');
     if (peso_defectos === undefined) throw new Error('peso_defectos es requerido');
     if (!comentario) throw new Error('comentario es requerido');
 
@@ -88,7 +88,7 @@ export class AnalisisFisicoEntity {
       superior_malla_18,
       superior_malla_16,
       superior_malla_14,
-      menor_malla_16,
+      menor_malla_14,
       peso_defectos,
       comentario,
       quaquers,

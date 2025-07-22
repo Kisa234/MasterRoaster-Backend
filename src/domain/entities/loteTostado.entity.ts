@@ -7,6 +7,7 @@ export class LoteTostadoEntity {
         public peso: number,
         public fecha_registro: Date,
         public id_analisis_rapido?: string,
+        public entregado?: Date
     ) {}
   
     static fromObject(obj: { [key: string]: any }): LoteTostadoEntity {
@@ -17,7 +18,8 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             fecha_registro,
-            id_analisis_rapido
+            id_analisis_rapido,
+            entregado
         } = obj;
 
         if(!id_lote_tostado) throw new Error('id_lote_tostado property is required');
@@ -41,7 +43,8 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             newFechaRegistro,
-            id_analisis_rapido
+            id_analisis_rapido,
+            entregado
         );
     }
   }

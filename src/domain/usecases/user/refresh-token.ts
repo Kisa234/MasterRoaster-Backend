@@ -17,7 +17,7 @@ export class RefreshAccessToken implements RefreshTokenUseCase {
           rol: payload.rol,
         },
         envs.JWT_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '50m' }
       );
 
       return newAccessToken;

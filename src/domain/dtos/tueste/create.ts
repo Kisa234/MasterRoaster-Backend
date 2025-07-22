@@ -3,6 +3,7 @@ import { AnalisisRapidoEntity } from "../../entities/analisisRapido.entity";
 
 export class CreateTuesteDto {
     private constructor(
+        public readonly id_tueste                  :string,  
         public readonly id_lote                  :string,
         public readonly fecha_tueste             :Date,
         public readonly tostadora                :string,
@@ -16,6 +17,7 @@ export class CreateTuesteDto {
 
     static create(props: { [key: string]: any }): [string?, CreateTuesteDto?] {
         const { 
+            id_tueste,
             id_lote     ,
             fecha_tueste,
             tostadora   ,
@@ -25,7 +27,7 @@ export class CreateTuesteDto {
             peso_entrada,
             id_pedido   ,
         } = props;
-        
+        if (!id_tueste) return ['ID de tueste es requerido', undefined];
         if (!id_pedido) return ['ID de pedido es requerido', undefined];
         if (!tostadora) return ['Tostadora es requerida', undefined];
         if (!peso_entrada) return ['Peso de entrada es requerido', undefined];
@@ -35,6 +37,7 @@ export class CreateTuesteDto {
 
         return [undefined, 
             new CreateTuesteDto(
+                id_tueste  ,
                 id_lote     ,
                 fecha_tueste,
                 tostadora   ,

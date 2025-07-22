@@ -86,5 +86,15 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     return tuestes.map(TuesteEntity.fromObject);
   }
 
+  async getTuestesCantByLote(id_lote: string): Promise<number> {
+    const tuestesCount = await prisma.tueste.count({
+      where: {
+        id_lote: id_lote,
+        eliminado: false
+      }
+    });
+    return tuestesCount;
+  }
+
   
 }

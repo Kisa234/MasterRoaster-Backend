@@ -13,7 +13,7 @@ export class CreateAnalisisFisicoDto {
         public readonly superior_malla_18: number,
         public readonly superior_malla_16: number,
         public readonly superior_malla_14: number,
-        public readonly menor_malla_16: number,
+        public readonly menor_malla_14: number,
         public readonly peso_defectos: number,
         public readonly quaquers: number,
         public readonly peso_muestra_tostada: number,
@@ -28,7 +28,7 @@ export class CreateAnalisisFisicoDto {
             peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
+            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, porcentaje_caramelizcacion, c_desarrollo,
             comentario
          } = props;
@@ -45,7 +45,7 @@ export class CreateAnalisisFisicoDto {
         if (superior_malla_18 === undefined) return ['El superior malla 18 es requerido', undefined];
         if (superior_malla_16 === undefined) return ['El superior malla 16 es requerido', undefined];
         if (superior_malla_14 === undefined) return ['El superior malla 14 es requerido', undefined];
-        if (menor_malla_16 === undefined) return ['El menor malla 16 es requerido', undefined];
+        if (menor_malla_14 === undefined) return ['El menor malla 16 es requerido', undefined];
         if (peso_defectos === undefined) return ['El peso de defectos es requerido', undefined];
    
 
@@ -55,7 +55,7 @@ export class CreateAnalisisFisicoDto {
             peso_muestra, peso_pergamino, wa, temperatura_wa,
             humedad, temperatura_humedad, densidad, color_grano_verde,
             olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_16, peso_defectos, quaquers, peso_muestra_tostada,
+            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
             desarrollo, porcentaje_caramelizcacion, c_desarrollo,
             comentario
         )];

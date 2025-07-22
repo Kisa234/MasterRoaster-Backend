@@ -82,6 +82,7 @@ model LoteTostado {
   fecha_tostado      DateTime
   perfil_tostado     String
   peso               Float
+  entregado          DateTime?
   fecha_registro     DateTime @default(now())
   eliminado          Boolean  @default(false)
   id_analisis_rapido String?  @unique
@@ -134,7 +135,7 @@ model Pedido {
 }
 
 model Tueste {
-  id_tueste                 String   @id @default(uuid())
+  id_tueste                 String   @id
   id_lote                   String
   tostadora                 String
   id_cliente                String
@@ -229,7 +230,7 @@ model AnalisisFisico {
   superior_malla_18         Float
   superior_malla_16         Float
   superior_malla_14         Float
-  menor_malla_16            Float
+  menor_malla_14            Float
   peso_defectos             Float
   quaquers                  Float?
   peso_muestra_tostada      Float?

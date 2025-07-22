@@ -260,7 +260,9 @@ export class CreatePedido implements CreatePedidoUseCase {
         const density = analisisFisico?.densidad ?? 0;
         const humidity = analisisFisico?.humedad ?? 0;
         for (let peso of dto.pesos) {
+            let cant = await this.tuesteRepository.getTuestesCantByLote(lote.id_lote);
             const [, createTuesteDto] = CreateTuesteDto.create({
+                id_tueste: `${lote.id_lote}-${cant+1}`,
                 id_lote: lote.id_lote,
                 fecha_tueste: dto.fecha_tueste,
                 tostadora: dto.tostadora,
