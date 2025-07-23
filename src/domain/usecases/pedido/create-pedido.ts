@@ -1,5 +1,3 @@
-import { error } from 'console';
-import { envs } from './../../../config/envs';
 import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { CreatePedidoDto } from "../../dtos/pedido/create";
@@ -38,7 +36,6 @@ export class CreatePedido implements CreatePedidoUseCase {
         const lote = await this.loteRepository.getLoteById(dto.id_lote);
         if (!lote || lote.eliminado) throw new Error('El lote no existe');
         const loteEntity = LoteEntity.fromObject(lote);
-        console.log(dto);
         //dependiendo del tipo de pedido 
         if (dto.tipo_pedido === 'Venta Verde') {
             return this.ventaVerde(loteEntity, dto);
@@ -101,7 +98,6 @@ export class CreatePedido implements CreatePedidoUseCase {
             await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, updateDestinoDto!);
         } else {
             // No tiene lote nuevo generado → se crea uno desde este lote origen
-            console.log('Creando nuevo lote destino desde el lote origen');
             const [error, createLoteDto] = CreateLoteDto.create({
                 productor: lote.productor,
                 finca: lote.finca,
@@ -110,11 +106,10 @@ export class CreatePedido implements CreatePedidoUseCase {
                 peso: dto.cantidad,
                 variedades: lote.variedades,
                 proceso: lote.proceso,
-                tipo_lote: 'Lote Origen',
+                tipo_lote: 'Lote Verde',
                 id_user: user.id_user,
                 id_analisis: lote.id_analisis,
             });
-            console.log(createLoteDto);
 
             nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, false, true, lote.id_lote);
         }
@@ -153,7 +148,6 @@ export class CreatePedido implements CreatePedidoUseCase {
         );
 
         let loteTostado: LoteEntity;
-        console.log(dto)
         if (pedidoExistente) {
             // 4A. Ya existe lote tostado → reutilizar y actualizar peso
             const lote = await this.loteRepository.getLoteById(pedidoExistente.id_nuevoLote!);
@@ -259,11 +253,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         if (!dto.pesos) throw new Error('Los pesos son requeridos');
         const density = analisisFisico?.densidad ?? 0;
         const humidity = analisisFisico?.humedad ?? 0;
+        let cant = 1;
         for (let peso of dto.pesos) {
-            let cant = await this.tuesteRepository.getTuestesCantByLote(lote.id_lote);
             const [, createTuesteDto] = CreateTuesteDto.create({
-                id_tueste: `${lote.id_lote}-${cant+1}`,
                 id_lote: lote.id_lote,
+                num_batch: cant,
                 fecha_tueste: dto.fecha_tueste,
                 tostadora: dto.tostadora,
                 id_cliente: dto.id_user,
@@ -273,6 +267,7 @@ export class CreatePedido implements CreatePedidoUseCase {
                 id_pedido: pedido.id_pedido,
             });
             await this.tuesteRepository.createTueste(createTuesteDto!);
+            cant++;
         }
         return PedidoEntity.fromObject(pedido);
     }

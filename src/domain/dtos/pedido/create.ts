@@ -33,6 +33,9 @@ export class CreatePedidoDto {
         if (!id_user) return ['El ID del cliente es requerido', undefined];
         if (!id_lote) return ['El ID del lote es requerido', undefined];
         
+        const fechaTuesteDate = fecha_tueste != null
+            ? new Date(fecha_tueste)
+            : undefined;
 
         return [
             undefined,
@@ -46,7 +49,7 @@ export class CreatePedidoDto {
                 id_nuevoLote_tostado,
                 pesos,
                 tostadora,
-                fecha_tueste ? new Date(`${fecha_tueste}T00:00:00`) : new Date()
+                fechaTuesteDate,
             )
             
         ];

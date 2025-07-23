@@ -135,7 +135,8 @@ model Pedido {
 }
 
 model Tueste {
-  id_tueste                 String   @id
+  id_tueste                 String   @id @default(uuid())
+  num_batch                 Int      
   id_lote                   String
   tostadora                 String
   id_cliente                String

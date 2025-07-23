@@ -4,6 +4,7 @@ export class TuesteEntity {
     constructor(
         
         public id_tueste                 :string,
+        public num_batch                 :number,
         public id_lote                   :string,
         public tostadora                 :string,
         public id_cliente                :string,
@@ -36,6 +37,7 @@ export class TuesteEntity {
     static fromObject(obj: { [key: string]: any }): TuesteEntity {
         const { 
             id_tueste                ,
+            num_batch                ,
             id_lote                  ,
             tostadora                ,
             id_cliente               ,
@@ -65,6 +67,8 @@ export class TuesteEntity {
         } = obj;
 
         if (!id_tueste) throw new Error('El ID del tueste es requerido');
+        if (!id_lote) throw new Error('El ID del lote es requerido');
+        if (!num_batch || num_batch <= 0) throw new Error('El número de batch debe ser mayor a 0');
         if (!fecha_tueste) throw new Error('La fecha del tueste es requerida');
         if (!tostadora) throw new Error('La tostadora es requerida');
         if (!peso_entrada) throw new Error('El peso de entrada es requerido');
@@ -72,6 +76,7 @@ export class TuesteEntity {
 
         return new TuesteEntity(
             id_tueste                ,
+            num_batch                ,
             id_lote                  ,
             tostadora                ,
             id_cliente               ,

@@ -60,7 +60,6 @@ export class PedidoController {
         if (error) {
             return res.status(400).json({ error });
         }
-
         new UpdatePedido( 
             this.pedidoRepository,
             this.loteRepository,

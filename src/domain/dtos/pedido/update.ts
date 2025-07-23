@@ -1,18 +1,18 @@
 export class UpdatePedidoDto {
     private constructor(
-        public readonly id_pedido    ?:    string,
-        public readonly tipo_pedido  ?:    string,
-        public readonly cantidad     ?:    number,
-        public readonly estado_pedido?:    string,
-        public readonly comentario   ?:    string,
-        public readonly id_user      ?:    string,
-        public readonly id_lote      ?:    string,
-        public readonly id_nuevoLote ?:    string,
-        public readonly id_nuevoLote_tostado ?: string,
-        public readonly pesos        ?:    number[],
-        public readonly tostadora    ?:    string,
-        public readonly fecha_tueste ?:    Date,
-    ) {}
+        public readonly id_pedido?: string,
+        public readonly tipo_pedido?: string,
+        public readonly cantidad?: number,
+        public readonly estado_pedido?: string,
+        public readonly comentario?: string,
+        public readonly id_user?: string,
+        public readonly id_lote?: string,
+        public readonly id_nuevoLote?: string,
+        public readonly id_nuevoLote_tostado?: string,
+        public readonly pesos?: number[],
+        public readonly tostadora?: string,
+        public readonly fecha_tueste?: Date,
+    ) { }
 
     get values() {
         const returnObj: { [key: string]: any } = {};
@@ -29,7 +29,7 @@ export class UpdatePedidoDto {
     }
 
     static update(props: { [key: string]: any }): [string?, UpdatePedidoDto?] {
-        const { 
+        const {
             id_pedido,
             tipo_pedido,
             cantidad,
@@ -42,11 +42,13 @@ export class UpdatePedidoDto {
             pesos,
             tostadora,
             fecha_tueste,
-         } = props;
+        } = props;
 
+        const fechaTuesteDate = fecha_tueste != null
+            ? new Date(fecha_tueste)
+            : undefined;
 
-        
-        return [undefined, 
+        return [undefined,
             new UpdatePedidoDto(
                 id_pedido,
                 tipo_pedido,
@@ -59,7 +61,7 @@ export class UpdatePedidoDto {
                 id_nuevoLote_tostado,
                 pesos,
                 tostadora,
-                fecha_tueste ? new Date(`${fecha_tueste}T00:00:00`) : new Date()
+                fechaTuesteDate
             )
         ];
     }
