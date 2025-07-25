@@ -31,7 +31,7 @@ export class AuthUser implements AuthUserUseCase {
     const accessToken = jwt.sign(
       { id: user.id_user, email: user.email, rol: user.rol },
       envs.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '1d' }
     );
 
     const refreshToken = jwt.sign(
