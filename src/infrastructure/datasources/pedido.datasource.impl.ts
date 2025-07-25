@@ -97,6 +97,15 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
         return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
     }
 
+    async getHistoricoPedidos(): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false,
+            }
+        });
+        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+    }
+
 
     async getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
         const pedidos = await prisma.pedido.findMany({

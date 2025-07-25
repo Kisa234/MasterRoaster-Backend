@@ -21,6 +21,9 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     getAllPedidos(): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getAllPedidos();
     }
+    getHistoricoPedidos(): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getHistoricoPedidos();
+    }
     updatePedido(id: string,updatePedidoDto:UpdatePedidoDto ): Promise<PedidoEntity> {
         return this.pedidoDataSource.updatePedido(id, updatePedidoDto);
     }
