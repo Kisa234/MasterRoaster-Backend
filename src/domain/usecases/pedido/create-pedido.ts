@@ -12,6 +12,14 @@ import { CreateLoteUseCase } from '../lote/lote/create-lote';
 import { AnalisisRepository } from '../../repository/analisis.repository';
 import { AnalisisFisicoRepository } from '../../repository/analisisFisico.repository';
 import { AnalisisFisicoEntity } from '../../entities/analisisFisico.entity';
+import { AnalisisSensorialRepository } from '../../repository/analisisSensorial.repository';
+import { AnalisisDefectosRespository } from '../../repository/analisisDefectos.repository';
+import { CreateAnalisisFisicoDto } from '../../dtos/analisis/fisico/create';
+import { CreateAnalisisSensorialDTO } from '../../dtos/analisis/sensorial/create';
+import { CreateAnalisisDto } from '../../dtos/analisis/analisis/create';
+import { CreateLoteAnalisisDto } from '../../dtos/lote-analisis/create';
+import { LoteAnalisisRepository } from '../../repository/lote-analisis.repository';
+import { CreateAnalisisDefectosDto } from '../../dtos/analisis/defectos/create';
 
 
 
@@ -26,8 +34,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         private readonly userRepository: UserRepository,
         private readonly createLoteUseCase: CreateLoteUseCase,
         private readonly tuesteRepository: TuesteRepository,
-        private readonly AnalisisRepository: AnalisisRepository,
-        private readonly AnalisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly analisisRepository: AnalisisRepository,
+        private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly analisisDefectosRepository: AnalisisDefectosRespository,
+        private readonly loteAnalisisRepository: LoteAnalisisRepository
 
     ) { }
 
@@ -108,10 +119,57 @@ export class CreatePedido implements CreatePedidoUseCase {
                 proceso: lote.proceso,
                 tipo_lote: 'Lote Verde',
                 id_user: user.id_user,
-                id_analisis: lote.id_analisis,
             });
 
             nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, false, true, lote.id_lote);
+
+            // 3) Si el lote original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
+            if (lote.id_analisis) {
+                let nuevoFis, nuevoSen, nuevoDef;
+                const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
+                if (!analisis) throw new Error('Análisis no encontrado');
+                if (analisis.analisisFisico_id) {
+                    // 3a) Recrear el análisis físico si existe
+                    let af = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
+                    const [, dtoFis] = CreateAnalisisFisicoDto.create({ ...af! });
+                    nuevoFis = await this.analisisFisicoRepository.createAnalisisFisico(dtoFis!);
+                }
+                if (analisis.analisisSensorial_id) {
+                    // 3b)  Recrear el análisis sensorial si existe
+                    let as = await this.analisisSensorialRepository.getAnalisisSensorialById(analisis.analisisSensorial_id!);
+                    const [, dtoSen] = CreateAnalisisSensorialDTO.create({ ...as! });
+                    nuevoSen = await this.analisisSensorialRepository.createAnalisisSensorial(dtoSen!);
+                }
+                if (analisis.analisisDefectos_id) {
+                    // 3c) Si hay análisis de defectos, recrearlo
+                    let ad = await this.analisisDefectosRepository.getAnalisisDefectosById(analisis.analisisDefectos_id!);
+                    const [, dtoDef] = CreateAnalisisDefectosDto.create({ ...ad! });
+                    nuevoDef = await this.analisisDefectosRepository.createAnalisisDefectos(dtoDef!);
+                }
+                // 3c) Crear la nueva entidad de análisis
+                // 3c) Relacionarlos en un nuevo “análisis”
+                const [, dtoAnalisis] = CreateAnalisisDto.create({
+                    analisisFisico_id: nuevoFis?.id_analisis_fisico ? nuevoFis.id_analisis_fisico : undefined,
+                    analisisSensorial_id: nuevoSen?.id_analisis_sensorial ? nuevoSen.id_analisis_sensorial : undefined,
+                    analisisDefectos_id: nuevoDef?.id_analisis_defecto ? nuevoDef.id_analisis_defecto : undefined,
+                });
+                const nuevoAnalisis = await this.analisisRepository.createAnalisis(dtoAnalisis!);
+
+                // 3d) Crear la relación entre el lote y el análisis
+                const [, dtoLoteAnalisis] = CreateLoteAnalisisDto.create({
+                    id_lote: nuevoLoteDestino.id_lote,
+                    id_analisis: nuevoAnalisis.id_analisis,
+                });
+                await this.loteAnalisisRepository.create(dtoLoteAnalisis!);
+
+                // 3e) Actualizar el lote destino con el nuevo análisis
+                const [, dtoUpdateLote] = UpdateLoteDto.update({
+                    id_analisis: nuevoAnalisis.id_analisis,
+                });
+                console.log('dtoUpdateLote', dtoUpdateLote);
+                await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, dtoUpdateLote!);
+            }
+
         }
 
         // 5. Crear el nuevo pedido con referencia al lote original y al nuevo lote
@@ -147,19 +205,19 @@ export class CreatePedido implements CreatePedidoUseCase {
             (p) => p.id_lote === lote.id_lote && p.tipo_pedido === 'Tostado Verde'
         );
 
-        let loteTostado: LoteEntity;
+        let nuevoLoteDestino: LoteEntity;
         if (pedidoExistente) {
             // 4A. Ya existe lote tostado → reutilizar y actualizar peso
             const lote = await this.loteRepository.getLoteById(pedidoExistente.id_nuevoLote!);
             if (!lote) {
                 throw new Error('El lote tostado relacionado no existe o fue eliminado');
             }
-            loteTostado = lote;
+            nuevoLoteDestino = lote;
             // Actualizar peso en verde y tostado del lote tostado
-            const nuevoPesoVerde = loteTostado.peso + cantidadRequerida;
-            const nuevoPesoTostado = loteTostado.peso_tostado! + dto.cantidad;
+            const nuevoPesoVerde = nuevoLoteDestino.peso + cantidadRequerida;
+            const nuevoPesoTostado = nuevoLoteDestino.peso_tostado! + dto.cantidad;
             const [, updateTostadoDto] = UpdateLoteDto.update({ peso: nuevoPesoVerde, peso_tostado: nuevoPesoTostado });
-            await this.loteRepository.updateLote(loteTostado.id_lote, updateTostadoDto!);
+            await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, updateTostadoDto!);
         } else {
             // 4B. No existe lote tostado → crear uno nuevo
             const [, createLoteDto] = CreateLoteDto.create({
@@ -173,10 +231,56 @@ export class CreatePedido implements CreatePedidoUseCase {
                 tipo_lote: 'Tostado Verde',
                 peso_tostado: dto.cantidad,
                 id_user: dto.id_user,
-                id_analisis: lote.id_analisis,
             });
 
-            loteTostado = await this.createLoteUseCase.execute(createLoteDto!, true, true, lote.id_lote);
+            nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, true, true, lote.id_lote);
+
+            // 3) Si el lote original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
+            if (lote.id_analisis) {
+                let nuevoFis, nuevoSen, nuevoDef;
+                const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
+                if (!analisis) throw new Error('Análisis no encontrado');
+                if (analisis.analisisFisico_id) {
+                    // 3a) Recrear el análisis físico si existe
+                    let af = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
+                    const [, dtoFis] = CreateAnalisisFisicoDto.create({ ...af! });
+                    nuevoFis = await this.analisisFisicoRepository.createAnalisisFisico(dtoFis!);
+                }
+                if (analisis.analisisSensorial_id) {
+                    // 3b)  Recrear el análisis sensorial si existe
+                    let as = await this.analisisSensorialRepository.getAnalisisSensorialById(analisis.analisisSensorial_id!);
+                    const [, dtoSen] = CreateAnalisisSensorialDTO.create({ ...as! });
+                    nuevoSen = await this.analisisSensorialRepository.createAnalisisSensorial(dtoSen!);
+                }
+                if (analisis.analisisDefectos_id) {
+                    // 3c) Si hay análisis de defectos, recrearlo
+                    let ad = await this.analisisDefectosRepository.getAnalisisDefectosById(analisis.analisisDefectos_id!);
+                    const [, dtoDef] = CreateAnalisisDefectosDto.create({ ...ad! });
+                    nuevoDef = await this.analisisDefectosRepository.createAnalisisDefectos(dtoDef!);
+                }
+                // 3c) Crear la nueva entidad de análisis
+                // 3c) Relacionarlos en un nuevo “análisis”
+                const [, dtoAnalisis] = CreateAnalisisDto.create({
+                    analisisFisico_id: nuevoFis?.id_analisis_fisico ? nuevoFis.id_analisis_fisico : undefined,
+                    analisisSensorial_id: nuevoSen?.id_analisis_sensorial ? nuevoSen.id_analisis_sensorial : undefined,
+                    analisisDefectos_id: nuevoDef?.id_analisis_defecto ? nuevoDef.id_analisis_defecto : undefined,
+                });
+                const nuevoAnalisis = await this.analisisRepository.createAnalisis(dtoAnalisis!);
+
+                // 3d) Crear la relación entre el lote y el análisis
+                const [, dtoLoteAnalisis] = CreateLoteAnalisisDto.create({
+                    id_lote: nuevoLoteDestino.id_lote,
+                    id_analisis: nuevoAnalisis.id_analisis,
+                });
+                await this.loteAnalisisRepository.create(dtoLoteAnalisis!);
+
+                // 3e) Actualizar el lote destino con el nuevo análisis
+                const [, dtoUpdateLote] = UpdateLoteDto.update({
+                    id_analisis: nuevoAnalisis.id_analisis,
+                });
+                console.log('dtoUpdateLote', dtoUpdateLote);
+                await this.loteRepository.updateLote(nuevoLoteDestino.id_lote, dtoUpdateLote!);
+            }            
         }
 
         // 5. Actualizar lote original (restar lo tostado)
@@ -196,7 +300,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             comentario: dto.comentario,
             id_user: dto.id_user,
             id_lote: lote.id_lote,
-            id_nuevoLote: loteTostado.id_lote,
+            id_nuevoLote: nuevoLoteDestino.id_lote,
         });
 
         const pedido = await this.pedidoRepository.createPedido(newPedidoDto!);
@@ -233,11 +337,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         if (!lote.id_analisis) {
             console.warn('El lote no tiene un análisis asociado, usando valores por defecto');
         } else {
-            const analisis = await this.AnalisisRepository.getAnalisisById(lote.id_analisis);
+            const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
             if (!analisis) {
                 console.warn(`No se encontró el análisis ${lote.id_analisis}, usando valores por defecto`);
             } else {
-                analisisFisico = await this.AnalisisFisicoRepository
+                analisisFisico = await this.analisisFisicoRepository
                     .getAnalisisFisicoById(analisis.analisisFisico_id!);
                 if (!analisisFisico) {
                     console.warn(`No se encontró el análisis físico ${analisis.analisisFisico_id}, usando valores por defecto`);

@@ -13,6 +13,12 @@ import { AnalisisDataSourceImpl } from '../../infrastructure/datasources/analisi
 import { AnalisisRepositoryImpl } from '../../infrastructure/repositories/analisis.repository.impl';
 import { AnalisisFisicoDataSourceImpl } from '../../infrastructure/datasources/analisisFisico.datasource.impl';
 import { AnalisisFisicoRepositoryImpl } from '../../infrastructure/repositories/analisisFisico.repository.impl';
+import { LoteAnalisisRepositoryImpl } from '../../infrastructure/repositories/lote-analisis.repository.impl';
+import { AnalisisSensorialDataSourceImpl } from '../../infrastructure/datasources/analisisSensorial.datasource.impl';
+import { AnalisisSensorialRepositoryImpl } from '../../infrastructure/repositories/analisisSensorial.repository.impl';
+import { AnalisisDefectosDataSourceImpl } from '../../infrastructure/datasources/analisisDefectos.datasource.impl';
+import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositories/analisisDefectos.repository.impl';
+import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lote-analisis.datasource.impl';
 
 export class PedidoRoutes {
 
@@ -43,6 +49,18 @@ export class PedidoRoutes {
         const AnalisisFisicoDatasource = new AnalisisFisicoDataSourceImpl();
         const AnalisisFisicoRepository = new AnalisisFisicoRepositoryImpl(AnalisisFisicoDatasource);
 
+        // AnalisisSensorial
+        const AnalisisSensorialDatasource = new AnalisisSensorialDataSourceImpl();
+        const AnalisisSensorialRepository = new AnalisisSensorialRepositoryImpl(AnalisisSensorialDatasource);
+
+        // AnalisisDefectos
+        const AnalisisDefectosDatasource = new AnalisisDefectosDataSourceImpl();
+        const AnalisisDefectosRepository = new AnalisisDefectosRespositoryImpl(AnalisisDefectosDatasource);
+
+        // LoteAnalisis
+        const LoteAnalisisDatasource = new LoteAnalisisDataSourceImpl();
+        const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDatasource);
+
         
         const cl = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
 
@@ -54,6 +72,9 @@ export class PedidoRoutes {
             cl,
             AnalisisRepository,
             AnalisisFisicoRepository,
+            AnalisisSensorialRepository,
+            AnalisisDefectosRepository,
+            LoteAnalisisRepository
         );
 
         // Definición de rutas

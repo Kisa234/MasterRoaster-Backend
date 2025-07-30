@@ -30,7 +30,6 @@ export class CreateAnalisisSensorial implements CreateAnalisisSensorialUseCase {
     ) { }
 
     async execute(dto: CreateAnalisisSensorialDTO, id: string, type: string): Promise<AnalisisSensorialEntity> {
-        console.log('CreateAnalisisSensorial UseCase - execute called with:', dto, id, type);
         if (type.toLowerCase() === 'lote') {
             return this.analisisxlote(dto, id);
         } else if (type.toLowerCase() === 'muestra') {

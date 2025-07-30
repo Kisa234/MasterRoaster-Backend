@@ -12,6 +12,8 @@ import { CreateAnalisisDto } from '../../../dtos/analisis/analisis/create';
 import { LoteRepository } from '../../../repository/lote.repository';
 import { CreateAnalisisSensorialDTO } from '../../../dtos/analisis/sensorial/create';
 import { LoteAnalisisRepository } from '../../../repository/lote-analisis.repository';
+import {AnalisisDefectosRespository} from '../../../repository/analisisDefectos.repository';
+import { CreateAnalisisDefectosDto } from '../../../dtos/analisis/defectos/create';
 
 
 
@@ -27,15 +29,16 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly analisisDefectosRepository: AnalisisDefectosRespository,
         private readonly loteRepository: LoteRepository,
     ) { }
 
     async execute(id: string, peso: number, id_user: string): Promise<LoteEntity> {
-        // 1) Load and validate the muestra
+        // 1) Obtener la muestra y validar
         const muestra = await this.muestraRepository.getMuestraById(id);
         if (!muestra) throw new Error('Muestra no encontrada');
 
-        // 2) Create the new lote
+        // 2) Crea el nuevo lote
         const [, createLoteDto] = CreateLoteDto.create({
             productor: muestra.productor,
             finca: muestra.finca,
@@ -49,51 +52,57 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         });
         const lote = await this.createLoteUseCase.execute(createLoteDto!);
 
-        // 3) If the muestra had an análisis, clone it onto the new lote
-        if (muestra.id_analisis) {
-            let nuevoFis, nuevoSen;
-            const analisis = await this.analisisRepository.getAnalisisById(muestra.id_analisis);
+        // 3) Si el lote original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
+        if (lote.id_analisis) {
+            let nuevoFis, nuevoSen, nuevoDef;
+            const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
             if (!analisis) throw new Error('Análisis no encontrado');
             if (analisis.analisisFisico_id) {
-                // 3a) Re-create físico analysis if it exists
+                // 3a) Recrear el análisis físico si existe
                 let af = await this.analisisFisicoRepository.getAnalisisFisicoById(analisis.analisisFisico_id!);
                 const [, dtoFis] = CreateAnalisisFisicoDto.create({ ...af! });
                 nuevoFis = await this.analisisFisicoRepository.createAnalisisFisico(dtoFis!);
             }
             if (analisis.analisisSensorial_id) {
-                // 3b) If there is a sensory analysis, we need to clone it too
+                // 3b)  Recrear el análisis sensorial si existe
                 let as = await this.analisisSensorialRepository.getAnalisisSensorialById(analisis.analisisSensorial_id!);
                 const [, dtoSen] = CreateAnalisisSensorialDTO.create({ ...as! });
                 nuevoSen = await this.analisisSensorialRepository.createAnalisisSensorial(dtoSen!);
             }
-            // 3c) Create the new análisis entity 
-            // 3c) Tie them together in a new “analisis”
+            if (analisis.analisisDefectos_id) {
+                // 3c) Si hay análisis de defectos, recrearlo
+                let ad = await this.analisisDefectosRepository.getAnalisisDefectosById(analisis.analisisDefectos_id!);
+                const [, dtoDef] = CreateAnalisisDefectosDto.create({ ...ad! });
+                nuevoDef = await this.analisisDefectosRepository.createAnalisisDefectos(dtoDef!);
+            }
+            // 3c) Crear la nueva entidad de análisis
+            // 3c) Relacionarlos en un nuevo “análisis”
             const [, dtoAnalisis] = CreateAnalisisDto.create({
                 analisisFisico_id: nuevoFis?.id_analisis_fisico ? nuevoFis.id_analisis_fisico : undefined,
                 analisisSensorial_id: nuevoSen?.id_analisis_sensorial ? nuevoSen.id_analisis_sensorial : undefined,
+                analisisDefectos_id: nuevoDef?.id_analisis_defecto ? nuevoDef.id_analisis_defecto : undefined,
             });
             const nuevoAnalisis = await this.analisisRepository.createAnalisis(dtoAnalisis!);
 
-            // 3d) Create the lote-analisis pivot
+            // 3d) Crear la relación entre el lote y el análisis
             const [, dtoLoteAnalisis] = CreateLoteAnalisisDto.create({
                 id_lote: lote.id_lote,
                 id_analisis: nuevoAnalisis.id_analisis,
             });
             await this.loteAnalisisRepository.create(dtoLoteAnalisis!);
 
-            // 3e) Update the lote itself with the new análisis_id
+            // 3e) Actualizar el lote destino con el nuevo análisis
             const [, dtoUpdateLote] = UpdateLoteDto.update({
                 id_analisis: nuevoAnalisis.id_analisis,
-                id_user: muestra.id_user,
             });
             console.log('dtoUpdateLote', dtoUpdateLote);
             await this.loteRepository.updateLote(lote.id_lote, dtoUpdateLote!);
         }
 
-        // 4) Finally, delete the original muestra
+        // 4) Finalmente, eliminar la muestra original
         await this.muestraRepository.deleteMuestra(muestra.id_muestra);
 
-        // 5) Return the freshly created (and updated) LoteEntity
+        // 5) Retorna el nuevo lote creado
         return lote;
     }
 }

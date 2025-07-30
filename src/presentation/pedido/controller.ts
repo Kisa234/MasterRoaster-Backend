@@ -20,6 +20,9 @@ import { AnalisisRepository } from "../../domain/repository/analisis.repository"
 import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
 import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
 import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-pedidos-tueste-fecha";
+import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
+import { AnalisisSensorialRepository } from "../../domain/repository/analisisSensorial.repository";
+import { AnalisisDefectosRespository } from "../../domain/repository/analisisDefectos.repository";
 
 export class PedidoController {
 
@@ -31,6 +34,9 @@ export class PedidoController {
         private readonly createLoteUseCase: CreateLoteUseCase,
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly analisisDefectosRepository: AnalisisDefectosRespository,
+        private readonly loteAnalisisRepository: LoteAnalisisRepository
     ) {
     }
 
@@ -48,6 +54,10 @@ export class PedidoController {
             this.tuesteRepository,
             this.analisisRepository,
             this.analisisFisicoRepository,
+            this.analisisSensorialRepository,
+            this.analisisDefectosRepository,
+            this.loteAnalisisRepository,
+
             )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))

@@ -26,6 +26,7 @@ import { BlendLotes } from '../../domain/usecases/lote/lote/blend-lotes';
 import { BlendLotesDto } from '../../domain/dtos/lotes/lote/blend-lotes';
 import { FusionarLotesDto } from '../../domain/dtos/lotes/lote/fusionar-lotes';
 import { GetLoteRoaster } from '../../domain/usecases/lote/lote/get-lote-roaster';
+import { AnalisisDefectosRespository } from '../../domain/repository/analisisDefectos.repository';
 
 export class LoteController {
 
@@ -36,6 +37,7 @@ export class LoteController {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly analisisSensorialRepository: AnalisisSensorialRepository,
+        private readonly analisisDefectosRepository: AnalisisDefectosRespository,
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly pedidoRepository: PedidoRepository
@@ -137,6 +139,7 @@ export class LoteController {
             this.analisisRepository,
             this.analisisFisicoRepository,
             this.analisisSensorialRepository,
+            this.analisisDefectosRepository,
             this.loteRepository
         )
         .execute(id_muestra, peso,id_user)

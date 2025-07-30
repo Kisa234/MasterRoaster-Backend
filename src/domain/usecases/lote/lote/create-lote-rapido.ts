@@ -21,7 +21,6 @@ export class CreateLoteRapido implements CreateLoteRapidoUseCase {
     async execute(createLoteRapidoDto: CreateLoteRapidoDto): Promise<LoteEntity> {
 
         const id = await this.generarId(createLoteRapidoDto);
-        console.log('ID generado:', id);
         const [, dto] = CreateLoteRapidoDto.create({
             id_lote: id,
             productor: createLoteRapidoDto.productor,

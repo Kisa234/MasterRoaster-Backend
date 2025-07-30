@@ -17,6 +17,8 @@ import { AnalisisSensorialDataSourceImpl } from '../../infrastructure/datasource
 import { AnalisisSensorialRepositoryImpl } from '../../infrastructure/repositories/analisisSensorial.repository.impl';
 import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
+import { AnalisisDefectosDataSourceImpl } from '../../infrastructure/datasources/analisisDefectos.datasource.impl';
+import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositories/analisisDefectos.repository.impl';
 
 export class LoteRoutes{
 
@@ -39,8 +41,11 @@ export class LoteRoutes{
         
         const analisisSensorialDataSource = new AnalisisSensorialDataSourceImpl();
         const analisisSensorialRepository = new AnalisisSensorialRepositoryImpl(analisisSensorialDataSource);
-        
-        
+
+        const analisisDefectosDataSource = new AnalisisDefectosDataSourceImpl();
+        const analisisDefectosRepository = new AnalisisDefectosRespositoryImpl(analisisDefectosDataSource);
+
+
         const loteDatasource = new LoteDataSourceImpl();
         const loteRepository = new LoteRepositoryImpl(loteDatasource);
         
@@ -63,6 +68,7 @@ export class LoteRoutes{
             analisisRepository,
             analisisFisicoRepository,
             analisisSensorialRepository,
+            analisisDefectosRepository,
             loteRepository,
             userRepository,
             pedidoRepository
