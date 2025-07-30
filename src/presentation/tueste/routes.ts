@@ -35,6 +35,7 @@ export class TuesteRoutes {
         
         router.post('/', tuesteController.createTueste);
         router.get('/', tuesteController.getAllTuestes);
+        router.get('/lote/:id', tuesteController.getTuestesByLoteTostado);
         router.get('/ref/:id', tuesteController.getReferenceTueste);
         router.get('/:id', tuesteController.getTuesteById);
         router.get('/fecha/:fecha', tuesteController.getTuesteByFecha);

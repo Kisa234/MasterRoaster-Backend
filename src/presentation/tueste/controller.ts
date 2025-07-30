@@ -112,6 +112,13 @@ export class TuesteController {
             .catch(error => res.status(400).json({ error }));
     
     }
+
+    public getTuestesByLoteTostado = async (req: Request, res: Response) => {
+        const id_lote_tostado = req.params.id;
+        this.tuesteRepository.getTostadosByLoteTostado(id_lote_tostado)
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
+    }
     
 
 }
