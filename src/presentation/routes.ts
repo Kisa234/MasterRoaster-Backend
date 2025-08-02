@@ -12,6 +12,7 @@ import { LoteTostadoRoutes } from "./lote-tostado/routes";
 import { HistorialRoutes } from "./historial/routes";
 import { PersonalizadoRoutes } from "./personalizado/routes";
 import { AnalisisDefectosRoutes } from "./analisisDefectos/routes";
+import { VariedadRoutes } from "./variedad/routes";
 
 
 export class AppRoutes{
@@ -28,6 +29,7 @@ export class AppRoutes{
         router.use('/lote', LoteRoutes.routes);
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
+        router.use('/variedad', VariedadRoutes.routes);
 
         router.use('/pedido', PedidoRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
@@ -35,6 +37,7 @@ export class AppRoutes{
         router.use('/historial', HistorialRoutes.routes);
         router.use('/user', UserRoutes.routes); 
         router.use('/p', PersonalizadoRoutes.routes);        
+        
         
 
         return router;

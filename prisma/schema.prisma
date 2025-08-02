@@ -76,6 +76,11 @@ model Lote {
   lotesHistoricos Lote_Analisis[]
 }
 
+model Variedad {
+  id_variedad String @id @default(uuid())
+  nombre      String
+}
+
 model LoteTostado {
   id_lote_tostado    String   @id
   id_lote            String
