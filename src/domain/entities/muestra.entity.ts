@@ -11,12 +11,26 @@ export class MuestraEntity {
         public proceso: string,
         public fecha_registro: Date, 
         public eliminado: boolean,
-        public id_user: string | null,
-        public id_analisis: string | null,
+        public id_user: string,
+        public id_analisis: string
     ) {}
 
     public static fromObject(obj: { [key: string]: any }): MuestraEntity {
-        const { id_muestra, productor, finca, region, departamento, peso, variedades, proceso, fecha_registro,id_analisis } = obj;
+        const { 
+            id_muestra,
+            productor,
+            finca,
+            region,
+            departamento,
+            peso,
+            variedades,
+            proceso,
+            fecha_registro,
+            eliminado = false,
+            id_user = '',
+            id_analisis = ''
+        } = obj;
+        
         if (!productor) throw new Error('productor property is required');
         if (!finca) throw new Error('finca property is required');
         if (!region) throw new Error('region property is required');
@@ -24,9 +38,6 @@ export class MuestraEntity {
         if (!peso) throw new Error('peso property is required');
         if (!variedades) throw new Error('variedades property is required');
         if (!proceso) throw new Error('proceso property is required');
-        // Estos campos son opcionales, no deben lanzar error si no existen
-        const id_user = obj.user_id ?? undefined;
-        const eliminado = obj.eliminado ?? false; // Valor por defecto si no existe
 
         const newFechaRegistro = new Date(fecha_registro);
         if (isNaN(newFechaRegistro.getTime())) {

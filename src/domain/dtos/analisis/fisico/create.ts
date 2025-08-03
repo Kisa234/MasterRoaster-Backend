@@ -1,37 +1,51 @@
 
 export class CreateAnalisisFisicoDto {
     private constructor(
-        public readonly peso_muestra: number,
-        public readonly peso_pergamino: number,
-        public readonly wa: number,
-        public readonly temperatura_wa: number,
-        public readonly humedad: number,
-        public readonly temperatura_humedad: number,
-        public readonly densidad: number,
-        public readonly color_grano_verde: string,
-        public readonly olor: string,
-        public readonly superior_malla_18: number,
-        public readonly superior_malla_16: number,
-        public readonly superior_malla_14: number,
-        public readonly menor_malla_14: number,
-        public readonly peso_defectos: number,
-        public readonly quaquers: number,
-        public readonly peso_muestra_tostada: number,
-        public readonly desarrollo: number,
-        public readonly porcentaje_caramelizacion: number,
-        public readonly c_desarrollo: number,
-        public readonly comentario: string,
+        public readonly peso_muestra                : number,
+        public readonly peso_pergamino              : number,
+        public readonly wa                          : number,
+        public readonly temperatura_wa              : number,
+        public readonly humedad                     : number,
+        public readonly temperatura_humedad         : number,
+        public readonly densidad                    : number,
+        public readonly color_grano_verde           : string,
+        public readonly olor                        : string,
+        public readonly superior_malla_18           : number,
+        public readonly superior_malla_16           : number,
+        public readonly superior_malla_14           : number,
+        public readonly menor_malla_14              : number,
+        public readonly peso_defectos               : number,
+        public readonly quaquers                    : number,
+        public readonly peso_muestra_tostada        : number,
+        public readonly desarrollo                  : number,
+        public readonly porcentaje_caramelizacion   : number,
+        public readonly c_desarrollo                : number,
+        public readonly comentario                  : string,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateAnalisisFisicoDto?] {
         const {
-            peso_muestra, peso_pergamino, wa, temperatura_wa,
-            humedad, temperatura_humedad, densidad, color_grano_verde,
-            olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
-            desarrollo, porcentaje_caramelizcacion, c_desarrollo,
+            peso_muestra,
+            peso_pergamino,
+            wa,
+            temperatura_wa,
+            humedad,
+            temperatura_humedad,
+            densidad,
+            color_grano_verde,
+            olor,
+            superior_malla_18,
+            superior_malla_16,
+            superior_malla_14,
+            menor_malla_14,
+            peso_defectos,
+            quaquers,
+            peso_muestra_tostada,
+            desarrollo,
+            porcentaje_caramelizacion,
+            c_desarrollo,
             comentario
-         } = props;
+        } = props;
 
         if (peso_muestra === undefined) return ['El peso de la muestra es requerido', undefined];
         if (peso_pergamino === undefined) return ['El peso del pergamino es requerido', undefined];
@@ -52,11 +66,25 @@ export class CreateAnalisisFisicoDto {
 
 
         return [undefined, new CreateAnalisisFisicoDto(
-            peso_muestra, peso_pergamino, wa, temperatura_wa,
-            humedad, temperatura_humedad, densidad, color_grano_verde,
-            olor, superior_malla_18, superior_malla_16, superior_malla_14,
-            menor_malla_14, peso_defectos, quaquers, peso_muestra_tostada,
-            desarrollo, porcentaje_caramelizcacion, c_desarrollo,
+            peso_muestra,
+            peso_pergamino,
+            wa,
+            temperatura_wa,
+            humedad,
+            temperatura_humedad,
+            densidad,
+            color_grano_verde,
+            olor,
+            superior_malla_18,
+            superior_malla_16,
+            superior_malla_14,
+            menor_malla_14,
+            peso_defectos,
+            quaquers,
+            peso_muestra_tostada,
+            desarrollo,
+            porcentaje_caramelizacion,
+            c_desarrollo,
             comentario
         )];
     }

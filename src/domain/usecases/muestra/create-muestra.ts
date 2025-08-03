@@ -11,55 +11,74 @@ export class CreateMuestra implements CreateMuestraUseCase {
     constructor(
         private readonly muestraRepository: MuestraRepository,
         private readonly userRepository: UserRepository,
-    ){}
+    ) { }
 
     async execute(createMuestraDto: CreateMuestraDto): Promise<MuestraEntity> {
 
-        const id= await this.generarId(createMuestraDto);
-        const [,dto] = CreateMuestraDto.create({
+        const id = await this.generarId(createMuestraDto);
+        const [, dto] = CreateMuestraDto.create({
             ...createMuestraDto,
-            id_muestra   : id,
+            id_muestra: id,
         });
-        
+
         return this.muestraRepository.createMuestra(dto!);
     }
 
     generarId = async (dto: CreateMuestraDto): Promise<string> => {
-            const { productor, variedades, proceso } = dto;
-        
-            const nombres = productor.trim().split(' ');
-            const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
-            const inicialApellido = nombres[1]?.charAt(0).toUpperCase() || '';
-        
-            let inicialVariedad = '';
-        
-            if (variedades.length >= 3) {
-                inicialVariedad = 'BL';
-            } else {
-                for (const variedad of variedades) {
-                    const palabras = variedad.trim().split(' ');
-                    if (palabras.length > 0) {
-                        inicialVariedad += palabras[0].slice(0, 2).toUpperCase(); // Primeras 2 letras de la primera palabra
-                        for (let i = 1; i < palabras.length; i++) {
-                            inicialVariedad += palabras[i].charAt(0).toUpperCase(); // 1ra letra de cada palabra adicional
-                        }
+        const { productor, variedades, proceso } = dto;
+
+        const nombres = productor.trim().split(' ');
+        const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
+        const inicialApellido = nombres[1]?.charAt(0).toUpperCase() || '';
+
+        let inicialVariedad = '';
+
+        if (variedades.length >= 3) {
+            inicialVariedad = 'BL';
+        } else {
+            for (const variedad of variedades) {
+                const palabras = variedad.trim().split(' ');
+                if (palabras.length > 0) {
+                    inicialVariedad += palabras[0].slice(0, 2).toUpperCase(); // Primeras 2 letras de la primera palabra
+                    for (let i = 1; i < palabras.length; i++) {
+                        inicialVariedad += palabras[i].charAt(0).toUpperCase(); // 1ra letra de cada palabra adicional
                     }
                 }
             }
-        
-            let inicialProceso = '';
-            if (proceso.toLowerCase() === 'natural') {
-                inicialProceso = 'NA';
-            } else if (proceso.toLowerCase() === 'honey') {
-                inicialProceso = 'HO';
-            }
-        
-            let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
-        
-            const muestras = await this.muestraRepository.getAllMuestras();
-            const numeroMuestraFinal = muestras.length + 1;
-            idGenerado = `${idGenerado}-${numeroMuestraFinal}`;
-            
-            return idGenerado;
         }
+
+        let inicialProceso = '';
+        if (proceso.toLowerCase() === 'natural') {
+            inicialProceso = 'NA';
+        } else if (proceso.toLowerCase() === 'honey') {
+            inicialProceso = 'HO';
+        }
+
+        let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
+
+        // LOTE PARA CLIENTE
+        let user;
+        const id_user = dto.id_user;
+        if (id_user) {
+            if (dto.id_user) {
+                user = await this.userRepository.getUserById(dto.id_user);
+            }
+            if (user?.rol === 'cliente') {
+                const partesNombre = user.nombre.trim().split(' ');
+                const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
+                const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
+                idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
+            }
+            else if (user?.rol !== 'cliente') {
+                throw new Error('No se puede generar un Lote para un usuario que no es cliente');
+            }
+        }
+
+
+        const muestras = await this.muestraRepository.getAllMuestras();
+        const numeroMuestraFinal = muestras.length + 1;
+        idGenerado = `${idGenerado}-${numeroMuestraFinal}`;
+
+        return idGenerado;
+    }
 }

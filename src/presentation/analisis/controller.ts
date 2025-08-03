@@ -8,6 +8,7 @@ import { UpdateAnalisis } from '../../domain/usecases/analisis/analisis/update-a
 import { DeleteAnalisis } from '../../domain/usecases/analisis/analisis/delete-analisis';
 import { GetAllAnalisis } from '../../domain/usecases/analisis/analisis/get-all-analisis';
 import { GetAnalisisByLoteId } from '../../domain/usecases/analisis/analisis/get-analisis-by-lote';
+import { GetAnalisisByMuestraId } from '../../domain/usecases/analisis/analisis/get-analisis-by-muestra';
 
 export class AnalisisController {
 
@@ -72,7 +73,7 @@ export class AnalisisController {
 
     public getAnalisisByMuestraId = async (req: Request, res: Response) => {
         const id_muestra = req.params.id_muestra;
-        new GetAnalisisByLoteId(this.analisisRepository)
+        new GetAnalisisByMuestraId(this.analisisRepository)
             .execute(id_muestra)
             .then( analisis => res.json(analisis))
             .catch( error => res.status(400).json({ error }));
