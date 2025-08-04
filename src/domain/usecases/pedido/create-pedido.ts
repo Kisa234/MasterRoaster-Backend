@@ -112,7 +112,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             const [error, createLoteDto] = CreateLoteDto.create({
                 productor: lote.productor,
                 finca: lote.finca,
-                region: lote.region,
+                provincia: lote.provincia,
                 departamento: lote.departamento,
                 peso: dto.cantidad,
                 variedades: lote.variedades,
@@ -223,7 +223,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             const [, createLoteDto] = CreateLoteDto.create({
                 productor: lote.productor,
                 finca: lote.finca,
-                region: lote.region,
+                provincia: lote.provincia,
                 departamento: lote.departamento,
                 peso: cantidadRequerida,
                 variedades: lote.variedades,

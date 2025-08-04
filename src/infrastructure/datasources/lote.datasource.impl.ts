@@ -64,7 +64,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     
   }
   
-  async createLoteFromMuestra(id: string,peso:number, dto:CreateLoteDto ): Promise<LoteEntity> {
+  async createLoteFromMuestra(id: string, dto:CreateLoteDto ): Promise<LoteEntity> {
     const Muestra = await prisma.muestra.findUnique({
       where: {
         id_muestra: id,
@@ -76,7 +76,6 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lote = await prisma.lote.create({
       data: dto!,
     });
-    
     
     await prisma.muestra.update({
       where: { id_muestra: id },

@@ -1,23 +1,25 @@
 export class UpdateLoteDto {
     private constructor(
+        public readonly proveedor?: string,
         public readonly productor?: string,
         public readonly finca?: string,
-        public readonly region?: string,
+        public readonly provincia?: string,
         public readonly departamento?: string,
         public readonly peso?: number,
         public readonly variedades?: string,
         public readonly proceso?: string,
         public readonly tipo_lote?: string,
+        public readonly clasificacion?: string,
         public readonly id_user?: string,
         public readonly id_analisis?: string,
         public readonly peso_tostado?: number,
-    ) {}
+    ) { }
 
     get values() {
         const returnObj: { [key: string]: any } = {};
         if (this.productor) returnObj.productor = this.productor;
         if (this.finca) returnObj.finca = this.finca;
-        if (this.region) returnObj.region = this.region;
+        if (this.provincia) returnObj.region = this.provincia;
         if (this.departamento) returnObj.departamento = this.departamento;
         if (this.variedades) returnObj.variedades = this.variedades;
         if (this.proceso) returnObj.proceso = this.proceso;
@@ -31,22 +33,37 @@ export class UpdateLoteDto {
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateLoteDto?] {
-        let { productor, finca, region, departamento, peso, 
-            id_user,variedades,proceso,tipo_lote, id_analisis, peso_tostado } = props;
+        let {
+            proveedor,
+            productor,
+            finca,
+            provincia,
+            departamento,
+            peso,
+            variedades,
+            proceso,
+            tipo_lote,
+            clasificacion,
+            id_user,
+            id_analisis,
+            peso_tostado,
+        } = props;
 
-        return [undefined, 
+        return [undefined,
             new UpdateLoteDto(
+                proveedor,
                 productor,
-                finca, 
-                region, 
-                departamento, 
-                peso, 
-                variedades, 
+                finca,
+                provincia,
+                departamento,
+                peso,
+                variedades,
                 proceso,
                 tipo_lote,
-                id_user , 
+                clasificacion,
+                id_user,
                 id_analisis,
-                peso_tostado
-        )];
+                peso_tostado,
+            )];
     }
 }

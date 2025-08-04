@@ -2,9 +2,11 @@
 export class MuestraEntity {
     constructor(
         public id_muestra: string,
+        public nombre_muestra:string,
+        public proveedor: string,
         public productor: string,
         public finca: string,
-        public region: string,
+        public provincia: string,
         public departamento: string,
         public peso: number,
         public variedades: string,
@@ -18,9 +20,11 @@ export class MuestraEntity {
     public static fromObject(obj: { [key: string]: any }): MuestraEntity {
         const { 
             id_muestra,
+            nombre_muestra,
+            proveedor,
             productor,
             finca,
-            region,
+            provincia,
             departamento,
             peso,
             variedades,
@@ -31,10 +35,6 @@ export class MuestraEntity {
             id_analisis = ''
         } = obj;
         
-        if (!productor) throw new Error('productor property is required');
-        if (!finca) throw new Error('finca property is required');
-        if (!region) throw new Error('region property is required');
-        if (!departamento) throw new Error('departamento property is required');
         if (!peso) throw new Error('peso property is required');
         if (!variedades) throw new Error('variedades property is required');
         if (!proceso) throw new Error('proceso property is required');
@@ -46,9 +46,11 @@ export class MuestraEntity {
 
         return new MuestraEntity(
             id_muestra,
+            nombre_muestra,
+            proveedor,
             productor,
             finca,
-            region,
+            provincia,
             departamento,
             peso,
             variedades,

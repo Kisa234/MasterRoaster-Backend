@@ -30,9 +30,11 @@ model User {
 
 model Muestra {
   id_muestra         String             @id
+  proveedor          String?
+  nombre_muestra     String?
   productor          String?
   finca              String?
-  region             String?
+  provincia          String?  @map("region")
   departamento       String?
   peso               Float
   variedades         String[]
@@ -50,15 +52,17 @@ model Muestra {
 
 model Lote {
   id_lote        String   @id
-  productor      String
-  finca          String
-  region         String
-  departamento   String
+  proveedor      String?
+  productor      String?
+  finca          String?
+  provincia      String?  @map("region")
+  departamento   String?
   peso           Float
   peso_tostado   Float?
   variedades     String[]
   proceso        String
   tipo_lote      String
+  clasificacion  String?
   id_user        String?
   id_analisis    String?
   fecha_registro DateTime @default(now())

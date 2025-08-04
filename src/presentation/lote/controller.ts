@@ -30,7 +30,7 @@ import { AnalisisDefectosRespository } from '../../domain/repository/analisisDef
 
 export class LoteController {
 
-    constructor (
+    constructor(
         private readonly createLoteUseCase: CreateLoteUseCase,
         private readonly loteAnalisisRepository: LoteAnalisisRepository,
         private readonly muestraRepository: MuestraRepository,
@@ -41,25 +41,34 @@ export class LoteController {
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly pedidoRepository: PedidoRepository
-    ){}
+    ) { }
 
-    public createLote = (req:Request , res : Response) => {
+    public createLote = (req: Request, res: Response) => {
         // 1. Verifica que req.user esté presente
         if (!req.user?.id) {
-          return res.status(401).json({ error: 'Usuario no autenticado' });
+            return res.status(401).json({ error: 'Usuario no autenticado' });
         }
-      
-        // 2. Inyecta id_user en el body antes de construir el DTO
+
+        // 2. Decide de dónde viene el id_user:
+        //    - Si el DTO entrante trae un id_user válido lo usamos.
+        //    - Si no lo trae, lo tomamos del token (req.user.id).
+        // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
+        // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
+        const idUserFromBody = req.body.id_user as string | undefined;
+        const effectiveUserId = idUserFromBody ?? req.user.id;
+
+        // 3. Arma el body final para el DTO
         const bodyWithUser = {
-          ...req.body,
-          id_user: req.user.id, // ← Viene del token, no del cliente
+            ...req.body,
+            id_user: effectiveUserId,
         };
-      
-        // 3. Construye el DTO ya con id_user inyectado
+
+        // 4. Crea el DTO y valida
         const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
         if (error) {
             return res.status(400).json({ error });
         }
+
         new CreateLote(
             this.loteRepository,
             this.userRepository,
@@ -67,70 +76,84 @@ export class LoteController {
 
         )
             .execute(createLoteDto!)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public createLoteRapido = (req:Request , res : Response) => {
-        const [error , createLoteRapidoDto] = CreateLoteRapidoDto.create(req.body);
+    public createLoteRapido = (req: Request, res: Response) => {
+        const [error, createLoteRapidoDto] = CreateLoteRapidoDto.create(req.body);
         if (error) {
-            return res.status(400).json({ error });``
+            return res.status(400).json({ error }); ``
         }
 
         new CreateLoteRapido(
             this.loteRepository,
             this.userRepository,
             this.pedidoRepository
-        )   .execute(createLoteRapidoDto!)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+        ).execute(createLoteRapidoDto!)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public getLoteById = (req:Request , res : Response) => {
+    public getLoteById = (req: Request, res: Response) => {
         new GetLoteById(this.loteRepository)
             .execute(req.params.id)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public updateLote = (req:Request , res : Response) => {
+    public updateLote = (req: Request, res: Response) => {
         const id_lote = req.params.id;
-        const [error, updateLoteDto] = UpdateLoteDto.update({...req.body, 'id_lote ': id_lote});
+        const [error, updateLoteDto] = UpdateLoteDto.update({ ...req.body, 'id_lote ': id_lote });
         if (error) {
             return res.status(400).json({ error });
         }
         new UpdateLote(this.loteRepository)
             .execute(req.params.id, updateLoteDto!)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public deleteLote = (req:Request , res : Response) => {
+    public deleteLote = (req: Request, res: Response) => {
         new DeleteLote(this.loteRepository)
             .execute(req.params.id)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public getLotes = (req:Request , res : Response) => {
+    public getLotes = (req: Request, res: Response) => {
         new GetLotes(this.loteRepository)
-        .execute()
-        .then( lotes => res.json(lotes))
-        .catch( error => res.status(400).json({ error }));
+            .execute()
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
     }
-    
-    public createLoteFromMuestra = (req:Request , res : Response) => {
+
+    public createLoteFromMuestra = (req: Request, res: Response) => {
         const id_muestra = req.params.id;
-        const peso = req.body.peso;
 
-          // 1. Verifica que req.user esté presente
+        // 1. Verifica que req.user esté presente
         if (!req.user?.id) {
-          return res.status(401).json({ error: 'Usuario no autenticado' });
+            return res.status(401).json({ error: 'Usuario no autenticado' });
         }
-        const id_user = req.user.id;
 
-        if (!peso) {
-            return res.status(400).json({ error: 'Peso is required' });
+        // 2. Decide de dónde viene el id_user:
+        //    - Si el DTO entrante trae un id_user válido lo usamos.
+        //    - Si no lo trae, lo tomamos del token (req.user.id).
+        // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
+        // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
+        const idUserFromBody = req.body.id_user as string | undefined;
+        const effectiveUserId = idUserFromBody ?? req.user.id;
+
+        // 3. Arma el body final para el DTO
+        const bodyWithUser = {
+            ...req.body,
+            id_user: effectiveUserId,
+        };
+
+        // 4. Crea el DTO y valida
+        const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
+        if(!createLoteDto){
+            return res.status(400).json({ error });
         }
         new CreateLoteFromMuestra(
             this.createLoteUseCase,
@@ -142,35 +165,35 @@ export class LoteController {
             this.analisisDefectosRepository,
             this.loteRepository
         )
-        .execute(id_muestra, peso,id_user)
-        .then( lote => res.json(lote))
-        .catch( error => res.status(400).json({ error }));
+            .execute(id_muestra, createLoteDto)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
-    
-    public getLotesByUserId = (req:Request , res : Response) => {
+
+    public getLotesByUserId = (req: Request, res: Response) => {
         new GetLotes(this.loteRepository)
-        .execute()
-        .then( lotes => res.json(lotes))
-        .catch( error => res.status(400).json({ error }));
+            .execute()
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
     }
     public getAllTostados = async (req: Request, res: Response) => {
         new GetALLLotesTostados(this.loteRepository)
             .execute()
-            .then( tuestes => res.json(tuestes))
-            .catch( error => res.status(400).json({ error}));
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
     }
     public getAllVerdes = async (req: Request, res: Response) => {
         new GetAllLotesVerdes(this.loteRepository)
             .execute()
-            .then( tuestes => res.json(tuestes))
-            .catch( error => res.status(400).json({ error}));
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
     }
     public getUserByLote = async (req: Request, res: Response) => {
         const id = req.params.id;
         new GetUserByLote(this.loteRepository)
             .execute(id)
             .then(user => res.json(user))
-            .catch( error => res.status(400).json({ error}));
+            .catch(error => res.status(400).json({ error }));
 
     }
     public blendLotes = async (req: Request, res: Response) => {
@@ -209,7 +232,7 @@ export class LoteController {
             .execute()
             .then(lotes => res.json(lotes))
             .catch(error => res.status(400).json({ error })
-        )
+            )
     }
 
 }

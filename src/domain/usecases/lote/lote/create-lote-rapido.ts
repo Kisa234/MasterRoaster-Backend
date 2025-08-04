@@ -22,18 +22,19 @@ export class CreateLoteRapido implements CreateLoteRapidoUseCase {
 
         const id = await this.generarId(createLoteRapidoDto);
         const [, dto] = CreateLoteRapidoDto.create({
+            ...createLoteRapidoDto,
             id_lote: id,
-            productor: createLoteRapidoDto.productor,
-            finca: createLoteRapidoDto.finca,
-            region: createLoteRapidoDto.region,
-            departamento: createLoteRapidoDto.departamento,
-            peso: createLoteRapidoDto.peso,
-            variedades: createLoteRapidoDto.variedades,
-            proceso: createLoteRapidoDto.proceso,
-            tipo_lote: createLoteRapidoDto.tipo_lote,
-            id_user: createLoteRapidoDto.id_user,
-            peso_tostado: createLoteRapidoDto.peso_tostado,
-            id_analisis: createLoteRapidoDto.id_analisis,
+            // productor: createLoteRapidoDto.productor,
+            // finca: createLoteRapidoDto.finca,
+            // provincia: createLoteRapidoDto.provincia,
+            // departamento: createLoteRapidoDto.departamento,
+            // peso: createLoteRapidoDto.peso,
+            // variedades: createLoteRapidoDto.variedades,
+            // proceso: createLoteRapidoDto.proceso,
+            // tipo_lote: createLoteRapidoDto.tipo_lote,
+            // id_user: createLoteRapidoDto.id_user,
+            // peso_tostado: createLoteRapidoDto.peso_tostado,
+            // id_analisis: createLoteRapidoDto.id_analisis,
         });
         if (!dto) {
             throw new Error('Error al crear el DTO de Lote');

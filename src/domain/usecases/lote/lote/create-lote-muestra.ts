@@ -15,10 +15,8 @@ import { LoteAnalisisRepository } from '../../../repository/lote-analisis.reposi
 import {AnalisisDefectosRespository} from '../../../repository/analisisDefectos.repository';
 import { CreateAnalisisDefectosDto } from '../../../dtos/analisis/defectos/create';
 
-
-
 export interface CreateLoteFromMuestraUseCase {
-    execute(id: string, peso: number, id_user: string): Promise<LoteEntity>;
+    execute(id: string, createLoteDto:CreateLoteDto): Promise<LoteEntity>;
 }
 
 export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
@@ -33,29 +31,19 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         private readonly loteRepository: LoteRepository,
     ) { }
 
-    async execute(id: string, peso: number, id_user: string): Promise<LoteEntity> {
+    async execute(id: string, createLoteDto:CreateLoteDto): Promise<LoteEntity> {
+
         // 1) Obtener la muestra y validar
         const muestra = await this.muestraRepository.getMuestraById(id);
         if (!muestra) throw new Error('Muestra no encontrada');
 
         // 2) Crea el nuevo lote
-        const [, createLoteDto] = CreateLoteDto.create({
-            productor: muestra.productor,
-            finca: muestra.finca,
-            region: muestra.region,
-            departamento: muestra.departamento,
-            peso: peso,
-            variedades: muestra.variedades,
-            proceso: muestra.proceso,
-            tipo_lote: 'Lote Verde',
-            id_user: id_user,
-        });
         const lote = await this.createLoteUseCase.execute(createLoteDto!);
 
-        // 3) Si el lote original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
-        if (lote.id_analisis) {
+        // 3) Si la muestra original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
+        if (muestra.id_analisis) {
             let nuevoFis, nuevoSen, nuevoDef;
-            const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
+            const analisis = await this.analisisRepository.getAnalisisById(muestra.id_analisis);
             if (!analisis) throw new Error('Análisis no encontrado');
             if (analisis.analisisFisico_id) {
                 // 3a) Recrear el análisis físico si existe
@@ -95,9 +83,10 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             const [, dtoUpdateLote] = UpdateLoteDto.update({
                 id_analisis: nuevoAnalisis.id_analisis,
             });
-            console.log('dtoUpdateLote', dtoUpdateLote);
             await this.loteRepository.updateLote(lote.id_lote, dtoUpdateLote!);
         }
+
+       
 
         // 4) Finalmente, eliminar la muestra original
         await this.muestraRepository.deleteMuestra(muestra.id_muestra);

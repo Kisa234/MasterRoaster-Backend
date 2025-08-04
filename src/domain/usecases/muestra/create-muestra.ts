@@ -14,13 +14,11 @@ export class CreateMuestra implements CreateMuestraUseCase {
     ) { }
 
     async execute(createMuestraDto: CreateMuestraDto): Promise<MuestraEntity> {
-
         const id = await this.generarId(createMuestraDto);
-        const [, dto] = CreateMuestraDto.create({
+        const [error, dto] = CreateMuestraDto.create({
             ...createMuestraDto,
             id_muestra: id,
         });
-
         return this.muestraRepository.createMuestra(dto!);
     }
 
@@ -68,9 +66,6 @@ export class CreateMuestra implements CreateMuestraUseCase {
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
                 idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
-            }
-            else if (user?.rol !== 'cliente') {
-                throw new Error('No se puede generar un Lote para un usuario que no es cliente');
             }
         }
 

@@ -19,13 +19,13 @@ export class CreateLote implements CreateLoteUseCase {
     ) { }
 
     async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity> {
-
+        console.log(createLoteDto);
         const id = await this.generarId(createLoteDto, tueste, usuario, id_c);
         const [, dto] = CreateLoteDto.create({
             id_lote: id,
             productor: createLoteDto.productor,
             finca: createLoteDto.finca,
-            region: createLoteDto.region,
+            provincia: createLoteDto.provincia,
             departamento: createLoteDto.departamento,
             peso: createLoteDto.peso,
             variedades: createLoteDto.variedades,
@@ -33,7 +33,7 @@ export class CreateLote implements CreateLoteUseCase {
             tipo_lote: createLoteDto.tipo_lote,
             id_user: createLoteDto.id_user,
             peso_tostado: createLoteDto.peso_tostado,
-            id_analisis: createLoteDto.id_analisis,
+            clasificacion: createLoteDto.clasificacion
         });
         if (!dto) {
             throw new Error('Error al crear el DTO de Lote');
