@@ -7,7 +7,7 @@ export class CreateMuestraDto {
         public readonly nombre_muestra : string,
         public readonly productor      : string,
         public readonly finca          : string,
-        public readonly provincia     : string,
+        public readonly distrito     : string,
         public readonly departamento   : string,
         public readonly peso           : number,
         public readonly variedades     : string[],
@@ -23,7 +23,7 @@ export class CreateMuestraDto {
             nombre_muestra,
             productor,
             finca,
-            provincia,
+            distrito,
             departamento,
             peso,
             variedades,
@@ -35,7 +35,7 @@ export class CreateMuestraDto {
         // if (!id_muestra) return ['El id_muestra es requerido', undefined];
         if (!productor) return ['El productor es requerido', undefined];
         if (!finca) return ['La finca es requerida', undefined];
-        if (!provincia) return ['La provincia es requerida', undefined];
+        if (!distrito) return ['La provincia es requerida', undefined];
         if (!departamento) return ['El departamento es requerido', undefined];
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
@@ -48,7 +48,7 @@ export class CreateMuestraDto {
             nombre_muestra,
             productor,
             finca,
-            provincia,
+            distrito,
             departamento,
             peso,
             variedades,

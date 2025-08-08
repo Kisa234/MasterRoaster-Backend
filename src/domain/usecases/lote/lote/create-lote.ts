@@ -25,7 +25,7 @@ export class CreateLote implements CreateLoteUseCase {
             id_lote: id,
             productor: createLoteDto.productor,
             finca: createLoteDto.finca,
-            provincia: createLoteDto.provincia,
+            distrito: createLoteDto.distrito,
             departamento: createLoteDto.departamento,
             peso: createLoteDto.peso,
             variedades: createLoteDto.variedades,

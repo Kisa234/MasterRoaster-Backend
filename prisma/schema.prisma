@@ -34,7 +34,7 @@ model Muestra {
   nombre_muestra     String?
   productor          String?
   finca              String?
-  provincia          String?  @map("region")
+  distrito          String?  @map("region")
   departamento       String?
   peso               Float
   variedades         String[]
@@ -55,7 +55,7 @@ model Lote {
   proveedor      String?
   productor      String?
   finca          String?
-  provincia      String?  @map("region")
+  distrito      String?  @map("region")
   departamento   String?
   peso           Float
   peso_tostado   Float?
@@ -145,14 +145,14 @@ model Pedido {
 
 model Tueste {
   id_tueste                 String   @id @default(uuid())
-  num_batch                 Int      
   id_lote                   String
-  tostadora                 String
   id_cliente                String
   id_pedido                 String
+  num_batch                 Int      
+  peso_entrada              Float
+  tostadora                 String
   densidad                  Float
   humedad                   Float
-  peso_entrada              Float
   fecha_tueste              DateTime
   temperatura_entrada       Float?
   llama_inicial             Float?

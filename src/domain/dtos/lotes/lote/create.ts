@@ -6,7 +6,7 @@ export class CreateLoteDto {
         public readonly proveedor      : string,
         public readonly productor      : string,
         public readonly finca          : string,
-        public readonly provincia     : string,
+        public readonly distrito     : string,
         public readonly departamento   : string,
         public readonly peso           : number,
         public readonly variedades     : string[],
@@ -23,7 +23,7 @@ export class CreateLoteDto {
             proveedor,
             productor,
             finca,
-            provincia,
+            distrito,
             departamento,
             peso,
             variedades,
@@ -37,7 +37,7 @@ export class CreateLoteDto {
         // if (!id_lote) return ['El id_lote es requerido', undefined];
         if (!productor) return ['El productor es requerido', undefined];
         if (!finca) return ['La finca es requerida', undefined];
-        if (!provincia) return ['La provincia es requerida', undefined];
+        if (!distrito) return ['La provincia es requerida', undefined];
         if (!departamento) return ['El departamento es requerido', undefined];
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
@@ -48,7 +48,7 @@ export class CreateLoteDto {
             proveedor,
             productor,
             finca,
-            provincia,
+            distrito,
             departamento,
             peso,
             variedades,

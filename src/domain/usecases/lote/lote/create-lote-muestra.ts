@@ -86,8 +86,6 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
             await this.loteRepository.updateLote(lote.id_lote, dtoUpdateLote!);
         }
 
-       
-
         // 4) Finalmente, eliminar la muestra original
         await this.muestraRepository.deleteMuestra(muestra.id_muestra);
 

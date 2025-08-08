@@ -69,7 +69,7 @@ export class BlendLotes implements BlendLotesUseCase {
         // 4.2) Strings para el DTO
         const productoresStr = productoresArr.join(', ');
         const fincasStr = Array.from(new Set(allLotes.map(l => l.finca))).join(', ');
-        const provinciasStr = Array.from(new Set(allLotes.map(l => l.provincia))).join(', ');
+        const distritoStr = Array.from(new Set(allLotes.map(l => l.distrito))).join(', ');
         const departamentosStr = Array.from(new Set(allLotes.map(l => l.departamento))).join(', ');
         const procesosStr = procesosArr.join(', ');
 
@@ -94,7 +94,7 @@ export class BlendLotes implements BlendLotesUseCase {
             id_lote: blendId,
             productor: productoresStr,
             finca: fincasStr,
-            provincia: provinciasStr,
+            distrito: distritoStr,
             departamento: departamentosStr,
             peso: pesoTotal,
             variedades: { set: variedadesArr },

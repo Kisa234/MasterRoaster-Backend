@@ -3,7 +3,7 @@ export class UpdateLoteDto {
         public readonly proveedor?: string,
         public readonly productor?: string,
         public readonly finca?: string,
-        public readonly provincia?: string,
+        public readonly distrito?: string,
         public readonly departamento?: string,
         public readonly peso?: number,
         public readonly variedades?: string,
@@ -19,7 +19,7 @@ export class UpdateLoteDto {
         const returnObj: { [key: string]: any } = {};
         if (this.productor) returnObj.productor = this.productor;
         if (this.finca) returnObj.finca = this.finca;
-        if (this.provincia) returnObj.region = this.provincia;
+        if (this.distrito) returnObj.region = this.distrito;
         if (this.departamento) returnObj.departamento = this.departamento;
         if (this.variedades) returnObj.variedades = this.variedades;
         if (this.proceso) returnObj.proceso = this.proceso;
@@ -37,7 +37,7 @@ export class UpdateLoteDto {
             proveedor,
             productor,
             finca,
-            provincia,
+            distrito,
             departamento,
             peso,
             variedades,
@@ -54,7 +54,7 @@ export class UpdateLoteDto {
                 proveedor,
                 productor,
                 finca,
-                provincia,
+                distrito,
                 departamento,
                 peso,
                 variedades,

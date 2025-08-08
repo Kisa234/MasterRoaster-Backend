@@ -4,7 +4,7 @@ export class UpdateMuestraDto {
     public readonly nombre_muestra      ?: string,
     public readonly productor           ?: string,
     public readonly finca               ?: string,
-    public readonly provincia           ?: string,
+    public readonly distrito           ?: string,
     public readonly departamento        ?: string,
     public readonly peso                ?: number,
     public readonly proceso             ?: string,
@@ -19,7 +19,7 @@ export class UpdateMuestraDto {
     if (this.nombre_muestra) returnObj.nombre_muestra = this.nombre_muestra;
     if (this.productor) returnObj.productor = this.productor;
     if (this.finca) returnObj.finca = this.finca;
-    if (this.provincia) returnObj.provincia = this.provincia;
+    if (this.distrito) returnObj.provincia = this.distrito;
     if (this.departamento) returnObj.departamento = this.departamento;
     if (this.peso) returnObj.peso = this.peso;
     if (this.proceso) returnObj.proceso = this.proceso;
@@ -36,7 +36,7 @@ export class UpdateMuestraDto {
       nombre_muestra,
       productor,
       finca,
-      provincia,
+      distrito,
       departamento,
       peso,
       proceso,
@@ -53,7 +53,7 @@ export class UpdateMuestraDto {
         nombre_muestra,
         productor,
         finca,
-        provincia,
+        distrito,
         departamento,
         peso,
         proceso,
