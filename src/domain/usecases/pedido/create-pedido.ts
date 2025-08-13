@@ -118,6 +118,7 @@ export class CreatePedido implements CreatePedidoUseCase {
                 variedades: lote.variedades,
                 proceso: lote.proceso,
                 tipo_lote: 'Lote Verde',
+                clasificacion:lote.clasificacion,
                 id_user: user.id_user,
             });
 
@@ -229,6 +230,7 @@ export class CreatePedido implements CreatePedidoUseCase {
                 variedades: lote.variedades,
                 proceso: lote.proceso,
                 tipo_lote: 'Tostado Verde',
+                clasificacion:lote.clasificacion,
                 peso_tostado: dto.cantidad,
                 id_user: dto.id_user,
             });
