@@ -11,10 +11,11 @@ export class UserEntity {
         public eliminado: boolean,
         public fecha_registro: Date,
         public fecha_editado?: Date,
+        public nombre_comercial?:string,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): UserEntity {
-        const { id_user, nombre, email, numero_telefono, rol, password, eliminado, fecha_registro, fecha_editado } = obj;
+        const { id_user, nombre, email, numero_telefono, rol, password, eliminado, fecha_registro, fecha_editado,nombre_comercial } = obj;
 
         if (!id_user) throw new Error('id_user property is required');
         if (!nombre) throw new Error('nombre property is required');
@@ -49,7 +50,8 @@ export class UserEntity {
             numero_telefono,
             eliminado,
             newFechaRegistro,
-            newFechaEditado
+            newFechaEditado,
+            nombre_comercial
         );
     }
 }

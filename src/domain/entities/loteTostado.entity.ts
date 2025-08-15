@@ -6,6 +6,7 @@ export class LoteTostadoEntity {
         public perfil_tostado: string,
         public peso: number,
         public fecha_registro: Date,
+        public id_user:string,
         public id_analisis_rapido?: string,
         public entregado?: Date
     ) {}
@@ -18,6 +19,7 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             fecha_registro,
+            id_user,
             id_analisis_rapido,
             entregado
         } = obj;
@@ -43,6 +45,7 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             newFechaRegistro,
+            id_user,
             id_analisis_rapido,
             entregado
         );

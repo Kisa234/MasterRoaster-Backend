@@ -6,6 +6,7 @@ export class UpdateUserDto {
         public readonly email?: string,
         public readonly rol?: string,
         public readonly password?: string,
+        public readonly nombre_comercial?: string,
 
     ) {}
 
@@ -16,19 +17,20 @@ export class UpdateUserDto {
         if (this.email) returnObj.email = this.email;
         if (this.rol) returnObj.rol = this.rol;
         if (this.password) returnObj.password = this.password;
-
+        if (this.nombre_comercial) returnObj.nombre_comercial = this.nombre_comercial;
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateUserDto?] {
-        const { id_user, nombre, email, rol, password, eliminado,  } = props;
+        const { id_user, nombre, email, rol, password, eliminado,nombre_comercial} = props;
         return [undefined, new UpdateUserDto(
             new Date(),
             id_user,
             nombre,
             email,
             rol,
-            password
+            password,
+            nombre_comercial,
         )];
     }
 }

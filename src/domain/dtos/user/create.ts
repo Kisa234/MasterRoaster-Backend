@@ -5,10 +5,11 @@ export class CreateUserDto {
         public readonly rol: string,
         public readonly password: string,
         public readonly numero_telefono: string,
+        public readonly nombre_comercial?: string,
     ) {}
 
     static create(props: { [key: string]: any }): [string?, CreateUserDto?] {
-        let { nombre, email, rol, password, numero_telefono} = props;
+        let { nombre, email, rol, password, numero_telefono,nombre_comercial} = props;
 
         if (!nombre) return ['Nombre es requerido', undefined];
         if (!email) return ['Email es requerido', undefined];
@@ -17,6 +18,6 @@ export class CreateUserDto {
         if (!numero_telefono) return ['Número de teléfono es requerido', undefined];
 
 
-        return [undefined, new CreateUserDto(nombre, email, rol, password, numero_telefono)];
+        return [undefined, new CreateUserDto(nombre, email, rol, password, numero_telefono, nombre_comercial)];
     }
 }

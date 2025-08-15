@@ -8,25 +8,35 @@ datasource db {
 }
 
 model User {
-  id_user         String    @id @default(uuid())
-  nombre          String
-  email           String    @unique
-  rol             String
-  password        String
-  numero_telefono String
-  eliminado       Boolean   @default(false)
-  fecha_registro  DateTime  @default(now())
-  fecha_editado   DateTime?
+  id_user          String    @id @default(uuid())
+  nombre           String
+  nombre_comercial String?
+  email            String    @unique
+  rol              String
+  password         String
+  numero_telefono  String
+  eliminado        Boolean   @default(false)
+  fecha_registro   DateTime  @default(now())
+  fecha_editado    DateTime?
 
   // Relación con lote
-  lotes     Lote[]
+  lotes         Lote[]
   // Relación con muestra
-  muestras  Muestra[]
+  muestras      Muestra[]
   // Relación con pedidos de cliente
-  pedidos   Pedido[]
+  pedidos       Pedido[]
   // Relación con Historial
-  Historial Historial[]
+  Historial     Historial[]
+  // Relacion con lotes Tostados
+  lotesTostados LoteTostado[]
 }
+
+model Variedad {
+  id_variedad String @id @default(uuid())
+  nombre      String
+}
+
+// INVENTARIADO DE CAFE
 
 model Muestra {
   id_muestra         String             @id
@@ -34,7 +44,7 @@ model Muestra {
   nombre_muestra     String?
   productor          String?
   finca              String?
-  distrito          String?  @map("region")
+  distrito           String?            @map("region")
   departamento       String?
   peso               Float
   variedades         String[]
@@ -55,7 +65,7 @@ model Lote {
   proveedor      String?
   productor      String?
   finca          String?
-  distrito      String?  @map("region")
+  distrito       String?  @map("region")
   departamento   String?
   peso           Float
   peso_tostado   Float?
@@ -80,27 +90,28 @@ model Lote {
   lotesHistoricos Lote_Analisis[]
 }
 
-model Variedad {
-  id_variedad String @id @default(uuid())
-  nombre      String
-}
-
 model LoteTostado {
-  id_lote_tostado    String   @id
+  id_lote_tostado    String    @id
   id_lote            String
   fecha_tostado      DateTime
   perfil_tostado     String
   peso               Float
   entregado          DateTime?
-  fecha_registro     DateTime @default(now())
-  eliminado          Boolean  @default(false)
-  id_analisis_rapido String?  @unique
+  id_analisis_rapido String?   @unique
+  id_user            String?
+  fecha_registro     DateTime  @default(now())
+  eliminado          Boolean   @default(false)
 
   analisisRapido AnalisisRapido? @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
-  pedido         Pedido?         @relation("PedidoLoteTostado")
   lote           Lote            @relation(fields: [id_lote], references: [id_lote])
   tuestes        Tueste[]
+
+  pedido  Pedido? @relation("PedidoLoteTostado")
+  usuario User?   @relation(fields: [id_user], references: [id_user])
 }
+
+
+// HISTORIAL DE ACCIONES POR USUARIO
 
 model Historial {
   id_historial   String   @id @default(uuid())
@@ -114,6 +125,8 @@ model Historial {
 
   user User @relation(fields: [id_user], references: [id_user])
 }
+
+// PEDIDO
 
 model Pedido {
   id_pedido            String    @id @default(uuid())
@@ -148,7 +161,7 @@ model Tueste {
   id_lote                   String
   id_cliente                String
   id_pedido                 String
-  num_batch                 Int      
+  num_batch                 Int
   peso_entrada              Float
   tostadora                 String
   densidad                  Float
@@ -178,6 +191,8 @@ model Tueste {
   pedido      Pedido       @relation(fields: [id_pedido], references: [id_pedido])
 }
 
+// HISTORIAL DE ANALISIS X CAFE VERDE
+
 model Lote_Analisis {
   id             String   @id @default(uuid())
   id_lote        String
@@ -201,6 +216,8 @@ model Muestra_Analisis {
 
   @@unique([id_muestra, id_analisis])
 }
+
+// ANALISIS
 
 model Analisis {
   id_analisis          String   @id @default(uuid())
@@ -304,9 +321,9 @@ model AnalisisSensorial {
 model AnalisisRapido {
   id_analisis_rapido String   @id @default(uuid())
   fecha_registro     DateTime @default(now())
-  fragancia          String   
+  fragancia          String
   aroma              String
-  floral             Boolean  
+  floral             Boolean
   afrutado           Boolean
   bayas              Boolean
   frutos_secos       Boolean
