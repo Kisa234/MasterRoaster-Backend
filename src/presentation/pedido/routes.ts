@@ -87,6 +87,7 @@ export class PedidoRoutes {
         router.get('/orden/tueste/:fecha', controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', controller.getPedidosByEstado);
         router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
+        router.get('/lote/:id_lote', controller.GetPedidosByLote);
         router.put('/completar/:id', controller.completarPedido);
         
         return router;

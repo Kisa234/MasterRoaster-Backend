@@ -26,9 +26,11 @@ model User {
   // Relación con pedidos de cliente
   pedidos       Pedido[]
   // Relación con Historial
-  Historial     Historial[]
+  historial     Historial[]
   // Relacion con lotes Tostados
   lotesTostados LoteTostado[]
+  // Relacion con las Entregas
+  envio         Envio[]
 }
 
 model Variedad {
@@ -86,8 +88,12 @@ model Lote {
   pedidosOrigen   Pedido[]        @relation("LoteOrigen")
   // pedidos que generaron este lote como nuevo
   pedidosDestino  Pedido[]        @relation("LoteCreado")
+  // los lotes tostados por lote
   LoteTostado     LoteTostado[]
+  // los analisis del lote como historico
   lotesHistoricos Lote_Analisis[]
+  // las bolsas del lote
+  productos       Producto[]
 }
 
 model LoteTostado {
@@ -106,10 +112,11 @@ model LoteTostado {
   lote           Lote            @relation(fields: [id_lote], references: [id_lote])
   tuestes        Tueste[]
 
-  pedido  Pedido? @relation("PedidoLoteTostado")
-  usuario User?   @relation(fields: [id_user], references: [id_user])
+  pedido  Pedido?       @relation("PedidoLoteTostado")
+  usuario User?         @relation(fields: [id_user], references: [id_user])
+  envio   Envio[]
+  skus    ProductoSKU[]
 }
-
 
 // HISTORIAL DE ACCIONES POR USUARIO
 
@@ -126,7 +133,7 @@ model Historial {
   user User @relation(fields: [id_user], references: [id_user])
 }
 
-// PEDIDO
+// PEDIDOS
 
 model Pedido {
   id_pedido            String    @id @default(uuid())
@@ -189,6 +196,70 @@ model Tueste {
   // Relación con Analisis Rapido
   loteTostado LoteTostado? @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
   pedido      Pedido       @relation(fields: [id_pedido], references: [id_pedido])
+}
+
+// BOLSAS
+
+enum Molienda {
+  ENTERO
+  MOLIDO
+}
+
+model Producto {
+  id_producto    String    @id @default(uuid())
+  nombre         String
+  descripcion    String?
+  id_lote        String?
+  activo         Boolean   @default(true)
+  fecha_registro DateTime  @default(now())
+  fecha_editado  DateTime?
+
+  skus ProductoSKU[]
+  lote Lote?          @relation(fields: [id_lote], references: [id_lote])
+}
+
+model ProductoSKU {
+  id_sku          String    @id @default(uuid())
+  sku_code        String?   @unique
+  id_producto     String
+  id_lote_tostado String
+  gramaje         Int
+  molienda        Molienda
+  cantidad        Int       @default(0)
+  eliminado       Boolean   @default(false)
+  fecha_registro  DateTime  @default(now())
+  fecha_editado   DateTime?
+
+  loteTostado LoteTostado @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
+  producto    Producto    @relation(fields: [id_producto], references: [id_producto])
+}
+
+// ENVIOS
+
+enum OrigenEnvio {
+  LOTE_TOSTADO
+  CAFE_EMBOLSADO
+  BOX_CAFE
+}
+
+enum ClasificacionEnvio {
+  PARCIAL
+  TOTAL
+}
+
+model Envio {
+  id_envio        String             @id @default(uuid())
+  origen          OrigenEnvio
+  clasificacion   ClasificacionEnvio
+  id_lote_tostado String
+  id_cliente      String
+  cantidad        Int
+  comentario      String?
+  fecha           DateTime           @default(now())
+  eliminado       Boolean            @default(false)
+
+  loteTostado LoteTostado @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
+  cliente     User        @relation(fields: [id_cliente], references: [id_user])
 }
 
 // HISTORIAL DE ANALISIS X CAFE VERDE

@@ -13,6 +13,7 @@ import { HistorialRoutes } from "./historial/routes";
 import { PersonalizadoRoutes } from "./personalizado/routes";
 import { AnalisisDefectosRoutes } from "./analisisDefectos/routes";
 import { VariedadRoutes } from "./variedad/routes";
+import { EnvioRoutes } from "./envio/routes";
 
 
 export class AppRoutes{
@@ -33,10 +34,12 @@ export class AppRoutes{
 
         router.use('/pedido', PedidoRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
-        
+        router.use('/envio', EnvioRoutes.routes);
+
         router.use('/historial', HistorialRoutes.routes);
         router.use('/user', UserRoutes.routes); 
-        router.use('/p', PersonalizadoRoutes.routes);        
+        router.use('/p', PersonalizadoRoutes.routes);  
+
         
         
 

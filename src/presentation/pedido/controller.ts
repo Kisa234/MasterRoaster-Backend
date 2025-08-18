@@ -1,3 +1,6 @@
+import { GetLoteById } from './../../domain/usecases/lote/lote/get-lote';
+import { GetPedidosByLote } from './../../domain/usecases/pedido/get-pedido-lote';
+import { GetPedidos } from './../../domain/usecases/pedido/get-pedidos';
 import { Request, Response } from "express";
 
 import { CreatePedidoDto } from "../../domain/dtos/pedido/create";
@@ -142,4 +145,13 @@ export class PedidoController {
             .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));
     };
+
+    public GetPedidosByLote = async (req: Request, res: Response) =>{
+        const idLote = req.params.id_lote;
+        new GetPedidosByLote(this.pedidoRepository)
+            .execute(idLote)
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error }));
+
+    }
 }
