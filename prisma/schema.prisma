@@ -33,9 +33,23 @@ model User {
   envio         Envio[]
 }
 
+// DATOS ADICIONALES
+
 model Variedad {
   id_variedad String @id @default(uuid())
   nombre      String
+}
+
+model Notas {
+  id        String    @id @default(uuid())
+  name      String
+  color     String
+  createdAt DateTime  @default(now())
+  parentId  String?
+  updatedAt DateTime? @updatedAt
+
+  parent   Notas?  @relation("jerarquia", fields: [parentId], references: [id])
+  children Notas[] @relation("jerarquia")
 }
 
 // INVENTARIADO DE CAFE
@@ -122,8 +136,8 @@ model LoteTostado {
 
 model Historial {
   id_historial   String   @id @default(uuid())
-  entidad        String // "Lote", "Pedido", "Usuario"
-  id_entidad     String // ID del lote, pedido o usuario
+  entidad        String 
+  id_entidad     String 
   id_user        String
   accion         String
   comentario     String
@@ -215,7 +229,7 @@ model Producto {
   fecha_editado  DateTime?
 
   skus ProductoSKU[]
-  lote Lote?          @relation(fields: [id_lote], references: [id_lote])
+  lote Lote?         @relation(fields: [id_lote], references: [id_lote])
 }
 
 model ProductoSKU {

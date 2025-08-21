@@ -82,7 +82,7 @@ export class ProductoDataSourceImpl implements ProductoDataSource {
     return ProductoEntity.fromObject(updated);
   }
 
-  // DELETE (a falta de campo `eliminado`, hacemos baja lógica con `activo=false`)
+  // DELETE
   async deleteProducto(id: string): Promise<ProductoEntity> {
     const updated = await prisma.producto.update({
       where: { id_producto: id },

@@ -14,6 +14,9 @@ import { PersonalizadoRoutes } from "./personalizado/routes";
 import { AnalisisDefectosRoutes } from "./analisisDefectos/routes";
 import { VariedadRoutes } from "./variedad/routes";
 import { EnvioRoutes } from "./envio/routes";
+import { NotasRoutes } from "./notas/routes";
+import { ProductoSkuRoutes } from "./productoSku/routes";
+import { ProductoRoutes } from "./producto/routes";
 
 
 export class AppRoutes{
@@ -30,7 +33,12 @@ export class AppRoutes{
         router.use('/lote', LoteRoutes.routes);
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
+
+        router.use('/sku', ProductoSkuRoutes.routes);
+        router.use('/producto', ProductoRoutes.routes);
+
         router.use('/variedad', VariedadRoutes.routes);
+        router.use('/notas', NotasRoutes.routes);
 
         router.use('/pedido', PedidoRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
