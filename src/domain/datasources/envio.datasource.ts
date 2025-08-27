@@ -1,4 +1,4 @@
-import { CreateEnvioDto } from '../dtos/envio/create';
+import { CreateEnvioDto } from '../dtos/envio/envio/create';
 import { UpdateEnvioDto } from '../dtos/envio/envio/update';
 import { EnvioEntity, ClasificacionEnvio } from '../entities/envio.entity';
 
