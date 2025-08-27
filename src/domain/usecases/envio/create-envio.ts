@@ -1,4 +1,4 @@
-import { CreateEnvioDto } from "../../dtos/envio/create";
+import { CreateEnvioDto } from "../../dtos/envio/envio/create";
 import { UpdateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/update";
 import { EnvioEntity } from "../../entities/envio.entity";
 import { EnvioRepository } from "../../repository/envio.repository";
@@ -53,12 +53,15 @@ export class CreateEnvio implements CreateEnvioUseCase {
     const nuevoStock = stockActual - dto.cantidad
     const [error,dtoUpdate] = UpdateLoteTostadoDto.update({
         peso:nuevoStock,
+        entregado:new Date(),
     })
     if (error){
         throw new Error(error);
     }
     this.loteTostadoRepository.updateLoteTostado(createEnvioDto.id_lote_tostado,dtoUpdate!);
-
+    if(nuevoStock == 0){
+      this.loteTostadoRepository.deleteLoteTostado(createEnvioDto.id_lote_tostado);
+    }
 
     // 7) Crear el envío
     const envio = await this.envioRepository.createEnvio(dto);

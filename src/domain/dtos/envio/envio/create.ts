@@ -1,4 +1,4 @@
-import { OrigenEnvio, ClasificacionEnvio } from "../../entities/envio.entity";
+import { ClasificacionEnvio, OrigenEnvio } from "@prisma/client";
 
 const ORIGEN_ENVIO_VALUES: ReadonlyArray<OrigenEnvio> = ['LOTE_TOSTADO', 'CAFE_EMBOLSADO', 'BOX_CAFE'];
 const CLASIFICACION_ENVIO_VALUES: ReadonlyArray<ClasificacionEnvio> = ['PARCIAL', 'TOTAL'];
@@ -40,6 +40,7 @@ export class CreateEnvioDto {
     if (!Number.isInteger(nCantidad) || nCantidad <= 0) {
       return ['cantidad debe ser un entero positivo en gramos', undefined];
     }
+
 
     return [undefined, new CreateEnvioDto(
       origenValue,

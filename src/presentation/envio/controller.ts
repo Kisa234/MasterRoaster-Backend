@@ -1,8 +1,8 @@
-import { CreateEnvioDto } from './../../domain/dtos/envio/create';
 import { EnvioRepository } from '../../domain/repository/envio.repository';
 import { CreateEnvio } from '../../domain/usecases/envio/create-envio';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { Request, Response } from "express";
+import { CreateEnvioDto } from '../../domain/dtos/envio/envio/create';
 
 
 export class EnvioController {
@@ -85,18 +85,24 @@ export class EnvioController {
                 return res.status(400).json({ error: "Parámetros 'from' y 'to' son requeridos (YYYY-MM-DD)." });
             }
 
-            const fromDate = new Date(from);
-            const toDate = new Date(to);
-            if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            // Inicio de día (local)
+            const fromStart = new Date(`${from}T00:00:00`);
+            // Límite superior EXCLUSIVO = inicio del día siguiente (local)
+            const toExclusive = new Date(`${to}T00:00:00`);
+            toExclusive.setDate(toExclusive.getDate() + 1);
+
+            if (isNaN(fromStart.getTime()) || isNaN(toExclusive.getTime())) {
                 return res.status(400).json({ error: "Fechas inválidas. Use formato YYYY-MM-DD." });
             }
 
-            const envios = await this.envioRepository.getEnviosByFechaRange(fromDate, toDate);
+            // IMPORTANTE: en el repo/SQL usar LT, no LTE
+            const envios = await this.envioRepository.getEnviosByFechaRange(fromStart, toExclusive);
             return res.json(envios);
         } catch (error: any) {
             return res.status(400).json({ error: error?.message ?? String(error) });
         }
     };
+
 
     public getEnviosByClasificacion = async (req: Request, res: Response) => {
         try {

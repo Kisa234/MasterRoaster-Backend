@@ -3,6 +3,8 @@
 import { ProductoSkuRepository } from "../../../repository/productoSku.repository";
 import { CreateProductoSkuDto } from "../../../dtos/producto/productoSku/create";
 import { ProductoSkuEntity } from "../../../entities/productoSku.entity";
+import { LoteTostadoRepository } from "../../../repository/loteTostado.repository";
+import { UpdateLoteTostadoDto } from "../../../dtos/lotes/lote-tostado/update";
 
 export interface UpsertProductoSkuUseCase {
   execute(dto: CreateProductoSkuDto): Promise<ProductoSkuEntity>;
@@ -10,7 +12,8 @@ export interface UpsertProductoSkuUseCase {
 
 export class UpsertProductoSku implements UpsertProductoSkuUseCase {
   constructor(
-    private readonly skuRepository: ProductoSkuRepository
+    private readonly skuRepository: ProductoSkuRepository,
+    private readonly loteTostadoRepository: LoteTostadoRepository
   ) {}
 
   async execute(dto: CreateProductoSkuDto): Promise<ProductoSkuEntity> {
@@ -28,7 +31,22 @@ export class UpsertProductoSku implements UpsertProductoSkuUseCase {
       );
     }
 
-    // 3) Crear o incrementar
+    // 3) Actualizar peso lote tostado
+    const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.id_lote_tostado);
+    if(!loteTostado) throw new Error('no existe el lote tostado');
+    const newPeso = loteTostado.peso - (dto.gramaje * (dto.cantidad? dto.cantidad : 0)) ;
+    let eliminado = false;
+    if( newPeso == 0){
+      eliminado = true;
+    }
+    const [err,updateDto] = UpdateLoteTostadoDto.update({
+      peso:newPeso,
+      eliminado:eliminado
+    })
+    if (err) throw new Error(err);
+    this.loteTostadoRepository.updateLoteTostado(dto.id_lote_tostado,updateDto!);
+
+    // 4) Crear o incrementar
     if (!sku) {
       // Reuso tu DTO factory para no duplicar validaciones
       const [err, createDto] = CreateProductoSkuDto.create({
@@ -43,7 +61,7 @@ export class UpsertProductoSku implements UpsertProductoSkuUseCase {
       return this.skuRepository.createSku(createDto!);
     }
 
-    // 4) Si existe: normaliza sku_code (si difiere) y suma stock
+    // 5) Si existe: normaliza sku_code (si difiere) y suma stock
     if (!sku.sku_code || sku.sku_code !== sku_code) {
       await this.skuRepository.setSkuCode(sku.id_sku, sku_code);
     }

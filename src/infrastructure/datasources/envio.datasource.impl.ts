@@ -1,9 +1,8 @@
-import { Envio } from './../../../node_modules/.prisma/client/index.d';
 import { prisma } from "../../data/postgres";
 import { EnvioDataSource } from "../../domain/datasources/envio.datasource";
-import { CreateEnvioDto } from "../../domain/dtos/envio/create";
-import { UpdateEnvioDto } from "../../domain/dtos/envio/update";
+import { UpdateEnvioDto } from "../../domain/dtos/envio/envio/update";
 import { EnvioEntity, ClasificacionEnvio } from "../../domain/entities/envio.entity";
+import { CreateEnvioDto } from '../../domain/dtos/envio/envio/create';
 
 export class EnvioDataSourceImpl implements EnvioDataSource {
     async createEnvio(dto: CreateEnvioDto): Promise<EnvioEntity> {

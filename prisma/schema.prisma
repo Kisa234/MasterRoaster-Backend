@@ -274,7 +274,25 @@ model Envio {
 
   loteTostado LoteTostado @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
   cliente     User        @relation(fields: [id_cliente], references: [id_user])
+  ficha       FichaEnvio?
 }
+
+model FichaEnvio {
+  id_ficha        String   @id @default(uuid())
+  id_envio        String   @unique
+  nombre          String
+  celular         String
+  direccion       String
+  distrito        String
+  dni             String?
+  referencia      String?
+  fecha_registro  DateTime @default(now())
+  fecha_editado   DateTime?
+
+  // Relación 1:1 con Envio
+  envio Envio @relation(fields: [id_envio], references: [id_envio], onDelete: Cascade, onUpdate: NoAction)
+}
+
 
 // HISTORIAL DE ANALISIS X CAFE VERDE
 

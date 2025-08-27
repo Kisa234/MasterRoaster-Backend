@@ -17,6 +17,7 @@ import { EnvioRoutes } from "./envio/routes";
 import { NotasRoutes } from "./notas/routes";
 import { ProductoSkuRoutes } from "./productoSku/routes";
 import { ProductoRoutes } from "./producto/routes";
+import { FichaEnvioRoutes } from "./fichaEnvio/routes";
 
 
 export class AppRoutes{
@@ -34,15 +35,17 @@ export class AppRoutes{
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
 
-        router.use('/sku', ProductoSkuRoutes.routes);
         router.use('/producto', ProductoRoutes.routes);
+        router.use('/sku', ProductoSkuRoutes.routes);
 
         router.use('/variedad', VariedadRoutes.routes);
         router.use('/notas', NotasRoutes.routes);
 
         router.use('/pedido', PedidoRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
+        
         router.use('/envio', EnvioRoutes.routes);
+        router.use('/fichaEnvio',FichaEnvioRoutes.routes);
 
         router.use('/historial', HistorialRoutes.routes);
         router.use('/user', UserRoutes.routes); 

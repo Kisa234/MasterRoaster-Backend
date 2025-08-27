@@ -18,7 +18,6 @@ export class ProductoController {
         try {
             const [err, dto] = CreateProductoDto.create(req.body);
             if (err) return res.status(400).json({ error: err });
-
             const usecase = new CreateProducto(
                 this.productoRepository,
                 this.loteRepository,

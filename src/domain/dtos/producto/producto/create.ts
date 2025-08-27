@@ -12,8 +12,7 @@ export class CreateProductoDto {
       id_lote,
     } = props;
 
-    if (nombre) return ['El nombre es requerido', undefined];
-    if (descripcion) return ['la descripcion es requerida', undefined];
+    if (!nombre) return ['El nombre es requerido', undefined];
 
     return [undefined, new CreateProductoDto(
       nombre,

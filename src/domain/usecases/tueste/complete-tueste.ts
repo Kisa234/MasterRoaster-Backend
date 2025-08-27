@@ -55,7 +55,6 @@ export class CompleteTueste implements CompleteTuesteUseCase {
                 peso:pesoFinalVerde,
                 peso_tostado: pesoFinalTostado,
             });
-            console.log(lote.id_lote,updateLoteDto);
             if (!updateLoteDto) throw new Error("Error generando DTO para lote tostado");
             await this.loteRepository.updateLote(lote.id_lote, updateLoteDto);
             // eliminar lote si ambos pesos son 0 
@@ -80,7 +79,6 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         const [, updateTueste] = UpdateTuesteDto.update({
             id_lote_tostado: loteTostado.id_lote_tostado,
         });
-        console.log(updateTueste);
         if (!updateTueste) throw new Error("Error generando DTO para tueste");
         for (const tueste of tuestesDelPedido) {
             await this.tuesteRepository.updateTueste(tueste.id_tueste, updateTueste);

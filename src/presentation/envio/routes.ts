@@ -18,6 +18,12 @@ export class EnvioRoutes {
 
     // Controller
     const controller = new EnvioController(envioRepository, loteTostadoRepository);
+   
+    // ---- Query routes (específicas primero) ----
+    router.get("/lote/:id_lote_tostado", controller.getEnviosByLote);
+    router.get("/cliente/:id_cliente", controller.getEnviosByCliente);
+    router.get("/rango-fecha", controller.getEnviosByFechaRange);
+    router.get("/clasificacion/:clasificacion", controller.getEnviosByClasificacion);
 
     // ---- CRUD ----
     router.post("/", controller.createEnvio);
@@ -25,11 +31,6 @@ export class EnvioRoutes {
     router.put("/:id_envio", controller.updateEnvio);
     router.delete("/:id_envio", controller.deleteEnvio);
     
-    // ---- Query routes (específicas primero) ----
-    router.get("/lote/:id_lote_tostado", controller.getEnviosByLote);
-    router.get("/cliente/:id_cliente", controller.getEnviosByCliente);
-    router.get("/rango-fecha", controller.getEnviosByFechaRange);
-    router.get("/clasificacion/:clasificacion", controller.getEnviosByClasificacion);
     
     return router;
   }

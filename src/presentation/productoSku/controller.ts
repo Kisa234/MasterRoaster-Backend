@@ -4,10 +4,12 @@ import { ProductoSkuRepository } from "../../domain/repository/productoSku.repos
 import { CreateProductoSkuDto } from "../../domain/dtos/producto/productoSku/create";
 import { UpdateProductoSkuDto } from "../../domain/dtos/producto/productoSku/update";
 import { UpsertProductoSku } from "../../domain/usecases/producto/productoSku/upsert-productoSku";
+import { LoteTostadoRepository } from "../../domain/repository/loteTostado.repository";
 
 export class ProductoSkuController {
     constructor(
         private readonly skuRepository: ProductoSkuRepository,
+        private readonly LoteTostadoRepository : LoteTostadoRepository
     ) { }
 
     // POST /sku  (empaquetar: crea o incrementa según exista)
@@ -16,7 +18,10 @@ export class ProductoSkuController {
             const [err, dto] = CreateProductoSkuDto.create(req.body);
             if (err) return res.status(400).json({ error: err });
 
-            new UpsertProductoSku(this.skuRepository)
+            new UpsertProductoSku(
+                this.skuRepository,
+                this.LoteTostadoRepository
+            )
                 .execute(dto!)
                 .then(producto => res.json(producto));
 

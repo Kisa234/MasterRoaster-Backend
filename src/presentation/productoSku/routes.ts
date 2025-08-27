@@ -2,6 +2,8 @@ import { Router } from "express";
 import { ProductoSkuDataSourceImpl } from "../../infrastructure/datasources/productoSku.datasource.impl";
 import { ProductoSkuRepositoryImpl } from "../../infrastructure/repositories/productoSku.repository.impl";
 import { ProductoSkuController } from "./controller";
+import { LoteTostadoRepositoryImpl } from "../../infrastructure/repositories/loteTostado.repository.impl";
+import { LoteTostadoDataSourceImpl } from "../../infrastructure/datasources/loteTostado.datasource.impl";
 
 export class ProductoSkuRoutes {
   static get routes() {
@@ -10,7 +12,10 @@ export class ProductoSkuRoutes {
     const skuDatasource = new ProductoSkuDataSourceImpl();
     const skuRepository = new ProductoSkuRepositoryImpl(skuDatasource);
 
-    const controller = new ProductoSkuController(skuRepository);
+    const loteTostadoDatasource = new LoteTostadoDataSourceImpl();
+    const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteTostadoDatasource);
+
+    const controller = new ProductoSkuController(skuRepository, loteTostadoRepository);
 
     // CREATE (empaquetar)
     router.post("/", controller.create);

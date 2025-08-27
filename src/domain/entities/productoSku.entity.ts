@@ -47,7 +47,7 @@ export class ProductoSkuEntity {
         }
 
         const newFechaEditado = new Date(fecha_editado);
-        if (isNaN(fecha_editado.getTime())) {
+        if (isNaN(newFechaEditado.getTime())) {
             throw new Error('fecha_editado no es válida');
         }
 
