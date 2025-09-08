@@ -89,4 +89,12 @@ export class MuestraController {
       .then(muestras => res.json(muestras))
       .catch(error => res.status(400).json({ error }));
   }
+
+  public completeMuestra = (req: Request, res: Response) => {
+    const id_muestra = req.params.id;
+    this.muestraRepository.completeMuestra(id_muestra)
+      .then(muestra => res.json(muestra))
+      .catch(error => res.status(400).json({ error })); 
+  }
+  
 }

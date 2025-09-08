@@ -59,6 +59,7 @@ export class EnvioEntity {
       throw new Error('fecha is not a valid date');
     }
 
+
     return new EnvioEntity(
       id_envio,
       origen as OrigenEnvio,

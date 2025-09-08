@@ -8,16 +8,21 @@ datasource db {
 }
 
 model User {
-  id_user          String    @id @default(uuid())
-  nombre           String
-  nombre_comercial String?
-  email            String    @unique
-  rol              String
-  password         String
-  numero_telefono  String
-  eliminado        Boolean   @default(false)
-  fecha_registro   DateTime  @default(now())
-  fecha_editado    DateTime?
+  id_user             String    @id @default(uuid())
+  nombre              String
+  nombre_comercial    String?
+  email               String    @unique
+  documento_tipo      String?
+  documento_identidad String?   @unique
+  fecha_nacimiento    DateTime?
+  departamento        String?
+  direccion           String?
+  numero_telefono     String
+  rol                 String
+  password            String
+  eliminado           Boolean   @default(false)
+  fecha_registro      DateTime  @default(now())
+  fecha_editado       DateTime?
 
   // Relación con lote
   lotes         Lote[]
@@ -68,6 +73,7 @@ model Muestra {
   id_user            String?
   id_analisis        String?
   fecha_registro     DateTime           @default(now())
+  completado         Boolean            @default(false)
   eliminado          Boolean            @default(false)
   // Relación con Usuario
   user               User?              @relation(fields: [id_user], references: [id_user])
@@ -136,8 +142,8 @@ model LoteTostado {
 
 model Historial {
   id_historial   String   @id @default(uuid())
-  entidad        String 
-  id_entidad     String 
+  entidad        String
+  id_entidad     String
   id_user        String
   accion         String
   comentario     String
@@ -278,21 +284,20 @@ model Envio {
 }
 
 model FichaEnvio {
-  id_ficha        String   @id @default(uuid())
-  id_envio        String   @unique
-  nombre          String
-  celular         String
-  direccion       String
-  distrito        String
-  dni             String?
-  referencia      String?
-  fecha_registro  DateTime @default(now())
-  fecha_editado   DateTime?
+  id_ficha       String    @id @default(uuid())
+  id_envio       String    @unique
+  nombre         String
+  celular        String
+  direccion      String
+  distrito       String
+  dni            String?
+  referencia     String?
+  fecha_registro DateTime  @default(now())
+  fecha_editado  DateTime?
 
   // Relación 1:1 con Envio
   envio Envio @relation(fields: [id_envio], references: [id_envio], onDelete: Cascade, onUpdate: NoAction)
 }
-
 
 // HISTORIAL DE ANALISIS X CAFE VERDE
 

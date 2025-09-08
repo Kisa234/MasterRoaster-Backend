@@ -4,18 +4,39 @@ export class UserEntity {
     constructor(
         public id_user: string,
         public nombre: string,
+        public nombre_comercial: string | null,
         public email: string,
+        public documento_tipo: string | null,
+        public documento_identidad: string | null,
+        public fecha_nacimiento: Date | null,
+        public departamento: string | null,
+        public direccion: string | null,
+        public numero_telefono: number | null,
         public rol: string,
         public password: string,
-        public numero_telefono: number,
         public eliminado: boolean,
         public fecha_registro: Date,
         public fecha_editado?: Date,
-        public nombre_comercial?:string,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): UserEntity {
-        const { id_user, nombre, email, numero_telefono, rol, password, eliminado, fecha_registro, fecha_editado,nombre_comercial } = obj;
+        const {
+            id_user,
+            nombre,
+            nombre_comercial,
+            email,
+            documento_tipo,
+            documento_identidad,
+            fecha_nacimiento,
+            departamento,
+            direccion,
+            numero_telefono,
+            rol,
+            password,
+            eliminado,
+            fecha_registro,
+            fecha_editado
+        } = obj;
 
         if (!id_user) throw new Error('id_user property is required');
         if (!nombre) throw new Error('nombre property is required');
@@ -39,19 +60,24 @@ export class UserEntity {
                 throw new Error('fecha_editado is not a valid date');
             }
         }
-        
+
 
         return new UserEntity(
             id_user,
             nombre,
+            nombre_comercial,
             email,
+            documento_tipo,
+            documento_identidad,
+            fecha_nacimiento,
+            departamento,
+            direccion,
+            numero_telefono,
             rol,
             password,
-            numero_telefono,
             eliminado,
-            newFechaRegistro,
-            newFechaEditado,
-            nombre_comercial
+            fecha_registro,
+            fecha_editado
         );
     }
 }

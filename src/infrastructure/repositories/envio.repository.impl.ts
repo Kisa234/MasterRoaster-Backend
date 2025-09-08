@@ -22,10 +22,10 @@ export class EnvioRepositoryImpl implements EnvioRepository{
         return this.envioDatasource.deleteEnvio(id_envio);
     }
     getEnviosByLote(id_lote_tostado: string): Promise<EnvioEntity[]> {
-        return this.getEnviosByLote(id_lote_tostado);
+        return this.envioDatasource.getEnviosByLote(id_lote_tostado);
     }
     getEnviosByCliente(id_cliente: string): Promise<EnvioEntity[]> {
-        return this.getEnviosByCliente(id_cliente);
+        return this.envioDatasource.getEnviosByCliente(id_cliente);
     }
     getEnviosByFechaRange(from: Date, to: Date): Promise<EnvioEntity[]> {
         return this.envioDatasource.getEnviosByFechaRange(from,to);

@@ -26,6 +26,7 @@ export class MuestraRoutes {
         router.post('/',authMiddleware, muestraController.createMuestra);
         router.get('/:id', muestraController.getMuestraById);
         router.put('/:id', muestraController.updateMuestra);
+        router.patch('/complete/:id', muestraController.completeMuestra);
         router.delete('/:id', muestraController.deleteMuestra);
         router.get('/', muestraController.getAllMuestra);
 

@@ -51,7 +51,7 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
     async getMuestras(): Promise<MuestraEntity[]> {
         const muestras = await prisma.muestra.findMany({
             where: {
-                eliminado: false
+                eliminado: false,
             }
         });
         return muestras.map(muestra => MuestraEntity.fromObject(muestra));
@@ -62,5 +62,17 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         return muestras.map(muestra => MuestraEntity.fromObject(muestra));
     }
     
+    async completeMuestra(id:string): Promise<MuestraEntity> {
+        const muestra = await this.getMuestraById(id);
+        const completedMuestra = await prisma.muestra.update({
+            where: {
+                id_muestra: id
+            },
+            data: {
+                completado: true
+            }
+        });
+        return MuestraEntity.fromObject(completedMuestra);
+    }
     
 }

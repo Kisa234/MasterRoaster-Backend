@@ -12,6 +12,7 @@ export class MuestraEntity {
         public variedades: string,
         public proceso: string,
         public fecha_registro: Date, 
+        public completado:boolean,
         public eliminado: boolean,
         public id_user: string,
         public id_analisis: string
@@ -30,6 +31,7 @@ export class MuestraEntity {
             variedades,
             proceso,
             fecha_registro,
+            completado = false,
             eliminado = false,
             id_user = '',
             id_analisis = ''
@@ -56,6 +58,7 @@ export class MuestraEntity {
             variedades,
             proceso,
             newFechaRegistro,
+            completado,
             eliminado,
             id_user,
             id_analisis
