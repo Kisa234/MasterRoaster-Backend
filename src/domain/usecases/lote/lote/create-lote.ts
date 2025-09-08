@@ -20,7 +20,7 @@ export class CreateLote implements CreateLoteUseCase {
 
     async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity> {
         console.log(createLoteDto);
-        const id = await this.generarId(createLoteDto, tueste, usuario, id_c);
+        const id = await this.generarId(createLoteDto);
         const [, dto] = CreateLoteDto.create({
             id_lote: id,
             productor: createLoteDto.productor,
@@ -42,7 +42,7 @@ export class CreateLote implements CreateLoteUseCase {
         return lote;
     }
 
-    generarId = async (dto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<string> => {
+    generarId = async (dto: CreateLoteDto, tueste?: Boolean): Promise<string> => {
         //  lOTE NUEVO
         const { productor, variedades, proceso } = dto;
         const nombres = productor.trim().split(' ');
@@ -85,16 +85,13 @@ export class CreateLote implements CreateLoteUseCase {
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
 
         // LOTE PARA CLIENTE
-        let user;
-        if (usuario) {
-            if (dto.id_user) {
-                user = await this.userRepository.getUserById(dto.id_user);
-            }
+        const user = await this.userRepository.getUserById(dto.id_user!);
+        if (user) {
             if (user?.rol === 'cliente') {
                 const partesNombre = user.nombre.trim().split(' ');
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
-                idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
+                idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
                 if (tueste) {
                     idGenerado = `${idGenerado}-T`;
                 }
