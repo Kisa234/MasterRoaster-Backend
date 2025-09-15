@@ -11,10 +11,10 @@ export class CreateUserDto {
         public readonly numero_telefono: string,
         public readonly rol: string,
         public readonly password: string,
-    ) {}
+    ) { }
 
     static create(props: { [key: string]: any }): [string?, CreateUserDto?] {
-        const { 
+        const {
             nombre,
             nombre_comercial,
             email,
@@ -36,10 +36,10 @@ export class CreateUserDto {
         if (!departamento) return ['departamento property is required', undefined];
         if (!direccion) return ['direccion property is required', undefined];
         if (!numero_telefono) return ['numero_telefono property is required', undefined];
-        if (rol === undefined || rol === null) return ['rol property is required', undefined];
+        if (!rol) return ['rol property is required', undefined];
         if (!password) return ['password property is required', undefined];
 
-
+        const newFecha = fecha_nacimiento ? new Date(fecha_nacimiento) : null;
 
         return [undefined, new CreateUserDto(
             nombre,
@@ -47,7 +47,7 @@ export class CreateUserDto {
             email,
             documento_tipo,
             documento_identidad,
-            fecha_nacimiento,
+            newFecha,
             departamento,
             direccion,
             numero_telefono,

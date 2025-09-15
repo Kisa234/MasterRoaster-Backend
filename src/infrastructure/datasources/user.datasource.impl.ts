@@ -10,9 +10,9 @@ import { UserEntity } from "../../domain/entities/user.entity";
 export  class UserDataSourceImpl implements UserDataSource {
 
   async createUser(createUserDto : CreateUserDto): Promise<UserEntity> {
+    console.log(createUserDto);
     const newUser = await prisma.user.create({
       data: createUserDto,
-      
     });
     return UserEntity.fromObject(newUser);
   }
