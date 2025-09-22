@@ -69,11 +69,10 @@ export class CompleteTueste implements CompleteTuesteUseCase {
             fecha_tostado: new Date(),
             peso: pesoTotalTostado,
             perfil_tostado: pedido.comentario,
-            id_usuario:tueste.id_cliente
+            id_user: pedido.id_user
         })
         if (!dto) throw new Error("Error generando DTO para lote tostado");
         const loteTostado = await this.createLoteTostado.execute(dto);
-        
         
         //7. actualizar lote tostado en los tuestes
         const [, updateTueste] = UpdateTuesteDto.update({

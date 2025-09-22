@@ -19,8 +19,8 @@ export class CreateLoteTostadoDto {
         if (isNaN(newFechaTostado.getTime())) {
             return ['La fecha_tostado no es válida', undefined];
         }
-
         
+
         return [undefined, 
             new CreateLoteTostadoDto(
                 id_lote_tostado, 

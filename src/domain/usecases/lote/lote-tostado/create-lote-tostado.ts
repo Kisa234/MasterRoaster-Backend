@@ -11,25 +11,16 @@ export default interface CreateLoteTostadoUseCase {
 export class CreateLoteTostado implements CreateLoteTostadoUseCase {
     constructor(
         private readonly loteTostadoRepository: LoteTostadoRepository,
-    ){}
+    ) { }
 
-    async execute( dto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
-        const id =  await this.generarId(dto);
-        const[ ,a] = CreateLoteTostadoDto.create({
-            id_lote_tostado: id,
-            id_lote: dto.id_lote,
-            fecha_tostado: dto.fecha_tostado,
-            peso: dto.peso,
-            perfil_tostado: dto.perfil_tostado
-        });
-        if (!a) {
-            throw new Error('Error al crear el lote tostado');
-        }
-        return this.loteTostadoRepository.createLoteTostado(a);
+    async execute(dto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
+        const id = await this.generarId(dto);
+        dto.id_lote_tostado = id; 
+        return this.loteTostadoRepository.createLoteTostado(dto);
     }
 
 
-    generarId =  async(dto: CreateLoteTostadoDto): Promise<string> => {
+    generarId = async (dto: CreateLoteTostadoDto): Promise<string> => {
         //obtener la fecha actual DDMM
         const fecha = new Date();
         const dia = fecha.getDate().toString().padStart(2, '0');
@@ -44,10 +35,10 @@ export class CreateLoteTostado implements CreateLoteTostadoUseCase {
             return lote.id_lote == dto.id_lote;
         });
         // si no hay lotes tostados del dia con el mismo id_lote, el contador es 1, sino se incrementa en 1 a la cantidad de lotes
-        let contador:number;
+        let contador: number;
         if (lotesMismoLote.length == 0) {
             contador = 1;
-        }else {
+        } else {
             contador = lotesMismoLote.length + 1;
         }
         const id = `${dto.id_lote}-${dia}${mes}-${contador}`;
