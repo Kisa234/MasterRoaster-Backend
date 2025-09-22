@@ -41,7 +41,6 @@ export class UserEntity {
         if (!id_user) throw new Error('id_user property is required');
         if (!nombre) throw new Error('nombre property is required');
         if (!email) throw new Error('email property is required');
-        if (!numero_telefono) throw new Error('numero_telefono property is required');
         if (rol === undefined || rol === null) throw new Error('rol property is required');
         if (!password) throw new Error('password property is required');
         if (eliminado === undefined || eliminado === null) throw new Error('eliminado property is required');

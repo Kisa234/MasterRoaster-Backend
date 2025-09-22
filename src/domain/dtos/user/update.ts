@@ -39,7 +39,6 @@ export class UpdateUserDto {
     static update(props: { [key: string]: any }): [string?, UpdateUserDto?] {
         
         const { 
-            fecha_editado,
             id_user,
             nombre,
             nombre_comercial,
@@ -53,6 +52,8 @@ export class UpdateUserDto {
             rol,
             password
         } = props;
+
+        console.log(props);
 
         return [undefined, new UpdateUserDto(
             new Date(),

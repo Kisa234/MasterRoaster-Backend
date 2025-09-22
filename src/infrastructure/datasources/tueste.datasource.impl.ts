@@ -60,8 +60,7 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     const tuestes = await prisma.tueste.findMany({
       where: {
         eliminado: false,
-        estado_tueste: { not: 'Completado' }
-
+        estado_tueste: { not: 'Pendiente' }
       }
     });
     return tuestes.map(TuesteEntity.fromObject);
