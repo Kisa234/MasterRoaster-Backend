@@ -1,9 +1,6 @@
-
-
 export class CreateLoteDto {
     private constructor(
         public readonly id_lote        : string,
-        public readonly proveedor      : string,
         public readonly productor      : string,
         public readonly finca          : string,
         public readonly distrito     : string,
@@ -15,6 +12,7 @@ export class CreateLoteDto {
         public readonly clasificacion? : string,
         public readonly id_user?       : string,
         public readonly peso_tostado?  : number,
+        public readonly proveedor?      : string,
     ) {}
 
     static create(props: { [key: string]: any } ): [string?, CreateLoteDto?] {
@@ -34,18 +32,16 @@ export class CreateLoteDto {
             peso_tostado,
         } = props;
 
-        // if (!id_lote) return ['El id_lote es requerido', undefined];
         if (!productor) return ['El productor es requerido', undefined];
         if (!finca) return ['La finca es requerida', undefined];
-        if (!distrito) return ['La provincia es requerida', undefined];
         if (!departamento) return ['El departamento es requerido', undefined];
+        if (!distrito) return ['El distrito es requerido', undefined];
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
 
         return [undefined, new CreateLoteDto(
             id_lote,
-            proveedor,
             productor,
             finca,
             distrito,
@@ -57,6 +53,7 @@ export class CreateLoteDto {
             clasificacion,
             id_user,
             peso_tostado,
+            proveedor,
         )];
     }
    

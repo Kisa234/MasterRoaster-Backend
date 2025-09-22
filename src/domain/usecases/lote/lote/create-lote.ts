@@ -19,26 +19,16 @@ export class CreateLote implements CreateLoteUseCase {
     ) { }
 
     async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity> {
-        console.log(createLoteDto);
+        console.log('createLoteDto', createLoteDto);
         const id = await this.generarId(createLoteDto);
-        const [, dto] = CreateLoteDto.create({
+        const [error, dto] = CreateLoteDto.create({
+            ...createLoteDto,
             id_lote: id,
-            productor: createLoteDto.productor,
-            finca: createLoteDto.finca,
-            distrito: createLoteDto.distrito,
-            departamento: createLoteDto.departamento,
-            peso: createLoteDto.peso,
-            variedades: createLoteDto.variedades,
-            proceso: createLoteDto.proceso,
-            tipo_lote: createLoteDto.tipo_lote,
-            id_user: createLoteDto.id_user,
-            peso_tostado: createLoteDto.peso_tostado,
-            clasificacion: createLoteDto.clasificacion
         });
-        if (!dto) {
-            throw new Error('Error al crear el DTO de Lote');
+        if (error) {
+           console.log('Error DTO:', error);
         }
-        const lote = this.loteRepository.createLote(dto);
+        const lote = this.loteRepository.createLote(dto!);
         return lote;
     }
 
@@ -71,9 +61,12 @@ export class CreateLote implements CreateLoteUseCase {
             inicialProceso = 'NA';
         } else if (proceso.toLowerCase() === 'honey') {
             inicialProceso = 'HO';
+        } else if (proceso.toLowerCase() === 'lavado') {
+            inicialProceso = '';
         }
 
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
+
 
         // NUMERO FINAL
         const lotes = await this.loteRepository.getLotes();               // Todos los lotes existentes
@@ -83,6 +76,7 @@ export class CreateLote implements CreateLoteUseCase {
         // Calcular: total lotes menos lotes ya “usados” por pedidos, +1 para el siguiente
         const numeroLoteFinal = lotes.length - uniquePedidos.size + 1;
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
+
 
         // LOTE PARA CLIENTE
         const user = await this.userRepository.getUserById(dto.id_user!);
@@ -97,12 +91,9 @@ export class CreateLote implements CreateLoteUseCase {
                 }
             }
             else if (user?.rol !== 'cliente') {
-                throw new Error('No se puede generar un Lote para un usuario que no es cliente');
+                return idGenerado;
             }
         }
-
-
-
 
 
         return idGenerado;
