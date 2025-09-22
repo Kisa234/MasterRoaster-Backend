@@ -30,8 +30,6 @@ export class CreateUserDto {
 
         if (!nombre) return ['nombre property is required', undefined];
         if (!email) return ['email property is required', undefined];
-        if (!documento_tipo) return ['documento_tipo property is required', undefined];
-        if (!documento_identidad) return ['documento_identidad property is required', undefined];
         if (!rol) return ['rol property is required', undefined];
         if (!password) return ['password property is required', undefined];
 
