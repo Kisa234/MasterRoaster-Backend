@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { PedidoController } from './controller';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
-import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 import { LoteDataSourceImpl } from '../../infrastructure/datasources/lote.datasource.impl';
 import { LoteRepositoryImpl } from '../../infrastructure/repositories/lote.repository.impl';
 import { TuesteDataSourceImpl } from '../../infrastructure/datasources/tueste.datasource.impl';
@@ -19,11 +18,13 @@ import { AnalisisSensorialRepositoryImpl } from '../../infrastructure/repositori
 import { AnalisisDefectosDataSourceImpl } from '../../infrastructure/datasources/analisisDefectos.datasource.impl';
 import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositories/analisisDefectos.repository.impl';
 import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lote-analisis.datasource.impl';
+import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
+import { DuplicateLote } from '../../domain/usecases/lote/lote/duplicar-lote';
 
 export class PedidoRoutes {
 
 
-    static get routes():Router {
+    static get routes(): Router {
 
         const router = Router();
 
@@ -61,20 +62,18 @@ export class PedidoRoutes {
         const LoteAnalisisDatasource = new LoteAnalisisDataSourceImpl();
         const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDatasource);
 
-        
-        const cl = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
+
+        const createLote = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
+        const duplicateLote = new DuplicateLote(LoteRepository, createLote, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
 
         const controller = new PedidoController(
             PedidoRepository,
             LoteRepository,
             UserRepository,
             TuesteRepository,
-            cl,
             AnalisisRepository,
             AnalisisFisicoRepository,
-            AnalisisSensorialRepository,
-            AnalisisDefectosRepository,
-            LoteAnalisisRepository
+            duplicateLote
         );
 
         // Definición de rutas
@@ -89,7 +88,7 @@ export class PedidoRoutes {
         router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
         router.get('/lote/:id_lote', controller.GetPedidosByLote);
         router.put('/completar/:id', controller.completarPedido);
-        
+
         return router;
 
     }

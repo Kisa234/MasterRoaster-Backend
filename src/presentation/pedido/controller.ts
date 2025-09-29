@@ -26,6 +26,7 @@ import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-p
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
 import { AnalisisSensorialRepository } from "../../domain/repository/analisisSensorial.repository";
 import { AnalisisDefectosRespository } from "../../domain/repository/analisisDefectos.repository";
+import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-lote';
 
 export class PedidoController {
 
@@ -34,12 +35,10 @@ export class PedidoController {
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
-        private readonly createLoteUseCase: CreateLoteUseCase,
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
-        private readonly analisisSensorialRepository: AnalisisSensorialRepository,
-        private readonly analisisDefectosRepository: AnalisisDefectosRespository,
-        private readonly loteAnalisisRepository: LoteAnalisisRepository
+        private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
+        
     ) {
     }
 
@@ -53,15 +52,10 @@ export class PedidoController {
             this.pedidoRepository,
             this.loteRepository,
             this.userRepository,
-            this.createLoteUseCase,
             this.tuesteRepository,
             this.analisisRepository,
             this.analisisFisicoRepository,
-            this.analisisSensorialRepository,
-            this.analisisDefectosRepository,
-            this.loteAnalisisRepository,
-
-            )
+        )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
@@ -73,14 +67,14 @@ export class PedidoController {
         if (error) {
             return res.status(400).json({ error });
         }
-        new UpdatePedido( 
+        new UpdatePedido(
             this.pedidoRepository,
             this.loteRepository,
             this.tuesteRepository,
             this.userRepository,
             this.analisisRepository,
             this.analisisFisicoRepository
-            )
+        )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
@@ -123,11 +117,15 @@ export class PedidoController {
         new GetAllPedidos(this.pedidoRepository)
             .execute()
             .then(pedidos => res.json(pedidos))
-            .catch(error => res.status(400).json({ error }));   
+            .catch(error => res.status(400).json({ error }));
     };
 
     public completarPedido = async (req: Request, res: Response) => {
-        new CompletarPedido(this.pedidoRepository)
+        new CompletarPedido(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.duplicateLoteUseCase,
+        )
             .execute(req.params.id)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
@@ -146,7 +144,7 @@ export class PedidoController {
             .catch(error => res.status(400).json({ error }));
     };
 
-    public GetPedidosByLote = async (req: Request, res: Response) =>{
+    public GetPedidosByLote = async (req: Request, res: Response) => {
         const idLote = req.params.id_lote;
         new GetPedidosByLote(this.pedidoRepository)
             .execute(idLote)
