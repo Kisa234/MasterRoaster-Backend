@@ -104,7 +104,7 @@ export class LoteController {
 
     public updateLote = (req: Request, res: Response) => {
         const id_lote = req.params.id;
-        const [error, updateLoteDto] = UpdateLoteDto.update({ ...req.body, 'id_lote ': id_lote });
+        const [error, updateLoteDto] = UpdateLoteDto.update({ ...req.body});
         if (error) {
             return res.status(400).json({ error });
         }

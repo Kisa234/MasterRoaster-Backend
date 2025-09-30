@@ -87,6 +87,8 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
+        console.log(dto);
+        console.log(lote);
         // 1. Verificar que hay suficiente peso en el lote 
         if (lote.peso < dto.cantidad) {
             throw new Error('No hay suficiente cantidad en el lote');
@@ -95,7 +97,10 @@ export class CreatePedido implements CreatePedidoUseCase {
         if (lote.tipo_lote === 'Lote Verde') {
             const nuevoPesoLote = lote.peso - dto.cantidad;
             const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
+            console.log('Actualizando lote:', lote.id_lote, 'Nuevo peso:', nuevoPesoLote);
+            
             await this.loteRepository.updateLote(lote.id_lote, updateLoteDto!);
+            
             //eliminar lote si el nuevo peso es  0 
             if (nuevoPesoLote == 0) {
                 await this.loteRepository.deleteLote(lote.id_lote);

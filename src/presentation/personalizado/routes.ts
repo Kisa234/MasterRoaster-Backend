@@ -43,6 +43,7 @@ export class PersonalizadoRoutes {
         router.get('/tueste/pendientes', controller.getTuestesPendientes);
         router.get('/pedidos/ultimos', controller.getUltimosPedidos);
         router.get('/stock/lotes', controller.getStockTotal);
+        router.get('/lotes/clasificacion', controller.getPesoPorClasificacion);
 
         return router;
     }

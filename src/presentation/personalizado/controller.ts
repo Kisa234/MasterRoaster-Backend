@@ -44,6 +44,7 @@ export class PersonalizadoController {
     return res.json(resumen);
 
   };
+
   public getTuestesPendientes = async (req: Request, res: Response) => {
     try {
       const pedidos = await this.pedidoRepository.getAllPedidos();
@@ -58,6 +59,7 @@ export class PersonalizadoController {
       return res.status(500).json({ message: 'Error al obtener tuestes pendientes' });
     }
   };
+
   public getUltimosPedidos = async (req: Request, res: Response) => {
     try {
       const pedidos = await this.pedidoRepository.getHistoricoPedidos();
@@ -75,6 +77,7 @@ export class PersonalizadoController {
       return res.status(500).json({ message: 'Error al obtener últimos pedidos' });
     }
   };
+
   public getStockTotal = async (req: Request, res: Response) => {
     try {
       const lotes = await this.loteRepository.getLotes();
@@ -120,6 +123,42 @@ export class PersonalizadoController {
     }
   };
 
+  public getPesoPorClasificacion = async (req: Request, res: Response) => {
+    try {
+      const lotes = await this.loteRepository.getLotes();
+      if (!lotes || lotes.length === 0) {
+        return res.status(404).json({ message: 'No se encontraron lotes' });
+      }
+
+      const clasificaciones = ['Selecto', 'Clasico', 'Exclusivo', 'Especial'];
+      const pesoPorClasificacion: Record<string, number> = {};
+
+      // Inicializar todas las clasificaciones en 0
+      for (const c of clasificaciones) {
+        pesoPorClasificacion[c] = 0;
+      }
+      pesoPorClasificacion['Otros'] = 0;
+
+      for (const lote of lotes) {
+        if (lote.eliminado) continue;
+        const peso = lote.peso ?? 0;
+        const clasificacion = lote.clasificacion?.toLowerCase() ?? '';
+
+        // Buscar coincidencia ignorando mayúsculas/minúsculas
+        const matched = clasificaciones.find(c => c.toLowerCase() === clasificacion);
+        if (matched) {
+          pesoPorClasificacion[matched] += peso;
+        } else {
+          pesoPorClasificacion['Otros'] += peso;
+        }
+      }
+
+      return res.json(pesoPorClasificacion);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Error al calcular peso por clasificación' });
+    }
+  };
 
 }
 
