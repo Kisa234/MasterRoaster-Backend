@@ -125,10 +125,20 @@ export class PersonalizadoController {
 
   public getPesoPorClasificacion = async (req: Request, res: Response) => {
     try {
-      const lotes = await this.loteRepository.getLotes();
+      let lotes = await this.loteRepository.getLotes();
+      lotes = (await Promise.all(
+        lotes.map(async lote => ({
+          lote,
+          role: await this.userRepository.getRole(lote.id_user!)
+        }))
+      )).filter(item => item.role === 'admin').map(item => item.lote);
+
+
       if (!lotes || lotes.length === 0) {
         return res.status(404).json({ message: 'No se encontraron lotes' });
       }
+
+
 
       const clasificaciones = ['Selecto', 'Clasico', 'Exclusivo', 'Especial'];
       const pesoPorClasificacion: Record<string, number> = {};
@@ -137,7 +147,6 @@ export class PersonalizadoController {
       for (const c of clasificaciones) {
         pesoPorClasificacion[c] = 0;
       }
-      pesoPorClasificacion['Otros'] = 0;
 
       for (const lote of lotes) {
         if (lote.eliminado) continue;
@@ -149,8 +158,8 @@ export class PersonalizadoController {
         if (matched) {
           pesoPorClasificacion[matched] += peso;
         } else {
-          pesoPorClasificacion['Otros'] += peso;
         }
+
       }
 
       return res.json(pesoPorClasificacion);

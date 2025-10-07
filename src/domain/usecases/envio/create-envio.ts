@@ -59,9 +59,6 @@ export class CreateEnvio implements CreateEnvioUseCase {
         throw new Error(error);
     }
     this.loteTostadoRepository.updateLoteTostado(createEnvioDto.id_lote_tostado,dtoUpdate!);
-    if(nuevoStock == 0){
-      this.loteTostadoRepository.deleteLoteTostado(createEnvioDto.id_lote_tostado);
-    }
 
     // 7) Crear el envío
     const envio = await this.envioRepository.createEnvio(dto);

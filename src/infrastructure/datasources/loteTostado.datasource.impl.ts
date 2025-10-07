@@ -47,9 +47,6 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
     }
     async getLoteTostados(): Promise<LoteTostadoEntity[]> {
         const lotes = await prisma.loteTostado.findMany({
-            where: {
-                eliminado: false
-            }
         });
         if (!lotes) return [];
         return lotes.map(lote => LoteTostadoEntity.fromObject(lote));
