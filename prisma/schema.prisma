@@ -112,8 +112,6 @@ model Lote {
   LoteTostado     LoteTostado[]
   // los analisis del lote como historico
   lotesHistoricos Lote_Analisis[]
-  // las bolsas del lote
-  productos       Producto[]
 }
 
 model LoteTostado {
@@ -135,7 +133,8 @@ model LoteTostado {
   pedido  Pedido?       @relation("PedidoLoteTostado")
   usuario User?         @relation(fields: [id_user], references: [id_user])
   envio   Envio[]
-  skus    ProductoSKU[]
+
+  inventarios Inventario[]
 }
 
 // HISTORIAL DE ACCIONES POR USUARIO
@@ -223,35 +222,48 @@ model Tueste {
 enum Molienda {
   ENTERO
   MOLIDO
+  NINGUNO
 }
 
 model Producto {
-  id_producto    String    @id @default(uuid())
-  nombre         String
-  descripcion    String?
-  id_lote        String?
-  activo         Boolean   @default(true)
-  fecha_registro DateTime  @default(now())
-  fecha_editado  DateTime?
-
-  skus ProductoSKU[]
-  lote Lote?         @relation(fields: [id_lote], references: [id_lote])
-}
-
-model ProductoSKU {
-  id_sku          String    @id @default(uuid())
-  sku_code        String?   @unique
-  id_producto     String
-  id_lote_tostado String
-  gramaje         Int
-  molienda        Molienda
-  cantidad        Int       @default(0)
-  eliminado       Boolean   @default(false)
-  fecha_registro  DateTime  @default(now())
+  id_producto     String              @id @default(uuid())
+  nombre          String
+  descripcion     String?
+  categoria       String?
+  es_combo        Boolean             @default(false)
+  activo          Boolean             @default(true)
+  fecha_registro  DateTime            @default(now())
   fecha_editado   DateTime?
 
-  loteTostado LoteTostado @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
-  producto    Producto    @relation(fields: [id_producto], references: [id_producto])
+  inventarios     Inventario[]
+  componentes     ProductoComponente[] @relation("ProductoCombo")
+  parteDeCombos   ProductoComponente[] @relation("ProductoParte")
+}
+
+model Inventario {
+  id_inventario   String     @id @default(uuid())
+  id_producto     String
+  id_lote_tostado String?
+  cantidad        Int        @default(0)
+  gramaje         Int?
+  molienda        Molienda   @default(NINGUNO)
+  unidad_medida   String?
+  fecha_registro  DateTime   @default(now())
+  fecha_editado   DateTime?
+
+  producto    Producto     @relation(fields: [id_producto], references: [id_producto])
+  loteTostado LoteTostado? @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
+}
+
+model ProductoComponente {
+  id_combo        String
+  id_producto     String
+  cantidad        Int      @default(1)
+
+  combo    Producto @relation("ProductoCombo", fields: [id_combo], references: [id_producto])
+  producto Producto @relation("ProductoParte", fields: [id_producto], references: [id_producto])
+
+  @@id([id_combo, id_producto])
 }
 
 // ENVIOS
