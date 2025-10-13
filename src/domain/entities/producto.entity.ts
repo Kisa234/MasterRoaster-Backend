@@ -1,45 +1,51 @@
 export class ProductoEntity {
     constructor(
-        public readonly id_producto          : string,
-        public readonly nombre               : string,
-        public readonly fecha_registro       : Date,
-        public readonly activo               : boolean,
-        public readonly id_lote              ?: string,
-        public readonly descripcion          ?: string,
-        public readonly fecha_editado        ?: Date,
-    ) { }
+        public id_producto: string,
+        public nombre: string,
+        public descripcion: string | null,
+        public categoria: string | null,
+        public es_combo: boolean,
+        public activo: boolean,
+        public fecha_registro: Date,
+        public fecha_editado?: Date | null,
+    ) {}
 
-    static fromObject(obj: { [key: string]: any }): ProductoEntity {
-        const{
-            id_producto,   
-            nombre,        
-            fecha_registro,
+    public static fromObject(obj: { [key: string]: any }): ProductoEntity {
+        const {
+            id_producto,
+            nombre,
+            descripcion,
+            categoria,
+            es_combo,
             activo,
-            id_lote,       
-            descripcion,   
-            fecha_editado 
-        }=obj;
+            fecha_registro,
+            fecha_editado,
+        } = obj;
 
-        if(!nombre) throw new Error('nombre property is required')
+        if (!id_producto) throw new Error('id_producto property is required');
+        if (!nombre) throw new Error('nombre property is required');
+        if (typeof es_combo !== 'boolean') throw new Error('es_combo debe ser boolean');
+        if (typeof activo !== 'boolean') throw new Error('activo debe ser boolean');
 
         const newFechaRegistro = new Date(fecha_registro);
         if (isNaN(newFechaRegistro.getTime())) {
             throw new Error('fecha_registro no es válida');
         }
 
-        const newfecha_editado = new Date(fecha_editado);
-        if (isNaN(newfecha_editado.getTime())) {
+        const newFechaEditado = fecha_editado ? new Date(fecha_editado) : null;
+        if (newFechaEditado && isNaN(newFechaEditado.getTime())) {
             throw new Error('fecha_editado no es válida');
         }
 
         return new ProductoEntity(
-            id_producto,   
-            nombre,        
-            newFechaRegistro,
+            id_producto,
+            nombre,
+            descripcion || null,
+            categoria || null,
+            es_combo,
             activo,
-            id_lote,       
-            descripcion,   
-            newfecha_editado 
+            newFechaRegistro,
+            newFechaEditado,
         );
     }
 }

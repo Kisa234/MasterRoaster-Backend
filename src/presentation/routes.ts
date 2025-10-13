@@ -15,9 +15,10 @@ import { AnalisisDefectosRoutes } from "./analisisDefectos/routes";
 import { VariedadRoutes } from "./variedad/routes";
 import { EnvioRoutes } from "./envio/routes";
 import { NotasRoutes } from "./notas/routes";
-import { ProductoSkuRoutes } from "./productoSku/routes";
-import { ProductoRoutes } from "./producto/routes";
 import { FichaEnvioRoutes } from "./fichaEnvio/routes";
+import { ProductoComponenteRoutes } from "./producto-componente/routes";
+import { ProductoRoutes } from "./producto/routes";
+import { InventarioRoutes } from "./inventario/routes";
 
 
 export class AppRoutes{
@@ -35,8 +36,6 @@ export class AppRoutes{
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
 
-        router.use('/producto', ProductoRoutes.routes);
-        router.use('/sku', ProductoSkuRoutes.routes);
 
         router.use('/variedad', VariedadRoutes.routes);
         router.use('/notas', NotasRoutes.routes);
@@ -50,6 +49,11 @@ export class AppRoutes{
         router.use('/historial', HistorialRoutes.routes);
         router.use('/user', UserRoutes.routes); 
         router.use('/p', PersonalizadoRoutes.routes);  
+
+        router.use('/productoComponente', ProductoComponenteRoutes.routes);
+        router.use('/producto', ProductoRoutes.routes);
+        router.use('/inventario', InventarioRoutes.routes);
+
 
         
         

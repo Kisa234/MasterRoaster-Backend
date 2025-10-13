@@ -1,116 +1,50 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ProductoRepository } from "../../domain/repository/producto.repository";
-import { CreateProductoDto } from "../../domain/dtos/producto/producto/create";
-import { UpdateProductoDto } from "../../domain/dtos/producto/producto/update";
-import { CreateProducto } from "../../domain/usecases/producto/producto/create-producto";
-import { LoteRepository } from "../../domain/repository/lote.repository";
-import { UserRepository } from "../../domain/repository/user.repository";
+import { CreateProductoDto } from "../../domain/dtos/producto/create";
+import { UpdateProductoDto } from "../../domain/dtos/producto/update";
 
 export class ProductoController {
-    constructor(
-        private readonly productoRepository: ProductoRepository,
-        private readonly loteRepository: LoteRepository,
-        private readonly userRepository: UserRepository
-    ) { }
+  constructor(private readonly productoRepository: ProductoRepository) {}
 
-    // POST /producto
-    create = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const [err, dto] = CreateProductoDto.create(req.body);
-            if (err) return res.status(400).json({ error: err });
-            const usecase = new CreateProducto(
-                this.productoRepository,
-                this.loteRepository,
-                this.userRepository
-            );
+  public createProducto = async (req: Request, res: Response) => {
+    const [error, createProductoDto] = CreateProductoDto.create(req.body);
+    if (error) return res.status(400).json({ error });
 
-            const producto = await usecase.execute(dto!);
-            return res.status(201).json(producto);
-        } catch (e) {
-            next(e);
-        }
-    };
+    this.productoRepository.createProducto(createProductoDto!)
+      .then(producto => res.status(201).json(producto))
+      .catch(error => res.status(400).json({ error }));
+  };
 
-    // GET /producto/:id
-    getById = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const p = await this.productoRepository.getProductoById(req.params.id);
-            if (!p) return res.status(404).json({ error: "Producto no encontrado" });
-            return res.json(p);
-        } catch (e) { next(e); }
-    };
+  public getProductoById = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    this.productoRepository.getProductoById(id)
+      .then(producto => {
+        if (!producto) return res.status(404).json({ error: "No encontrado" });
+        res.json(producto);
+      })
+      .catch(error => res.status(400).json({ error }));
+  };
 
-    // GET /producto
-    list = async (_req: Request, res: Response, next: NextFunction) => {
-        try {
-            const productos = await this.productoRepository.getProductos();
-            return res.json(productos);
-        } catch (e) { next(e); }
-    };
+  public getAllProductos = async (_req: Request, res: Response) => {
+    this.productoRepository.getAllProductos()
+      .then(productos => res.json(productos))
+      .catch(error => res.status(400).json({ error }));
+  };
 
-    // GET /producto/activos
-    listActivos = async (_req: Request, res: Response, next: NextFunction) => {
-        try {
-            const productos = await this.productoRepository.getProductosActivos();
-            return res.json(productos);
-        } catch (e) { next(e); }
-    };
+  public updateProducto = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const [error, updateProductoDto] = UpdateProductoDto.update(req.body);
+    if (error) return res.status(400).json({ error });
 
-    // GET /producto/lote/:id_lote
-    listByLote = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const productos = await this.productoRepository.getProductosByLote(req.params.id_lote);
-            return res.json(productos);
-        } catch (e) { next(e); }
-    };
+    this.productoRepository.updateProducto(id, updateProductoDto!)
+      .then(producto => res.json(producto))
+      .catch(error => res.status(400).json({ error }));
+  };
 
-    // GET /producto/search?q=texto
-    search = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const q = String(req.query.q ?? "");
-            if (!q.trim()) return res.json([]);
-            const productos = await this.productoRepository.buscarProductos(q);
-            return res.json(productos);
-        } catch (e) { next(e); }
-    };
-
-    // PATCH /producto/:id
-    update = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const [err, dto] = UpdateProductoDto.update(req.body);
-            if (err) return res.status(400).json({ error: err });
-
-            const updated = await this.productoRepository.updateProducto(req.params.id, dto!);
-            return res.json(updated);
-        } catch (e) { next(e); }
-    };
-
-    // PATCH /producto/:id/activo  { activo: boolean }
-    toggleActivo = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { activo } = req.body;
-            if (typeof activo !== "boolean") {
-                return res.status(400).json({ error: "activo debe ser boolean" });
-            }
-            const updated = await this.productoRepository.toggleProductoActivo(req.params.id, activo);
-            return res.json(updated);
-        } catch (e) { next(e); }
-    };
-
-    // PATCH /producto/:id/lote  { id_lote: string | null }
-    vincularLote = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { id_lote } = req.body as { id_lote: string | null };
-            const updated = await this.productoRepository.vincularLote(req.params.id, id_lote ?? null);
-            return res.json(updated);
-        } catch (e) { next(e); }
-    };
-
-    // DELETE /producto/:id (baja lógica = activo:false en tu impl)
-    delete = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const updated = await this.productoRepository.deleteProducto(req.params.id);
-            return res.json(updated);
-        } catch (e) { next(e); }
-    };
+  public deleteProducto = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    this.productoRepository.deleteProducto(id)
+      .then(producto => res.json(producto))
+      .catch(error => res.status(400).json({ error }));
+  };
 }
