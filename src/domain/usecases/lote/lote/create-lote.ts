@@ -7,7 +7,7 @@ import { PedidoRepository } from "../../../repository/pedido.repository";
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
@@ -18,21 +18,20 @@ export class CreateLote implements CreateLoteUseCase {
         private readonly pedidoRepository: PedidoRepository
     ) { }
 
-    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, usuario?: boolean, id_c?: string): Promise<LoteEntity> {
-        console.log('createLoteDto', createLoteDto);
-        const id = await this.generarId(createLoteDto);
+    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<LoteEntity> {
+        const id = await this.generarId(createLoteDto, tueste, id_c,);
         const [error, dto] = CreateLoteDto.create({
             ...createLoteDto,
             id_lote: id,
         });
         if (error) {
-           console.log('Error DTO:', error);
+            console.log('Error DTO:', error);
         }
         const lote = this.loteRepository.createLote(dto!);
         return lote;
     }
 
-    generarId = async (dto: CreateLoteDto, tueste?: Boolean): Promise<string> => {
+    generarId = async (dto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<string> => {
         //  lOTE NUEVO
         const { productor, variedades, proceso } = dto;
         const nombres = productor.trim().split(' ');
@@ -67,7 +66,6 @@ export class CreateLote implements CreateLoteUseCase {
 
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
 
-
         // NUMERO FINAL
         const lotes = await this.loteRepository.getLotes();               // Todos los lotes existentes
         const lotesPedidos = await this.pedidoRepository.getLotesCreados(); // Todos los id_nuevoLote de pedidos
@@ -85,17 +83,28 @@ export class CreateLote implements CreateLoteUseCase {
                 const partesNombre = user.nombre.trim().split(' ');
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
+                if (id_c) {
+                    idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
+                    if (tueste) {
+                        idGenerado = `${idGenerado}-T`;
+                    }
+                    return idGenerado;
+                }
+
                 idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
+
                 if (tueste) {
                     idGenerado = `${idGenerado}-T`;
                 }
+
             }
             else if (user?.rol !== 'cliente') {
                 return idGenerado;
             }
+
+
+
         }
-
-
         return idGenerado;
     }
 

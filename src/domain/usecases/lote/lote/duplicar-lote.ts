@@ -16,6 +16,7 @@ import { CreateAnalisisDefectosDto } from "../../../dtos/analisis/defectos/creat
 import { CreateAnalisisDto } from "../../../dtos/analisis/analisis/create";
 import { CreateLoteAnalisisDto } from "../../../dtos/lote-analisis/create";
 import { UpdateLoteDto } from "../../../dtos/lotes/lote/update";
+import { create } from 'domain';
 
 export interface DuplicateLoteUseCase {
     execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean): Promise<LoteEntity>;
@@ -36,20 +37,31 @@ export class DuplicateLote implements DuplicateLoteUseCase {
     async execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean): Promise<LoteEntity> {
 
         const tipo_lote = pedido.tipo_pedido === 'Venta Verde' ? 'Lote Verde' : 'Lote Tostado';
+         
+        let pesoVerde = pedido.cantidad;
+        let pesoTostado = 0;
 
-        const [error, createLoteDto] = CreateLoteDto.create({
+        if (tueste){
+            pesoVerde = pedido.cantidad * 1.15;
+            pesoTostado = pedido.cantidad;
+        }
+
+        let [error, createLoteDto] = CreateLoteDto.create({
             productor: lote.productor,
             finca: lote.finca,
             distrito: lote.distrito,
             departamento: lote.departamento,
-            peso: pedido.cantidad,
+            peso: pesoVerde,
+            peso_tostado: pesoTostado,
             variedades: lote.variedades,
             proceso: lote.proceso,
             tipo_lote: tipo_lote,
             clasificacion: lote.clasificacion,
             id_user: pedido.id_user,
         });
-        const nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, false, true, lote.id_lote);
+
+        
+        const nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, tueste, lote.id_lote);
 
         if (lote.id_analisis) {
             let nuevoFis, nuevoSen, nuevoDef;

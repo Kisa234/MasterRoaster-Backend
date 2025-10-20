@@ -58,18 +58,6 @@ export class DeletePedido implements DeletePedidoUseCase {
         if (!updateDtoOriginal) throw new Error('Error generando DTO para lote original');
         await this.loteRepository.updateLote(loteOriginal.id_lote, updateDtoOriginal);
         
-        // 2. Restaurar peso al nuevo lote
-        const nuevoLote = await this.loteRepository.getLoteById(pedido.id_nuevoLote!);
-        if (!nuevoLote) throw new Error('Nuevo lote no encontrado');
-        const pesoNuevoRestaurado = nuevoLote.peso - pedido.cantidad;
-        const [, updateDtoNuevo] = UpdateLoteDto.update({ peso: pesoNuevoRestaurado });
-        if (!updateDtoNuevo) throw new Error('Error generando DTO para nuevo lote');
-        await this.loteRepository.updateLote(nuevoLote.id_lote, updateDtoNuevo);
-
-        // 3. Eliminar el nuevo lote si su peso es 0 o negativo
-        if (pesoNuevoRestaurado <= 0) {
-          await this.loteRepository.deleteLote(nuevoLote.id_lote);
-        }
 
         // 4. Eliminar Pedido
         await this.pedidoRepository.deletePedido(pedido.id_pedido);
@@ -83,23 +71,6 @@ export class DeletePedido implements DeletePedidoUseCase {
         if (!dto) throw new Error('Error generando DTO para restaurar lote original');
         await this.loteRepository.updateLote(loteOriginal.id_lote, dto);
         
-        // 2. Restaurar peso al nuevo lote
-        const nuevoLote = await this.loteRepository.getLoteById(pedido.id_nuevoLote!);
-        if (!nuevoLote) throw new Error('Nuevo lote no encontrado');
-        const pesoRestauradoVerde = nuevoLote.peso - pedido.cantidad * 1.15;
-        const pesoRestauradoTostado = nuevoLote.peso_tostado! - pedido.cantidad;
-        const [, updateNuevoLoteDto] = UpdateLoteDto.update({ 
-          peso: pesoRestauradoVerde, 
-          peso_tostado: pesoRestauradoTostado 
-        });
-        if (!updateNuevoLoteDto) throw new Error('Error generando DTO para nuevo lote');
-        await this.loteRepository.updateLote(nuevoLote.id_lote, updateNuevoLoteDto);
-
-        // 3. Eliminar el nuevo lote si su peso es 0 o negativo
-        if (pesoRestauradoVerde <= 0 || pesoRestauradoTostado <= 0) {
-          await this.loteRepository.deleteLote(nuevoLote.id_lote);
-        }
-
         // 4. Eliminar Pedido
         await this.pedidoRepository.deletePedido(pedido.id_pedido);
        

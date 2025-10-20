@@ -94,8 +94,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false);
             // actualizar pedido
             const [, updatePedidoDto] = UpdatePedidoDto.update({
-                id_nuevoLote: loteOrigen.id_lote,
+                id_nuevoLote: await nuevoLoteDestino.id_lote,
             });
+            await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
 
             // marcar pedido como completado
             return this.pedidoRepository.completarPedido(pedidoId);
@@ -132,8 +133,8 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         if (!loteOrigen) throw new Error("Lote origen no válido");
 
         // restar stock en lote origen
-        if (loteOrigen.peso < pedido.cantidad) throw new Error("Stock insuficiente");
-        loteOrigen.peso -= pedido.cantidad;
+        if (loteOrigen.peso < pedido.cantidad * 1.15) throw new Error("Stock insuficiente");
+        loteOrigen.peso -= pedido.cantidad * 1.15;
         if (loteOrigen.peso <= 0) {
             const [error, updateLoteDto] = UpdateLoteDto.update({ peso: loteOrigen.peso });
             if (error) throw new Error(`Error al actualizar lote: ${error}`);
@@ -153,8 +154,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, true);
             // actualizar pedido
             const [, updatePedidoDto] = UpdatePedidoDto.update({
-                id_nuevoLote: nuevoLoteDestino.id_lote,
+                id_nuevoLote: await nuevoLoteDestino.id_lote,
             });
+            await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
 
             // marcar pedido como completado
             return this.pedidoRepository.completarPedido(pedidoId);
