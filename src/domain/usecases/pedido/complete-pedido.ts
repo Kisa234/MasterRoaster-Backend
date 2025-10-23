@@ -1,30 +1,12 @@
-import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
-import { CreatePedidoDto } from "../../dtos/pedido/create";
-import { CreateTuesteDto } from "../../dtos/tueste/create";
-import { LoteEntity } from "../../entities/lote.entity";
 import { PedidoEntity } from "../../entities/pedido.entity";
 import { LoteRepository } from "../../repository/lote.repository";
 import { PedidoRepository } from "../../repository/pedido.repository";
-import { TuesteRepository } from "../../repository/tueste.repository";
-import { UserRepository } from "../../repository/user.repository";
-import { CreateLoteUseCase } from '../lote/lote/create-lote';
-import { AnalisisRepository } from '../../repository/analisis.repository';
-import { AnalisisFisicoRepository } from '../../repository/analisisFisico.repository';
-import { AnalisisFisicoEntity } from '../../entities/analisisFisico.entity';
-import { AnalisisSensorialRepository } from '../../repository/analisisSensorial.repository';
-import { AnalisisDefectosRespository } from '../../repository/analisisDefectos.repository';
-import { CreateAnalisisFisicoDto } from '../../dtos/analisis/fisico/create';
-import { CreateAnalisisSensorialDTO } from '../../dtos/analisis/sensorial/create';
-import { CreateAnalisisDto } from '../../dtos/analisis/analisis/create';
-import { CreateLoteAnalisisDto } from '../../dtos/lote-analisis/create';
-import { LoteAnalisisRepository } from '../../repository/lote-analisis.repository';
-import { CreateAnalisisDefectosDto } from '../../dtos/analisis/defectos/create';
-import { Pedido } from '@prisma/client';
-import PedidoRepositoryImpl from './../../../infrastructure/repositories/pedido.repository.impl';
-import { error } from 'console';
 import { DuplicateLoteUseCase } from './../lote/lote/duplicar-lote';
 import { UpdatePedidoDto } from '../../dtos/pedido/update';
+import { InventarioRepository } from "../../repository/inventario.repository";
+import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
+import { UpdateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/update";
 
 export interface CompletarPedidoUseCase {
     execute(id_pedido: string): Promise<PedidoEntity>;
@@ -34,7 +16,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     constructor(
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
+        private readonly inventarioRepository: InventarioRepository,
     ) { }
 
     async execute(id_pedido: string): Promise<PedidoEntity> {
@@ -59,6 +43,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             case 'Orden Tueste':
                 return this.pedidoRepository.completarPedido(id_pedido);
                 break
+            case 'Maquila':
+                return this.maquilaCompletion(pedido.id_pedido);
+                break
             default:
                 throw new Error('Tipo de pedido inválido');
         }
@@ -72,7 +59,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
         if (!pedido || pedido.estado_pedido !== "Pendiente") throw new Error("Pedido no válido");
 
-        const loteOrigen = await this.loteRepository.getLoteById(pedido.id_lote);
+        const loteOrigen = await this.loteRepository.getLoteById(pedido.id_lote!);
         if (!loteOrigen) throw new Error("Lote origen no válido");
 
         // restar stock en lote origen
@@ -129,7 +116,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
         if (!pedido || pedido.estado_pedido !== "Pendiente") throw new Error("Pedido no válido");
 
-        const loteOrigen = await this.loteRepository.getLoteById(pedido.id_lote);
+        const loteOrigen = await this.loteRepository.getLoteById(pedido.id_lote!);
         if (!loteOrigen) throw new Error("Lote origen no válido");
 
         // restar stock en lote origen
@@ -180,6 +167,45 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             return this.pedidoRepository.completarPedido(pedidoId);
 
         }
+    }
+
+    async maquilaCompletion(pedidoId: string) {
+        const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
+        if (!pedido || pedido.estado_pedido !== "Pendiente")
+            throw new Error("Pedido no válido o ya completado");
+
+        // 🔹 1. Obtener lote tostado origen
+        const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(pedido.id_lote_tostado!);
+        if (!loteTostado || loteTostado.peso <= 0)
+            throw new Error("Lote tostado no válido o eliminado");
+
+        // 🔹 2. Calcular total solicitado en kg
+        if (!pedido.cantidad || !pedido.gramaje)
+            throw new Error("Cantidad y gramaje requeridos para maquila");
+        const totalSolicitadoKg = (pedido.cantidad * pedido.gramaje);
+
+        // 🔹 3. Verificar stock disponible
+        if (loteTostado.peso < totalSolicitadoKg)
+            throw new Error(`Stock insuficiente. Solo hay ${loteTostado.peso} kg disponibles`);
+
+        // 🔹 4. Restar stock en lote origen
+        const nuevoPeso = loteTostado.peso - totalSolicitadoKg;
+        const [error, updateLoteTostadoDto] = UpdateLoteTostadoDto.update({ peso: nuevoPeso });
+        if (error) throw new Error(`Error al actualizar lote: ${error}`);
+        await this.loteTostadoRepository.updateLoteTostado(loteTostado.id_lote_tostado, updateLoteTostadoDto!);
+
+        // 🔹 5. Crear registro en inventario del producto resultante
+        await this.inventarioRepository.createInventario({
+            id_producto: pedido.id_producto!,
+            id_lote_tostado: loteTostado.id_lote_tostado,
+            cantidad: pedido.cantidad,
+            gramaje: pedido.gramaje,
+            molienda: pedido.molienda!,
+            unidad_medida: "BOLSAS"
+        });
+
+        // 🔹 6. Marcar pedido como completado
+        return this.pedidoRepository.completarPedido(pedidoId);
     }
 
 

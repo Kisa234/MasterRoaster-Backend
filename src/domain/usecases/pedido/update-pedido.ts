@@ -10,6 +10,7 @@ import { LoteEntity } from "../../entities/lote.entity";
 import { AnalisisRepository } from "../../repository/analisis.repository";
 import { AnalisisFisicoRepository } from "../../repository/analisisFisico.repository";
 import { AnalisisFisicoEntity } from "../../entities/analisisFisico.entity";
+import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 
 export interface UpdatePedidoUseCase {
   execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity>;
@@ -19,6 +20,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   constructor(
     private readonly pedidoRepository: PedidoRepository,
     private readonly loteRepository: LoteRepository,
+    private readonly loteTostadoRepository: LoteTostadoRepository,
     private readonly tuesteRepository: TuesteRepository,
     private readonly userRepository: UserRepository,
     private readonly analisisRepository: AnalisisRepository,
@@ -30,27 +32,33 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
     if (!pedido || pedido.eliminado) throw new Error('El pedido no existe o fue eliminado');
     if (pedido.estado_pedido === 'Completado') throw new Error('No se puede modificar un pedido completado');
-    const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote);
-    if (!loteOriginal) throw new Error('Lote original no encontrado');
+
 
     if (pedido.tipo_pedido === 'Venta Verde') {
 
-      return this.actualizarVentaVerde(pedido, loteOriginal, updateDto);
+      return this.actualizarVentaVerde(pedido, updateDto);
     }
 
     if (pedido.tipo_pedido === 'Tostado Verde') {
 
-      return this.actualizarTostadoVerde(pedido, loteOriginal, updateDto);
+      return this.actualizarTostadoVerde(pedido, updateDto);
     }
 
     if (pedido.tipo_pedido === 'Orden Tueste') {
-      return this.editarOrdenTueste(pedido, loteOriginal, updateDto);
+      return this.editarOrdenTueste(pedido, updateDto);
+    }
+
+    if (pedido.tipo_pedido === 'Maquila') {
+      return this.editarMaquila(pedido, updateDto);
     }
 
     throw new Error('Tipo de pedido inválido');
   }
 
-  private async actualizarVentaVerde(pedido: PedidoEntity, loteOriginal: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+  private async actualizarVentaVerde(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+
+    const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
+    if (!loteOriginal) throw new Error('Lote original no encontrado');
 
     const diferencia = pedido.cantidad - dto.cantidad!;
     // Validar si la cantidad ha cambiado
@@ -62,33 +70,20 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
     if ((loteOriginal.peso + pedido.cantidad) < dto.cantidad!) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
-    }
-
-    // 2. Actualizar peso en lote original
-    const nuevoPesoLote = loteOriginal.peso + pedido.cantidad - dto.cantidad!;
-    const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
-    if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
-    await this.loteRepository.updateLote(loteOriginal.id_lote, updateLoteDto);
+    };
 
 
-
-    // 3. Actualizar peso nuevo lote
-    const nuevoLote = await this.loteRepository.getLoteById(pedido.id_nuevoLote!);
-    if (!nuevoLote || nuevoLote.eliminado) throw new Error('Lote clonado no válido');
-    const nuevoPeso = nuevoLote.peso - pedido.cantidad + dto.cantidad!;
-    const [, updateNuevoLoteDto] = UpdateLoteDto.update({ peso: nuevoPeso });
-    await this.loteRepository.updateLote(nuevoLote.id_lote, updateNuevoLoteDto!);
-
-
-
-    // 4. Actualizar pedido
+    // 2. Actualizar pedido
     await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
+  private async actualizarTostadoVerde(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
 
-  private async actualizarTostadoVerde(pedido: PedidoEntity, loteOriginal: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
+    if (!loteOriginal) throw new Error('Lote original no encontrado');
+
     const diferencia = pedido.cantidad - dto.cantidad!;
     // Validar si la cantidad ha cambiado
     if (diferencia === 0) throw new Error('La cantidad no ha cambiado');
@@ -101,30 +96,16 @@ export class UpdatePedido implements UpdatePedidoUseCase {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
     }
 
-    // 2. Actualizar peso en lote original
-    const nuevoPesoLote = loteOriginal.peso + pedido.cantidad * 1.15 - dto.cantidad! * 1.15;
-    const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
-    if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
-    await this.loteRepository.updateLote(loteOriginal.id_lote, updateLoteDto);
-
-    // 3. Actualizar peso nuevo lote
-    const nuevoLote = await this.loteRepository.getLoteById(pedido.id_nuevoLote!);
-    if (!nuevoLote || nuevoLote.eliminado) throw new Error('Lote clonado no válido');
-    const nuevoPesoVerde = nuevoLote.peso - pedido.cantidad * 1.15 + dto.cantidad! * 1.15;
-    const nuevoPesoTostado = nuevoLote.peso_tostado! - pedido.cantidad + dto.cantidad!;
-    const [, updateNuevoLoteDto] = UpdateLoteDto.update({
-      peso: nuevoPesoVerde,
-      peso_tostado: nuevoPesoTostado
-    });
-    await this.loteRepository.updateLote(nuevoLote.id_lote, updateNuevoLoteDto!);
-
-    // 4. Actualizar pedido
+    // 2. Actualizar pedido
     await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
-  async editarOrdenTueste(pedido: PedidoEntity, lote: LoteEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+  async editarOrdenTueste(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+
+    const lote = await this.loteRepository.getLoteById(pedido.id_lote!);
+    if (!lote) throw new Error('Lote original no encontrado');
 
     const pesoAnterior = pedido.cantidad;
     const pesoNuevo = dto.cantidad!;
@@ -198,5 +179,37 @@ export class UpdatePedido implements UpdatePedidoUseCase {
 
     return PedidoEntity.fromObject(newpedido!);
   }
+
+  async editarMaquila(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    // 1) Validar lote tostado de origen
+    if (!pedido.id_lote_tostado) {
+      throw new Error('El pedido de maquila no tiene lote tostado de origen');
+    }
+
+    const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(pedido.id_lote_tostado);
+    if (!loteTostado) throw new Error('Lote tostado no válido o eliminado');
+
+    // 2) Determinar valores "finales" (si no vienen en el DTO, se usan los actuales)
+    const nuevaCantidad = dto.cantidad ?? pedido.cantidad;
+    const nuevoGramaje = dto.gramaje ?? pedido.gramaje;
+
+    // 3) Validaciones de dominio
+    if (nuevaCantidad <= 0) throw new Error('La cantidad de bolsas debe ser mayor a 0');
+    if (!nuevoGramaje || nuevoGramaje <= 0) throw new Error('El gramaje debe ser mayor a 0');
+
+    // 4) Calcular peso total solicitado en kg
+    const totalSolicitadoKg = (nuevaCantidad * nuevoGramaje); // gramaje viene en gramos
+
+    if (loteTostado.peso < totalSolicitadoKg) {
+      throw new Error(`Stock insuficiente. Solo hay ${loteTostado.peso} kg disponibles`);
+    }
+
+    // 5) Actualizar pedido (DTO ya limpio y sin undefined)
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+
+    return PedidoEntity.fromObject(pedidoActualizado!);
+  }
+
+
 
 }

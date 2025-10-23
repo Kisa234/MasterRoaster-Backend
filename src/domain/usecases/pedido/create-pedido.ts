@@ -1,26 +1,15 @@
-import { CreateLoteDto } from '../../dtos/lotes/lote/create';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { CreatePedidoDto } from "../../dtos/pedido/create";
 import { CreateTuesteDto } from "../../dtos/tueste/create";
-import { LoteEntity } from "../../entities/lote.entity";
 import { PedidoEntity } from "../../entities/pedido.entity";
 import { LoteRepository } from "../../repository/lote.repository";
 import { PedidoRepository } from "../../repository/pedido.repository";
 import { TuesteRepository } from "../../repository/tueste.repository";
 import { UserRepository } from "../../repository/user.repository";
-import { CreateLoteUseCase } from '../lote/lote/create-lote';
 import { AnalisisRepository } from '../../repository/analisis.repository';
 import { AnalisisFisicoRepository } from '../../repository/analisisFisico.repository';
 import { AnalisisFisicoEntity } from '../../entities/analisisFisico.entity';
-import { AnalisisSensorialRepository } from '../../repository/analisisSensorial.repository';
-import { AnalisisDefectosRespository } from '../../repository/analisisDefectos.repository';
-import { CreateAnalisisFisicoDto } from '../../dtos/analisis/fisico/create';
-import { CreateAnalisisSensorialDTO } from '../../dtos/analisis/sensorial/create';
-import { CreateAnalisisDto } from '../../dtos/analisis/analisis/create';
-import { CreateLoteAnalisisDto } from '../../dtos/lote-analisis/create';
-import { LoteAnalisisRepository } from '../../repository/lote-analisis.repository';
-import { CreateAnalisisDefectosDto } from '../../dtos/analisis/defectos/create';
-
+import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 
 
 export interface CreatePedidoUseCase {
@@ -31,6 +20,7 @@ export class CreatePedido implements CreatePedidoUseCase {
     constructor(
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly clienteRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
         private readonly analisisRepository: AnalisisRepository,
@@ -39,10 +29,6 @@ export class CreatePedido implements CreatePedidoUseCase {
     ) { }
 
     async execute(dto: CreatePedidoDto): Promise<PedidoEntity> {
-        //validar lote 
-        const lote = await this.loteRepository.getLoteById(dto.id_lote);
-        if (!lote || lote.eliminado) throw new Error('El lote no existe');
-        const loteEntity = LoteEntity.fromObject(lote);
         //dependiendo del tipo de pedido 
         switch (dto.tipo_pedido) {
             case 'Venta Verde':
@@ -52,8 +38,11 @@ export class CreatePedido implements CreatePedidoUseCase {
                 return this.tostadoVerdeValidations(dto);
                 break;
             case 'Orden Tueste':
-                return this.ordenTueste(loteEntity, dto);
+                return this.ordenTueste(dto);
                 break
+            case 'Maquila':
+                return this.maquilaValidations(dto);
+                break;
             default:
                 throw new Error('Tipo de pedido inválido');
         }
@@ -61,7 +50,7 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     async ventaVerdeValidations(dto: CreatePedidoDto) {
-        const lote = await this.loteRepository.getLoteById(dto.id_lote);
+        const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
         if (lote.peso < dto.cantidad) throw new Error("Stock insuficiente");
@@ -74,7 +63,7 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     async tostadoVerdeValidations(dto: CreatePedidoDto) {
-        const lote = await this.loteRepository.getLoteById(dto.id_lote);
+        const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
         const cantidadVerde = dto.cantidad * 1.15;
@@ -86,9 +75,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         return this.pedidoRepository.createPedido(dto);
     }
 
-    private async ordenTueste(lote: LoteEntity, dto: CreatePedidoDto): Promise<PedidoEntity> {
-        console.log(dto);
-        console.log(lote);
+    async ordenTueste(dto: CreatePedidoDto): Promise<PedidoEntity> {
+        if (dto.id_lote == null) { throw new Error('El id_lote es requerido para una orden de tueste'); }
+        const lote = await this.loteRepository.getLoteById(dto.id_lote!);
+        if (!lote || lote.eliminado) { throw new Error('Lote no válido'); }
+
         // 1. Verificar que hay suficiente peso en el lote 
         if (lote.peso < dto.cantidad) {
             throw new Error('No hay suficiente cantidad en el lote');
@@ -98,9 +89,9 @@ export class CreatePedido implements CreatePedidoUseCase {
             const nuevoPesoLote = lote.peso - dto.cantidad;
             const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
             console.log('Actualizando lote:', lote.id_lote, 'Nuevo peso:', nuevoPesoLote);
-            
+
             await this.loteRepository.updateLote(lote.id_lote, updateLoteDto!);
-            
+
             //eliminar lote si el nuevo peso es  0 
             if (nuevoPesoLote == 0) {
                 await this.loteRepository.deleteLote(lote.id_lote);
@@ -157,6 +148,40 @@ export class CreatePedido implements CreatePedidoUseCase {
             cant++;
         }
         return PedidoEntity.fromObject(pedido);
+    }
+
+    async maquilaValidations(dto: CreatePedidoDto) {
+
+        console.log(dto);
+
+        // 1. Verificar que el lote tostado exista
+        const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.id_lote_tostado!);
+        if (!loteTostado || loteTostado.peso < 0) {
+            throw new Error("Lote tostado no válido o eliminado");
+        }
+
+        // Validar campos requeridos
+        if (!dto.gramaje) throw new Error('El gramaje es requerido para pedidos de maquila');
+        if (!dto.cantidad) throw new Error('La cantidad de bolsas es requerida para pedidos de maquila');
+        if (dto.cantidad <= 0) throw new Error('La cantidad de bolsas debe ser mayor a 0');
+        if (dto.gramaje <= 0) throw new Error('El gramaje debe ser mayor a 0');
+
+        // calcular el total en gramos y pasar a kilos
+        const totalSolicitadoKg = (dto.cantidad * dto.gramaje);
+        if (loteTostado.peso < totalSolicitadoKg) {
+            throw new Error(`Stock insuficiente. Solo hay ${loteTostado.peso} kg disponibles`);
+        }
+
+        // 3. Validar cliente
+        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        if (!cliente || cliente.eliminado) {
+            throw new Error("Cliente no válido");
+        }
+
+        // 4. Crear pedido de maquila
+        const pedido = await this.pedidoRepository.createPedido(dto);
+
+        return pedido;
     }
 }
 

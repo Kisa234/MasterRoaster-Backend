@@ -20,6 +20,11 @@ import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositori
 import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lote-analisis.datasource.impl';
 import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 import { DuplicateLote } from '../../domain/usecases/lote/lote/duplicar-lote';
+import { InventarioDataSourceImpl } from '../../infrastructure/datasources/inventario.datasource.impl';
+import { InventarioRepositoryImpl } from '../../infrastructure/repositories/inventario.repository.impl';
+import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
+import { LoteTostadoDataSourceImpl } from '../../infrastructure/datasources/loteTostado.datasource.impl';
+import { LoteTostadoRepositoryImpl } from '../../infrastructure/repositories/loteTostado.repository.impl';
 
 export class PedidoRoutes {
 
@@ -62,6 +67,13 @@ export class PedidoRoutes {
         const LoteAnalisisDatasource = new LoteAnalisisDataSourceImpl();
         const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDatasource);
 
+        // Inventario
+        const InventarioDatasource = new InventarioDataSourceImpl();
+        const InventarioRepository = new InventarioRepositoryImpl(InventarioDatasource);
+
+        // LoteTostado
+        const LoteTostadoDatasource = new LoteTostadoDataSourceImpl();
+        const LoteTostadoRepository = new LoteTostadoRepositoryImpl(LoteTostadoDatasource);
 
         const createLote = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
         const duplicateLote = new DuplicateLote(LoteRepository, createLote, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
@@ -73,7 +85,9 @@ export class PedidoRoutes {
             TuesteRepository,
             AnalisisRepository,
             AnalisisFisicoRepository,
-            duplicateLote
+            duplicateLote,
+            InventarioRepository,
+            LoteTostadoRepository
         );
 
         // Definición de rutas

@@ -1,12 +1,8 @@
-import { GetLoteById } from './../../domain/usecases/lote/lote/get-lote';
 import { GetPedidosByLote } from './../../domain/usecases/pedido/get-pedido-lote';
-import { GetPedidos } from './../../domain/usecases/pedido/get-pedidos';
 import { Request, Response } from "express";
-
 import { CreatePedidoDto } from "../../domain/dtos/pedido/create";
 import { UpdatePedidoDto } from "../../domain/dtos/pedido/update";
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
-
 import { CreatePedido } from "../../domain/usecases/pedido/create-pedido";
 import { UpdatePedido } from "../../domain/usecases/pedido/update-pedido";
 import { DeletePedido } from "../../domain/usecases/pedido/delete-pedido";
@@ -18,15 +14,13 @@ import { GetAllPedidos } from '../../domain/usecases/pedido/get-pedidos';
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { LoteRepository } from "../../domain/repository/lote.repository";
-import { CreateLoteUseCase } from "../../domain/usecases/lote/lote/create-lote";
 import { AnalisisRepository } from "../../domain/repository/analisis.repository";
 import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico.repository";
 import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
 import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-pedidos-tueste-fecha";
-import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
-import { AnalisisSensorialRepository } from "../../domain/repository/analisisSensorial.repository";
-import { AnalisisDefectosRespository } from "../../domain/repository/analisisDefectos.repository";
 import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-lote';
+import { InventarioRepository } from '../../domain/repository/inventario.repository';
+import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 
 export class PedidoController {
 
@@ -38,23 +32,30 @@ export class PedidoController {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
+        private readonly inventarioRepository: InventarioRepository,
+        private readonly loteTostadoRepository: LoteTostadoRepository,
         
     ) {
     }
 
     public createPedido = async (req: Request, res: Response) => {
+        // Inyectamos el usuario autenticado directamente aquí
+        // const body = { ...req.body, creado_por_id: req.user!.id };
+
         const [error, createPedidoDto] = CreatePedidoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
 
+
         new CreatePedido(
             this.pedidoRepository,
             this.loteRepository,
+            this.loteTostadoRepository,
             this.userRepository,
             this.tuesteRepository,
             this.analisisRepository,
-            this.analisisFisicoRepository,
+            this.analisisFisicoRepository
         )
             .execute(createPedidoDto!)
             .then(pedido => res.json(pedido))
@@ -70,6 +71,7 @@ export class PedidoController {
         new UpdatePedido(
             this.pedidoRepository,
             this.loteRepository,
+            this.loteTostadoRepository,
             this.tuesteRepository,
             this.userRepository,
             this.analisisRepository,
@@ -85,7 +87,6 @@ export class PedidoController {
             this.pedidoRepository,
             this.loteRepository,
             this.tuesteRepository,
-            this.userRepository,
         )
             .execute(req.params.id)
             .then(pedido => res.json(pedido))
@@ -124,7 +125,9 @@ export class PedidoController {
         new CompletarPedido(
             this.pedidoRepository,
             this.loteRepository,
+            this.loteTostadoRepository,
             this.duplicateLoteUseCase,
+            this.inventarioRepository
         )
             .execute(req.params.id)
             .then(pedido => res.json(pedido))

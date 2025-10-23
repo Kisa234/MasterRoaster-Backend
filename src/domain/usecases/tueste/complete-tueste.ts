@@ -45,7 +45,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         
         //5. actualizar lote si es Tostado Verde
         let pesoTotalTostado = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);
-        const lote = await this.loteRepository.getLoteById(pedido.id_lote);
+        const lote = await this.loteRepository.getLoteById(pedido.id_lote!);
         if (!lote) throw new Error("Lote no encontrado");
         if (lote.tipo_lote === "Tostado Verde") {
             // sumar todos los pesos finales de los tuestes

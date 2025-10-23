@@ -34,7 +34,7 @@ export class PersonalizadoController {
       resumen.push({
         id_pedido: pedido!.id_pedido,
         id_tueste: tueste.id_tueste,
-        id_lote: pedido!.id_lote,
+        id_lote: pedido!.id_lote!,
         fecha_tueste: tueste.fecha_tueste.toLocaleDateString('es-ES'),
         peso: tueste.peso_entrada,
         comentario: pedido!.comentario!

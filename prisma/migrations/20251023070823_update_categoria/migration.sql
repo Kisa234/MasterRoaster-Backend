@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Categoria" ADD COLUMN     "eliminado" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "fecha_registro" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

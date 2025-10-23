@@ -1,4 +1,4 @@
-import { Molienda } from "../../entities/inventario.entity";
+import { Molienda } from "@prisma/client";
 
 export class CreateInventarioDto {
     private constructor(

@@ -19,6 +19,7 @@ import { FichaEnvioRoutes } from "./fichaEnvio/routes";
 import { ProductoComponenteRoutes } from "./producto-componente/routes";
 import { ProductoRoutes } from "./producto/routes";
 import { InventarioRoutes } from "./inventario/routes";
+import { CategoriaRoutes } from "./categoria/routes";
 
 
 export class AppRoutes{
@@ -53,6 +54,7 @@ export class AppRoutes{
         router.use('/productoComponente', ProductoComponenteRoutes.routes);
         router.use('/producto', ProductoRoutes.routes);
         router.use('/inventario', InventarioRoutes.routes);
+        router.use('/categoria', CategoriaRoutes.routes);
 
 
         

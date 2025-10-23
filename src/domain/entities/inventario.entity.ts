@@ -1,8 +1,5 @@
-export enum Molienda {
-    ENTERO = 'ENTERO',
-    MOLIDO = 'MOLIDO',
-    NINGUNO = 'NINGUNO',
-}
+import { Molienda } from "@prisma/client";
+
 export class InventarioEntity {
     constructor(
         public id_inventario: string,
