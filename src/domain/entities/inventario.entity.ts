@@ -11,7 +11,7 @@ export class InventarioEntity {
         public unidad_medida: string | null,
         public fecha_registro: Date,
         public fecha_editado?: Date | null,
-    ) {}
+    ) { }
 
     public static fromObject(obj: { [key: string]: any }): InventarioEntity {
         const {
@@ -28,17 +28,15 @@ export class InventarioEntity {
 
         if (!id_inventario) throw new Error('id_inventario property is required');
         if (!id_producto) throw new Error('id_producto property is required');
-        if (cantidad === undefined || cantidad === null) throw new Error('cantidad property is required');
+        if (!cantidad) throw new Error('cantidad property is required');
 
-        if (!Object.values(Molienda).includes(molienda))
-            throw new Error(`molienda debe ser uno de: ${Object.values(Molienda).join(', ')}`);
 
         const newFechaRegistro = new Date(fecha_registro);
         if (isNaN(newFechaRegistro.getTime())) {
             throw new Error('fecha_registro no es válida');
         }
 
-        const newFechaEditado = fecha_editado ? new Date(fecha_editado) : null;
+        const newFechaEditado = new Date(fecha_editado);
         if (newFechaEditado && isNaN(newFechaEditado.getTime())) {
             throw new Error('fecha_editado no es válida');
         }
@@ -46,11 +44,11 @@ export class InventarioEntity {
         return new InventarioEntity(
             id_inventario,
             id_producto,
-            id_lote_tostado || null,
+            id_lote_tostado,
             cantidad,
-            gramaje || null,
+            gramaje,
             molienda,
-            unidad_medida || null,
+            unidad_medida,
             newFechaRegistro,
             newFechaEditado,
         );

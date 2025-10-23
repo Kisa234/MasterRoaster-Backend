@@ -60,18 +60,10 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
     if (!loteOriginal) throw new Error('Lote original no encontrado');
 
-    const diferencia = pedido.cantidad - dto.cantidad!;
-    // Validar si la cantidad ha cambiado
-    if (diferencia === 0) throw new Error('La cantidad no ha cambiado');
-
-    //validar que el nuevo peso no sea 0 o negativo
-    if (dto.cantidad! <= 0) throw new Error('La cantidad del pedido debe ser mayor a 0');
-
     // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if ((loteOriginal.peso + pedido.cantidad) < dto.cantidad!) {
+    if (loteOriginal.peso < dto.cantidad!) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
     };
-
 
     // 2. Actualizar pedido
     await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
@@ -84,15 +76,8 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
     if (!loteOriginal) throw new Error('Lote original no encontrado');
 
-    const diferencia = pedido.cantidad - dto.cantidad!;
-    // Validar si la cantidad ha cambiado
-    if (diferencia === 0) throw new Error('La cantidad no ha cambiado');
-
-    //validar que el nuevo peso no sea 0 o negativo
-    if (dto.cantidad! <= 0) throw new Error('La cantidad del pedido debe ser mayor a 0');
-
     // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if ((loteOriginal.peso + pedido.cantidad * 1.15) < dto.cantidad!) {
+    if (loteOriginal.peso < (dto.cantidad!  * 1.15)) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
     }
 

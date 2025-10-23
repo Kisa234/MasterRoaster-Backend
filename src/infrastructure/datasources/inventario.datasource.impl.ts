@@ -6,13 +6,14 @@ import { InventarioEntity } from "../../domain/entities/inventario.entity";
 
 export class InventarioDataSourceImpl implements InventarioDataSource {
   getInventariosByProducto(id_producto: string): Promise<InventarioEntity[]> {
-      throw new Error("Method not implemented.");
+    throw new Error('error');
   }
 
-  getAllInventarios(): Promise<InventarioEntity[]> {
-      throw new Error("Method not implemented.");
+  async getAllInventarios(): Promise<InventarioEntity[]> {
+    const items = await prisma.inventario.findMany();
+    return items.map(i => InventarioEntity.fromObject(i));
   }
-  
+
   async createInventario(dto: CreateInventarioDto): Promise<InventarioEntity> {
     const inventario = await prisma.inventario.create({ data: dto });
     return InventarioEntity.fromObject(inventario);
@@ -41,8 +42,4 @@ export class InventarioDataSourceImpl implements InventarioDataSource {
     return InventarioEntity.fromObject(deleted);
   }
 
-  async getInventarios(): Promise<InventarioEntity[]> {
-    const items = await prisma.inventario.findMany();
-    return items.map(i => InventarioEntity.fromObject(i));
-  }
 }
