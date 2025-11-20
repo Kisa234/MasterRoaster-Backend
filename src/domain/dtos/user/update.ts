@@ -13,8 +13,11 @@ export class UpdateUserDto {
         public readonly numero_telefono?: number,
         public readonly rol?: string,
         public readonly password?: string,
+        public readonly tuestes?: number,
+        public readonly suscripcion?: boolean,
+        public readonly cant_suscripcion?: number,
 
-    ) {}
+    ) { }
 
     get values() {
         const returnObj: { [key: string]: any } = {};
@@ -32,13 +35,16 @@ export class UpdateUserDto {
         if (this.numero_telefono) returnObj.numero_telefono = this.numero_telefono;
         if (this.rol) returnObj.rol = this.rol;
         if (this.password) returnObj.password = this.password;
+        if (this.tuestes) returnObj.tuestes = this.tuestes;
+        if (this.suscripcion) returnObj.suscripcion = this.suscripcion;
+        if (this.cant_suscripcion) returnObj.cant_suscripcion = this.cant_suscripcion;
 
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateUserDto?] {
-        
-        const { 
+
+        const {
             id_user,
             nombre,
             nombre_comercial,
@@ -50,10 +56,11 @@ export class UpdateUserDto {
             direccion,
             numero_telefono,
             rol,
-            password
+            password,
+            tuestes,
+            suscripcion,
+            cant_suscripcion
         } = props;
-
-        console.log(props);
 
         return [undefined, new UpdateUserDto(
             new Date(),
@@ -68,7 +75,10 @@ export class UpdateUserDto {
             direccion,
             numero_telefono,
             rol,
-            password
+            password,
+            tuestes,
+            suscripcion,
+            cant_suscripcion
         )];
     }
 }

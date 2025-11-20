@@ -10,6 +10,7 @@ import { AnalisisRepository } from '../../repository/analisis.repository';
 import { AnalisisFisicoRepository } from '../../repository/analisisFisico.repository';
 import { AnalisisFisicoEntity } from '../../entities/analisisFisico.entity';
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
+import { UpdateUserDto } from "../../dtos/user/update";
 
 
 export interface CreatePedidoUseCase {
@@ -43,13 +44,16 @@ export class CreatePedido implements CreatePedidoUseCase {
             case 'Maquila':
                 return this.maquilaValidations(dto);
                 break;
+            case 'Suscripcion':
+                return this.suscripcionValidations(dto);
+                break;
             default:
                 throw new Error('Tipo de pedido inválido');
         }
 
     }
 
-    async ventaVerdeValidations(dto: CreatePedidoDto) {
+    async ventaVerdeValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
@@ -62,7 +66,7 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     }
 
-    async tostadoVerdeValidations(dto: CreatePedidoDto) {
+    async tostadoVerdeValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
@@ -150,7 +154,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         return PedidoEntity.fromObject(pedido);
     }
 
-    async maquilaValidations(dto: CreatePedidoDto) {
+    async maquilaValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
 
         console.log(dto);
 
@@ -182,6 +186,29 @@ export class CreatePedido implements CreatePedidoUseCase {
         const pedido = await this.pedidoRepository.createPedido(dto);
 
         return pedido;
+    }
+
+    async suscripcionValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
+
+        // Validar cliente
+        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        if (!cliente || cliente.eliminado) {
+            throw new Error("Cliente no válido");
+        }
+        const [error, usdto] = UpdateUserDto.update({
+            suscripcion: true,
+            cant_suscripcion: dto.cantidad
+        });
+        await this.clienteRepository.updateUser(dto.id_user, usdto!);
+
+        // Crear pedido de suscripción
+        const pedido = await this.pedidoRepository.createPedido(dto);
+
+        // completar el pedido automáticamente
+        await this.pedidoRepository.completarPedido(pedido.id_pedido);
+
+        return pedido;
+
     }
 }
 

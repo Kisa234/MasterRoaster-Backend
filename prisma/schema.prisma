@@ -23,23 +23,81 @@ model User {
   eliminado           Boolean   @default(false)
   fecha_registro      DateTime  @default(now())
   fecha_editado       DateTime?
+  tuestes             Int?      @default(0)
+  suscripcion         Boolean   @default(false)
+  cant_suscripcion    Int?      @default(0)
 
   // Relación con lote
-  lotes    Lote[]
+  lotes              Lote[]
   // Relación con muestra
-  muestras Muestra[]
+  muestras           Muestra[]
   // Relación con pedidos de cliente
-  pedidos  Pedido[]  @relation("Cliente")
-
-  pedidosCreados Pedido[] @relation("PedidoCreadoPor")
-
-  pedidosCompletados Pedido[]      @relation("PedidoCompletadoPor")
+  pedidos            Pedido[]       @relation("Cliente")
+  // Relación con pedidos creados
+  pedidosCreados     Pedido[]       @relation("PedidoCreadoPor")
+  // Relación con pedidos completados
+  pedidosCompletados Pedido[]       @relation("PedidoCompletadoPor")
   // Relación con Historial
   historial          Historial[]
   // Relacion con lotes Tostados
   lotesTostados      LoteTostado[]
   // Relacion con las Entregas
   envio              Envio[]
+  // Relacion con BoxRespuestas
+  boxRespuestas      BoxRespuesta[]
+}
+
+// SUSCRIPCIONES
+
+model BoxTemplate {
+  id_box_template String   @id @default(uuid())
+  nombre          String
+  descripcion     String?
+  activo          Boolean  @default(true)
+  fecha_creado    DateTime @default(now())
+  eliminado       Boolean  @default(false)
+
+  cafe_fijo_1   String
+  tueste_fijo_1 String[] @default([])
+  cafe_fijo_2   String
+  tueste_fijo_2 String[] @default([])
+
+  opciones    BoxOpcion[]
+  respuestas  BoxRespuesta[]
+  lote_fijo_1 Lote           @relation("BOX_FIJO_1", fields: [cafe_fijo_1], references: [id_lote])
+  lote_fijo_2 Lote           @relation("BOX_FIJO_2", fields: [cafe_fijo_2], references: [id_lote])
+}
+
+model BoxOpcion {
+  id_opcion       String   @id @default(uuid())
+  id_box_template String
+  id_cafe         String
+  tuestes         String[] @default([])
+
+  lote     Lote        @relation(fields: [id_cafe], references: [id_lote])
+  template BoxTemplate @relation(fields: [id_box_template], references: [id_box_template])
+}
+
+model BoxRespuesta {
+  id_respuesta    String @id @default(uuid())
+  id_box_template String
+  id_user         String
+
+  molienda_1 Molienda
+  molienda_2 Molienda
+  molienda_3 Molienda
+
+  tueste_1 String
+  tueste_2 String
+  tueste_3 String
+
+  id_cafe_elegido String
+
+  fecha_registro DateTime @default(now())
+
+  lote_elegido Lote        @relation(fields: [id_cafe_elegido], references: [id_lote])
+  boxTemplate  BoxTemplate @relation(fields: [id_box_template], references: [id_box_template])
+  user         User        @relation(fields: [id_user], references: [id_user])
 }
 
 // DATOS ADICIONALES
@@ -116,6 +174,11 @@ model Lote {
   LoteTostado     LoteTostado[]
   // los analisis del lote como historico
   lotesHistoricos Lote_Analisis[]
+
+  boxTemplates1 BoxTemplate[]  @relation("BOX_FIJO_1")
+  boxTemplates2 BoxTemplate[]  @relation("BOX_FIJO_2")
+  boxOpcions    BoxOpcion[]
+  boxRespuestas BoxRespuesta[]
 }
 
 model LoteTostado {
@@ -200,7 +263,7 @@ model Pedido {
   // Relación con los tuestes realizados para este pedido
   tueste            Tueste[]
   // Relacion con los productos en caso de maquila
-  producto         Producto?    @relation(fields: [id_producto], references: [id_producto])
+  producto          Producto?    @relation(fields: [id_producto], references: [id_producto])
 }
 
 model Tueste {

@@ -15,7 +15,7 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
 
     async createPedido(createPedidoDto: CreatePedidoDto): Promise<PedidoEntity> {
         const newPedido = await prisma.pedido.create({
-            data: createPedidoDto!
+            data: createPedidoDto
         });
         return PedidoEntity.fromObject(newPedido);
     }

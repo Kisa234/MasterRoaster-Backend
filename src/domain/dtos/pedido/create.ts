@@ -56,7 +56,7 @@ export class CreatePedidoDto {
 
     const fechaTuesteDate = fecha_tueste ? new Date(fecha_tueste) : undefined;
 
-    // 👇 Creamos el DTO completo
+
     const dto = new CreatePedidoDto(
       tipo_pedido,
       cantidad,
@@ -75,10 +75,10 @@ export class CreatePedidoDto {
       creado_por_id,
     );
 
-    // 👇 Filtra las propiedades undefined automáticamente
     const filteredDto = Object.fromEntries(
       Object.entries(dto).filter(([_, v]) => v !== undefined)
     ) as CreatePedidoDto;
+
 
     return [undefined, filteredDto];
   }

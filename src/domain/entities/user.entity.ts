@@ -15,6 +15,9 @@ export class UserEntity {
         public rol: string,
         public password: string,
         public eliminado: boolean,
+        public tuestes: number | null,
+        public suscripcion: boolean,
+        public cant_suscripcion: number | null,
         public fecha_registro: Date,
         public fecha_editado?: Date,
     ) { }
@@ -34,6 +37,9 @@ export class UserEntity {
             rol,
             password,
             eliminado,
+            tuestes,
+            suscripcion,
+            cant_suscripcion,
             fecha_registro,
             fecha_editado
         } = obj;
@@ -75,6 +81,9 @@ export class UserEntity {
             rol,
             password,
             eliminado,
+            tuestes,
+            suscripcion,
+            cant_suscripcion,
             fecha_registro,
             fecha_editado
         );

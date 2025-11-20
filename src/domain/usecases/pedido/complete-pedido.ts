@@ -46,6 +46,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             case 'Maquila':
                 return this.maquilaCompletion(pedido.id_pedido);
                 break
+            case 'Suscripcion':
+                return this.pedidoRepository.completarPedido(id_pedido);
+                break; 
             default:
                 throw new Error('Tipo de pedido inválido');
         }
