@@ -27,6 +27,7 @@ export class UpdateLoteDto {
         if (this.id_analisis) returnObj.id_analisis = this.id_analisis;
         if (this.peso !== undefined) returnObj.peso = this.peso;
         if (this.peso_tostado !== undefined) returnObj.peso_tostado = this.peso_tostado;
+        if (this.clasificacion) returnObj.clasificacion = this.clasificacion;
 
         return returnObj;
     }
