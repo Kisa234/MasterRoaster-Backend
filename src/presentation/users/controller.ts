@@ -80,14 +80,13 @@ export class UserController {
   }
 
   public login = async (req: Request, res: Response) => {
-    console.log('Login request received');
     const { email, password } = req.body;
+
 
     try {
       const { accessToken, refreshToken, user } = await new AuthUser(this.userRepository)
         .execute(email, password);
 
-     
       return res.json({
         accessToken,
         refreshToken,
@@ -103,7 +102,6 @@ export class UserController {
   };
 
   public refresh = async (req: Request, res: Response) => {
-    console.log('Refresh token request received');
     // Ahora esperamos el refreshToken en el body
     const { refreshToken } = req.body;
     if (!refreshToken) {
@@ -131,6 +129,30 @@ export class UserController {
       rol: user.rol
     });
   };
+
+  public logout = async (req: Request, res: Response) => {
+    try {
+      // Limpiar cookies (debes usar los mismos nombres que al setearlas)
+      res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+      });
+
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+      });
+
+      return res.json({ message: 'Logout exitoso' });
+
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  };
+
+
 
 
 }

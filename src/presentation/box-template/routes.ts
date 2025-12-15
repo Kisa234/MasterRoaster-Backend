@@ -21,6 +21,7 @@ export class BoxTemplateRoutes {
 
     router.post("/", controller.create);
     router.get("/", controller.getAll);
+    router.get("/active", controller.getActiveTemplate);
     router.get("/:id_box_template", controller.getById);
     router.put("/:id_box_template", controller.update);
     router.delete("/:id_box_template", controller.delete);

@@ -17,13 +17,24 @@ export interface AuthUserUseCase {
 export class AuthUser implements AuthUserUseCase {
   constructor(
     private readonly userRepository: UserRepository
-  ) {}
+  ) { }
 
   async execute(email: string, password: string): Promise<AuthResult> {
     const user = await this.userRepository.findByEmail(email);
     if (!user) throw new Error('Usuario no encontrado');
 
-    if (user.rol !== 'admin') throw new Error('No tienes permisos para acceder');
+    // Caso 1: Cliente
+    if (user.rol === 'cliente') {
+      if (!user.suscripcion) {
+        throw new Error('Suscripción requerida');
+      }
+    }
+
+    // Caso 2: Admin
+    if (user.rol !== 'admin' && user.rol !== 'cliente') {
+      throw new Error('No tienes permisos para acceder');
+    }
+
 
     const valid = await Encryption.comparePassword(password, user.password);
     if (!valid) throw new Error('Contraseña incorrecta');

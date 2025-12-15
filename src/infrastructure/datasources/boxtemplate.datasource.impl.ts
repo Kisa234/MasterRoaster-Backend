@@ -55,4 +55,11 @@ export class BoxTemplateDataSourceImpl implements BoxTemplateDataSource {
             data: { activo: true }
         });
     }
+
+    async getActiveBoxTemplate(): Promise<BoxTemplateEntity | null> {
+        const box =  await prisma.boxTemplate.findFirst({
+            where: { activo: true, eliminado: false }
+        });
+        return box ? BoxTemplateEntity.fromObject(box) : null;
+    }
 }

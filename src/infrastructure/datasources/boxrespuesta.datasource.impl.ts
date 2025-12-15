@@ -37,8 +37,7 @@ export class BoxRespuestaDataSourceImpl implements BoxRespuestaDataSource {
 
     async getRespuestasByTemplate(id_box_template: string): Promise<BoxRespuestaEntity[]> {
         const respuestas = await prisma.boxRespuesta.findMany({
-            where: { id_box_template },
-            orderBy: { fecha_registro: "desc" }
+            where: { id_box_template }
         });
         return respuestas.map(BoxRespuestaEntity.fromObject);
     }

@@ -101,7 +101,6 @@ model BoxRespuesta {
 }
 
 // DATOS ADICIONALES
-
 model Variedad {
   id_variedad String @id @default(uuid())
   nombre      String
@@ -120,7 +119,6 @@ model Notas {
 }
 
 // INVENTARIADO DE CAFE
-
 model Muestra {
   id_muestra         String             @id
   proveedor          String?

@@ -11,6 +11,7 @@ import { BoxTemplateRepository } from "../../domain/repository/boxtemplate.repos
 import { CreateFullBoxTemplateDto } from "../../domain/dtos/boxes/box-template/create-full";
 import { UpdateFullBoxTemplateDto } from "../../domain/dtos/boxes/box-template/update-full";
 import { SetActiveBoxTemplates } from "../../domain/usecases/boxes/box-template/set-active-template";
+import { GetActiveBoxTemplatesUseCase } from "../../domain/usecases/boxes/box-template/get-active-boxtemplate";
 
 export class BoxTemplateController {
 
@@ -81,6 +82,16 @@ export class BoxTemplateController {
             res.status(204).send();
         }
         catch (err: any) {
+            res.status(400).json({ error: err?.message ?? String(err) });
+        }
+    }
+
+    public getActiveTemplate = async (_req: Request, res: Response) => {
+        try {
+            const activeTemplate = await new GetActiveBoxTemplatesUseCase(this.boxTemplateRepository).execute();
+            if (!activeTemplate) return res.status(404).json({ error: "Active BoxTemplate not found" });
+            res.json(activeTemplate);
+        } catch (err: any) {
             res.status(400).json({ error: err?.message ?? String(err) });
         }
     }

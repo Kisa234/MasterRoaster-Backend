@@ -9,4 +9,6 @@ export abstract class BoxTemplateRepository {
   abstract deleteBoxTemplate(id_box_template: string): Promise<BoxTemplateEntity>;
   abstract getAllBoxTemplates(): Promise<BoxTemplateEntity[]>;
   abstract setActiveTemplateUseCase(id_box_template: string): Promise<void>;
+  abstract getActiveBoxTemplate(): Promise<BoxTemplateEntity | null>;
+
 }

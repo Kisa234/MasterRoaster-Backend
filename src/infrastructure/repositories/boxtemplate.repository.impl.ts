@@ -33,4 +33,8 @@ export class BoxTemplateRepositoryImpl implements BoxTemplateRepository {
     setActiveTemplateUseCase(id_box_template: string): Promise<void> {
         return this.datasource.setActiveTemplateUseCase(id_box_template);
     }
+
+    getActiveBoxTemplate(): Promise<BoxTemplateEntity | null> {
+        return this.datasource.getActiveBoxTemplate();
+    }
 }

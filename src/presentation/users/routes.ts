@@ -15,6 +15,7 @@ export class UserRoutes{
         
         router.get('/me', authMiddleware, userController.getSessionInfo);
         router.post('/login', userController.login);
+        router.post('/logout', authMiddleware, userController.logout);
         router.post('/refresh', userController.refresh);
         router.post('/', userController.createUser);
         router.get('/:id', userController.getUserById);
