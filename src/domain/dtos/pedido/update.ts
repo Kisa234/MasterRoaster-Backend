@@ -14,6 +14,7 @@ export class UpdatePedidoDto {
     public readonly fecha_tueste?: Date,
     public readonly molienda?: string,
     public readonly gramaje?: number,
+    public readonly facturado?: boolean,
   ) {}
 
   get values() {
@@ -30,6 +31,7 @@ export class UpdatePedidoDto {
     if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
     if (this.molienda) returnObj.molienda = this.molienda;
     if (this.gramaje) returnObj.gramaje = this.gramaje;
+    if (this.facturado) returnObj.facturado = this.facturado;
 
     return returnObj;
   }
@@ -50,6 +52,7 @@ export class UpdatePedidoDto {
       fecha_tueste,
       molienda,
       gramaje,
+      facturado,
     } = props;
 
     const fechaTuesteDate = fecha_tueste ? new Date(fecha_tueste) : undefined;
@@ -71,6 +74,7 @@ export class UpdatePedidoDto {
         fechaTuesteDate,
         molienda,
         gramaje,
+        facturado,
       ),
     ];
   }

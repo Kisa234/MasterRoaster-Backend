@@ -10,6 +10,8 @@ export class UpdateLoteDto {
         public readonly proceso?: string,
         public readonly tipo_lote?: string,
         public readonly clasificacion?: string,
+        public readonly costo?: number,
+        public readonly altura?: number,
         public readonly id_user?: string,
         public readonly id_analisis?: string,
         public readonly peso_tostado?: number,
@@ -28,6 +30,8 @@ export class UpdateLoteDto {
         if (this.peso !== undefined) returnObj.peso = this.peso;
         if (this.peso_tostado !== undefined) returnObj.peso_tostado = this.peso_tostado;
         if (this.clasificacion) returnObj.clasificacion = this.clasificacion;
+        if (this.costo !== undefined) returnObj.costo = this.costo;
+        if (this.altura !== undefined) returnObj.altura = this.altura;
 
         return returnObj;
     }
@@ -45,6 +49,8 @@ export class UpdateLoteDto {
             proceso,
             tipo_lote,
             clasificacion,
+            costo,
+            altura,
             id_user,
             id_analisis,
             peso_tostado,
@@ -65,6 +71,8 @@ export class UpdateLoteDto {
                 proceso,
                 tipo_lote,
                 clasificacion,
+                costo,
+                altura,
                 id_user,
                 id_analisis,
                 peso_tostado,

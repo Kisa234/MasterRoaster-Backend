@@ -155,6 +155,8 @@ model Lote {
   proceso        String
   tipo_lote      String
   clasificacion  String?
+  costo          Float?
+  altura         Int?
   id_user        String?
   id_analisis    String?
   fecha_registro DateTime @default(now())
@@ -226,6 +228,7 @@ model Pedido {
   fecha_registro       DateTime  @default(now())
   tipo_pedido          String
   cantidad             Float
+  facturado            Boolean?
   estado_pedido        String    @default("Pendiente")
   id_user              String
   id_lote              String?
@@ -404,7 +407,7 @@ model FichaEnvio {
   fecha_editado  DateTime?
 
   // Relación 1:1 con Envio
-  envio Envio @relation(fields: [id_envio], references: [id_envio], onDelete: Cascade, onUpdate: NoAction)
+  envio Envio @relation(fields: [id_envio], references: [id_envio])
 }
 
 // HISTORIAL DE ANALISIS X CAFE VERDE
