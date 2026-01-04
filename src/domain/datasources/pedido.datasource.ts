@@ -18,4 +18,5 @@ export abstract class PedidoDatasource {
     abstract getPedidosByLote(id_lote: string): Promise<PedidoEntity[]>;
     abstract getLotesCreados(): Promise<string[]>;
     abstract getLotesTostadoCreados(): Promise<string[]>;
+    abstract setFacturado(state:boolean, id_pedido: string): Promise<PedidoEntity>;
 }

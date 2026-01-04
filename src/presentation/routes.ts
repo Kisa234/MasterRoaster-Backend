@@ -23,6 +23,8 @@ import { CategoriaRoutes } from "./categoria/routes";
 import { BoxTemplateRoutes } from "./box-template/routes";
 import { BoxOpcionRoutes } from "./box-opcion/routes";
 import { BoxRespuestaRoutes } from "./box-respuesta/routes";
+import { IngresoCafeRoutes } from "./ingreso-cafe/routes";
+import { CambioRoutes } from "./cambio/routes";
 
 
 export class AppRoutes {
@@ -51,6 +53,8 @@ export class AppRoutes {
         router.use('/fichaEnvio', FichaEnvioRoutes.routes);
 
         router.use('/historial', HistorialRoutes.routes);
+        router.use('/cambio', CambioRoutes.routes);
+
         router.use('/user', UserRoutes.routes);
         router.use('/p', PersonalizadoRoutes.routes);
 
@@ -64,6 +68,7 @@ export class AppRoutes {
         router.use('/box-opcion', BoxOpcionRoutes.routes);
         router.use('/box-respuesta', BoxRespuestaRoutes.routes);
 
+        router.use('/ingreso-cafe', IngresoCafeRoutes.routes);
 
         return router;
     }

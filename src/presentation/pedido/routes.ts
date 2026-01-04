@@ -91,18 +91,21 @@ export class PedidoRoutes {
         );
 
         // Definición de rutas
-        router.post('/', controller.createPedido);
-        router.get('/', controller.getAllPedidos);
-        router.get('/:id', controller.getPedidoById);
-        router.put('/:id', controller.updatePedido);
-        router.delete('/:id', controller.deletePedido);
+        
         router.get('/orden/tueste', controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', controller.getPedidosByEstado);
         router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
         router.get('/lote/:id_lote', controller.GetPedidosByLote);
         router.put('/completar/:id', controller.completarPedido);
+        router.put('/facturar/:id_pedido', controller.SetPedidoFacturado)
 
+
+        router.post('/', controller.createPedido);
+        router.get('/', controller.getAllPedidos);
+        router.get('/:id', controller.getPedidoById);
+        router.put('/:id', controller.updatePedido);
+        router.delete('/:id', controller.deletePedido);
         return router;
 
     }

@@ -19,6 +19,7 @@ model User {
   direccion           String?
   numero_telefono     String
   rol                 String
+  id_rol              String?
   password            String
   eliminado           Boolean   @default(false)
   fecha_registro      DateTime  @default(now())
@@ -27,6 +28,8 @@ model User {
   suscripcion         Boolean   @default(false)
   cant_suscripcion    Int?      @default(0)
 
+  // Relacion con el Rol
+  Rol                Rol?           @relation(fields: [id_rol], references: [id_rol])
   // Relación con lote
   lotes              Lote[]
   // Relación con muestra
@@ -45,6 +48,42 @@ model User {
   envio              Envio[]
   // Relacion con BoxRespuestas
   boxRespuestas      BoxRespuesta[]
+  // Relacion con Ingresos de Cafe
+  ingresosCafe       IngresoCafe[]
+  // Relacion con el Historial de Cambios
+  cambios            Cambios[]
+}
+
+// ROLES Y PERMISOS
+
+model Rol {
+  id_rol      String   @id @default(uuid())
+  nombre      String   @unique
+  descripcion String?
+  activo      Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  usuarios User[]
+  permisos RolPermiso[]
+}
+
+model RolPermiso {
+  id_rol     String
+  id_permiso String
+
+  rol     Rol     @relation(fields: [id_rol], references: [id_rol])
+  permiso Permiso @relation(fields: [id_permiso], references: [id_permiso])
+
+  @@id([id_rol, id_permiso])
+}
+
+model Permiso {
+  id_permiso  String   @id @default(uuid())
+  codigo      String   @unique
+  descripcion String?
+  created_at  DateTime @default(now())
+
+  roles RolPermiso[]
 }
 
 // SUSCRIPCIONES
@@ -174,11 +213,13 @@ model Lote {
   LoteTostado     LoteTostado[]
   // los analisis del lote como historico
   lotesHistoricos Lote_Analisis[]
-
-  boxTemplates1 BoxTemplate[]  @relation("BOX_FIJO_1")
-  boxTemplates2 BoxTemplate[]  @relation("BOX_FIJO_2")
-  boxOpcions    BoxOpcion[]
-  boxRespuestas BoxRespuesta[]
+  // Relacion con BoxTemplates
+  boxTemplates1   BoxTemplate[]   @relation("BOX_FIJO_1")
+  boxTemplates2   BoxTemplate[]   @relation("BOX_FIJO_2")
+  boxOpcions      BoxOpcion[]
+  boxRespuestas   BoxRespuesta[]
+  // Relacion con Ingresos de Cafe
+  ingresosCafe    IngresoCafe[]
 }
 
 model LoteTostado {
@@ -206,6 +247,21 @@ model LoteTostado {
   inventarios Inventario[]
 }
 
+// ANALITICA
+
+model IngresoCafe {
+  id_ingreso     String   @id @default(uuid())
+  id_lote        String
+  cantidad_kg    Float
+  costo_unitario Float
+  fecha_ingreso  DateTime @default(now())
+  proveedor      String?
+  id_user        String?
+
+  lote Lote  @relation(fields: [id_lote], references: [id_lote])
+  user User? @relation(fields: [id_user], references: [id_user])
+}
+
 // HISTORIAL DE ACCIONES POR USUARIO
 
 model Historial {
@@ -215,8 +271,21 @@ model Historial {
   id_user        String
   accion         String
   comentario     String
+  objeto_antes   Json?  
   fecha_registro DateTime @default(now())
-  cambios        Json
+
+
+  user User @relation(fields: [id_user], references: [id_user])
+}
+
+model Cambios {
+  id_cambio    String   @id @default(uuid())
+  entidad      String // "Lote", "Pedido", "Producto", etc.
+  id_entidad   String
+  objeto_antes Json
+  comentario   String?
+  id_user      String
+  created_at   DateTime @default(now())
 
   user User @relation(fields: [id_user], references: [id_user])
 }

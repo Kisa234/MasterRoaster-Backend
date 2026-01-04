@@ -29,7 +29,6 @@ export class FusionarLotes implements FusionarLoteUseCase {
       throw new Error('El peso a transferir debe ser mayor a 0');
     }
     
-
     // Obtener entidades
     const lote1 = await this.loteRepository.getLoteById(id1);
     const lote2 = await this.loteRepository.getLoteById(id2);
@@ -47,7 +46,6 @@ export class FusionarLotes implements FusionarLoteUseCase {
     // Calcular nuevos pesos
     const nuevoPeso1 = lote1.peso + pesoTransferir;
     const nuevoPeso2 = lote2.peso - pesoTransferir;
-
 
     // Actualizar lote1
     const [err1, updateDto1] = UpdateLoteDto.update({ peso: nuevoPeso1 });

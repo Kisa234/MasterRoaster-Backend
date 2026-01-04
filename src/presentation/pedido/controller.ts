@@ -21,6 +21,7 @@ import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-p
 import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-lote';
 import { InventarioRepository } from '../../domain/repository/inventario.repository';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
+import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
 
 export class PedidoController {
 
@@ -34,7 +35,7 @@ export class PedidoController {
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
         private readonly inventarioRepository: InventarioRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
-        
+
     ) {
     }
 
@@ -101,7 +102,11 @@ export class PedidoController {
     };
 
     public getPedidosByEstado = async (req: Request, res: Response) => {
-        new GetPedidosByEstado(this.pedidoRepository)
+        new GetPedidosByEstado(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.userRepository
+        )
             .execute(req.params.estado)
             .then(pedidos => res.json(pedidos))
             .catch(error => res.status(400).json({ error }));
@@ -155,4 +160,21 @@ export class PedidoController {
             .catch(error => res.status(400).json({ error }));
 
     }
+
+    public SetPedidoFacturado = async (req: Request, res: Response) => {
+        try {
+            const { id_pedido } = req.params;
+
+            const pedido = await new SetPedidoFacturado(
+                this.pedidoRepository,
+                this.userRepository
+            ).execute(true, id_pedido);
+
+            res.json(pedido);
+        } catch (error: any) {
+            res.status(400).json({ message: error.message });
+        }
+    }
+
+
 }

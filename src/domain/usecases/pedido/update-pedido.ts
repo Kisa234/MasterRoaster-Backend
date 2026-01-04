@@ -77,7 +77,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     if (!loteOriginal) throw new Error('Lote original no encontrado');
 
     // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if (loteOriginal.peso < (dto.cantidad!  * 1.15)) {
+    if (loteOriginal.peso < (dto.cantidad! * 1.15)) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
     }
 
@@ -88,7 +88,6 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   }
 
   async editarOrdenTueste(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
-
     const lote = await this.loteRepository.getLoteById(pedido.id_lote!);
     if (!lote) throw new Error('Lote original no encontrado');
 
@@ -101,67 +100,91 @@ export class UpdatePedido implements UpdatePedidoUseCase {
       throw new Error('No hay suficiente café verde disponible en el lote original');
     }
 
-
     // 1. Actualizar peso en lote original
     const nuevoPesoLote = lote.peso - diferencia;
     const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
     if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
     await this.loteRepository.updateLote(lote.id_lote, updateLoteDto);
 
-
     //2. Actualizar pedido
     const newpedido = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
 
     //3. eliminar tuestes anteriores
+    // verificar si la cantidad de tuestes son diferentes o los pesos son diferentes para eliminar los tuestes 
     const tuestes = await this.tuesteRepository.getTostadosByPedido(pedido.id_pedido);
-    if (!tuestes || tuestes.length === 0) console.log('No se encontraron tuestes para este pedido');
-    for (const tueste of tuestes) {
-      await this.tuesteRepository.deleteTueste(tueste.id_tueste);
-    }
-    console.log('Tuestes anteriores eliminados');
+    let debeRecrearTuestes = false;
 
-    // 4. crear nuevo tueste
-
-    //consegir analisis fisico
-    let analisisFisico: AnalisisFisicoEntity | null = null;
-
-    if (!lote.id_analisis) {
-      console.warn('El lote no tiene un análisis asociado, usando valores por defecto');
+    if (!tuestes || tuestes.length === 0) {
+      // No existen tuestes → hay que crearlos
+      debeRecrearTuestes = true;
     } else {
-      const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
-      if (!analisis) {
-        console.warn(`No se encontró el análisis ${lote.id_analisis}, usando valores por defecto`);
+      // 1. Cantidad distinta
+      if (tuestes.length !== dto.pesos!.length) {
+        debeRecrearTuestes = true;
       } else {
-        analisisFisico = await this.analisisFisicoRepository
-          .getAnalisisFisicoById(analisis.analisisFisico_id!);
-        if (!analisisFisico) {
-          console.warn(`No se encontró el análisis físico ${analisis.analisisFisico_id}, usando valores por defecto`);
+        // 2. Comparar pesos uno a uno
+        const pesosActuales = tuestes.map(t => t.peso_entrada);
+        const pesosNuevos = dto.pesos!;
+
+        for (let i = 0; i < pesosActuales.length; i++) {
+          if (pesosActuales[i] !== pesosNuevos[i]) {
+            debeRecrearTuestes = true;
+            break;
+          }
         }
       }
     }
 
-    //generar tuestes
-    if (!dto.pesos) throw new Error('Los pesos son requeridos');
-    const density = analisisFisico?.densidad ?? 0;
-    const humidity = analisisFisico?.humedad ?? 0;
-    let cant = 1;
-    for (let peso of dto.pesos) {
-      const [, createTuesteDto] = CreateTuesteDto.create({
-        id_lote: lote.id_lote,
-        num_batch: cant,
-        fecha_tueste: dto.fecha_tueste,
-        tostadora: dto.tostadora,
-        id_cliente: dto.id_user,
-        densidad: density,
-        humedad: humidity,
-        peso_entrada: peso,
-        id_pedido: pedido.id_pedido,
-      });
-      await this.tuesteRepository.createTueste(createTuesteDto!);
-      cant++;
+    if (debeRecrearTuestes) {
+      for (const tueste of tuestes ?? []) {
+        await this.tuesteRepository.deleteTueste(tueste.id_tueste);
+      }
+      // conseguir analisis
+
+      //consegir analisis fisico
+      let analisisFisico: AnalisisFisicoEntity | null = null;
+
+      if (!lote.id_analisis) {
+        console.warn('El lote no tiene un análisis asociado, usando valores por defecto');
+      } else {
+        const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
+        if (!analisis) {
+          console.warn(`No se encontró el análisis ${lote.id_analisis}, usando valores por defecto`);
+        } else {
+          analisisFisico = await this.analisisFisicoRepository
+            .getAnalisisFisicoById(analisis.analisisFisico_id!);
+          if (!analisisFisico) {
+            console.warn(`No se encontró el análisis físico ${analisis.analisisFisico_id}, usando valores por defecto`);
+          }
+        }
+      }
+      // CREAR NUEVOS TUESTES
+      if (!dto.pesos) throw new Error('Los pesos son requeridos');
+
+      const density = analisisFisico?.densidad ?? 0;
+      const humidity = analisisFisico?.humedad ?? 0;
+
+      let cant = 1;
+      for (const peso of dto.pesos) {
+        const [, createTuesteDto] = CreateTuesteDto.create({
+          id_lote: lote.id_lote,
+          num_batch: cant,
+          fecha_tueste: dto.fecha_tueste,
+          tostadora: dto.tostadora,
+          id_cliente: dto.id_user,
+          densidad: density,
+          humedad: humidity,
+          peso_entrada: peso,
+          id_pedido: pedido.id_pedido,
+        });
+
+        await this.tuesteRepository.createTueste(createTuesteDto!);
+        cant++;
+      }
+    } else {
+      
     }
-
-
+   
     return PedidoEntity.fromObject(newpedido!);
   }
 

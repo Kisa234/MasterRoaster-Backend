@@ -54,5 +54,8 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     getLotesTostadoCreados(): Promise<string[]> {
         return this.pedidoDataSource.getLotesTostadoCreados();
     }
+    setFacturado(state: boolean, id_pedido: string): Promise<PedidoEntity> {
+        return this.pedidoDataSource.setFacturado(state,id_pedido);
+    }
 
 }

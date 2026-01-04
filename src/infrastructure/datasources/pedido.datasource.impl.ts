@@ -4,7 +4,6 @@ import { CreatePedidoDto } from '../../domain/dtos/pedido/create';
 import { prisma } from "../../data/postgres";
 import { UpdatePedidoDto } from '../../domain/dtos/pedido/update';
 import { PedidoDatasource } from "../../domain/datasources/pedido.datasource";
-import { error } from "console";
 import { LoteEntity } from "../../domain/entities/lote.entity";
 import { CreatePedido } from '../../domain/usecases/pedido/create-pedido';
 
@@ -53,6 +52,9 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
             where: {
                 estado_pedido: estado,
                 eliminado: false
+            },
+            orderBy:{
+                fecha_tueste: 'desc'
             }
         });
         return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
@@ -176,5 +178,17 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
 
         // Extraigo solo el campo id_lote_tostado de cada registro, filtrando los nulos
         return registros.map(r => r.id_nuevoLote_tostado).filter((id): id is string => id !== null);
+    }
+
+    async setFacturado(state: boolean, id_pedido: string): Promise<PedidoEntity> {
+        const pedido = await prisma.pedido.update({
+            where: {
+                id_pedido: id_pedido
+            },
+            data: {
+                facturado : state
+            }
+        })
+        return PedidoEntity.fromObject(pedido);
     }
 }

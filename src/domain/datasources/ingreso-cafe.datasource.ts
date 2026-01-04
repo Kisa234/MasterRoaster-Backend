@@ -10,4 +10,7 @@ export abstract class IngresoCafeDataSource {
     abstract deleteIngresoCafe(id: string): Promise<IngresoCafeEntity>;
 
     abstract getIngresosByLote(id_lote: string): Promise<IngresoCafeEntity[]>;
+
+    abstract getAllIngresosCafe(): Promise<IngresoCafeEntity[]>;
+
 }

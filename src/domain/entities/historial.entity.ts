@@ -7,11 +7,12 @@ export class HistorialEntity {
         public accion: string,
         public comentario: string,
         public fecha_registro: Date,
-        public cambios: any
+        public objeto_antes: any | null
+
     ) {}
   
     static fromObject(obj: { [key: string]: any }): HistorialEntity {
-        const { id_historial, entidad, id_entidad, id_user, accion, comentario, fecha_registro, cambios } = obj;
+        const { id_historial, entidad, id_entidad, id_user, accion, comentario, fecha_registro, objeto_antes } = obj;
     
         if (!id_historial) throw new Error('id_historial property is required');
         if (!entidad) throw new Error('entidad property is required');
@@ -35,7 +36,7 @@ export class HistorialEntity {
             accion,
             comentario,
             newFechaRegistro,
-            cambios
+            objeto_antes
         );
         
     }

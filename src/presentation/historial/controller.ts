@@ -12,7 +12,28 @@ export class HistorialController {
         private readonly historialRepository: HistorialRepository
     ) { }
 
-    
+    public createHistorial = async (req: Request, res: Response) => {
+        const [error, dto] = CreateHistorialDto.create(req.body);
+        if (error) return res.status(400).json({ error });
+
+        if (!req.user) {
+            return res.status(401).json({ error: 'No autorizado' });
+        }
+
+        const id_user = req.user.id;
+
+        const [error2, dtoWithUser] = CreateHistorialDto.create({
+            ...req.body,
+            id_user
+        });
+
+        new CreateHistorial(this.historialRepository)
+            .execute(dtoWithUser!)
+            .then(historial => res.status(201).json(historial))
+            .catch(err => res.status(400).json({ error: err.message }));
+    };
+
+
     public getHistorialById = (req: Request, res: Response) => {
         new GetHistorialById(this.historialRepository)
             .execute(req.params.id)
@@ -43,5 +64,5 @@ export class HistorialController {
             .catch(error => res.status(400).json({ error }));
     }
 
-    
+
 }

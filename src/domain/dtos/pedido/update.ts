@@ -15,7 +15,7 @@ export class UpdatePedidoDto {
     public readonly molienda?: string,
     public readonly gramaje?: number,
     public readonly facturado?: boolean,
-  ) {}
+  ) { }
 
   get values() {
     const returnObj: { [key: string]: any } = {};
@@ -31,7 +31,7 @@ export class UpdatePedidoDto {
     if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
     if (this.molienda) returnObj.molienda = this.molienda;
     if (this.gramaje) returnObj.gramaje = this.gramaje;
-    if (this.facturado) returnObj.facturado = this.facturado;
+    if (this.facturado !== undefined) returnObj.facturado = this.facturado;
 
     return returnObj;
   }

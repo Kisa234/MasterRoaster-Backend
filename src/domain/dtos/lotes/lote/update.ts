@@ -57,7 +57,6 @@ export class UpdateLoteDto {
         } = props;
 
 
-        console.log(props);
 
         return [undefined,
             new UpdateLoteDto(
