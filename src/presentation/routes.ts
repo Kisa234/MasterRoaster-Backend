@@ -25,6 +25,9 @@ import { BoxOpcionRoutes } from "./box-opcion/routes";
 import { BoxRespuestaRoutes } from "./box-respuesta/routes";
 import { IngresoCafeRoutes } from "./ingreso-cafe/routes";
 import { CambioRoutes } from "./cambio/routes";
+import { RolRoutes } from "./roles-permiso/rol/routes";
+import { PermisoRoutes } from "./roles-permiso/permiso/routes";
+import { RolPermisoRoutes } from "./roles-permiso/rol-permiso/routes";
 
 
 export class AppRoutes {
@@ -56,6 +59,11 @@ export class AppRoutes {
         router.use('/cambio', CambioRoutes.routes);
 
         router.use('/user', UserRoutes.routes);
+        router.use('/rol', RolRoutes.routes);
+        router.use('/permiso', PermisoRoutes.routes);
+        router.use('/rol-permiso', RolPermisoRoutes.routes);
+
+
         router.use('/p', PersonalizadoRoutes.routes);
 
         router.use('/productoComponente', ProductoComponenteRoutes.routes);

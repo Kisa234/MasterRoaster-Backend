@@ -4,6 +4,11 @@ declare global {
   namespace Express {
     interface Request {
       user?: JwtPayload;
+
+      auditContext?: {
+        entidad: string;
+        accion: string;
+      };
     }
   }
 }

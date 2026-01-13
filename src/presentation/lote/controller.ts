@@ -27,6 +27,8 @@ import { BlendLotesDto } from '../../domain/dtos/lotes/lote/blend-lotes';
 import { FusionarLotesDto } from '../../domain/dtos/lotes/lote/fusionar-lotes';
 import { GetLoteRoaster } from '../../domain/usecases/lote/lote/get-lote-roaster';
 import { AnalisisDefectosRespository } from '../../domain/repository/analisisDefectos.repository';
+import { HistorialRepository } from '../../domain/repository/historial.repository';
+
 
 export class LoteController {
 
@@ -40,7 +42,8 @@ export class LoteController {
         private readonly analisisDefectosRepository: AnalisisDefectosRespository,
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
-        private readonly pedidoRepository: PedidoRepository
+        private readonly pedidoRepository: PedidoRepository,
+        private readonly historialRepository: HistorialRepository
     ) { }
 
     public createLote = (req: Request, res: Response) => {
@@ -76,7 +79,14 @@ export class LoteController {
 
         )
             .execute(createLoteDto!)
-            .then(lote => res.json(lote))
+            .then(lote => {
+                this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: lote.id_lote,
+                    id_user: req.user!.id
+                });
+                res.json(lote);
+            })
             .catch(error => res.status(400).json({ error }));
     }
 
@@ -102,9 +112,9 @@ export class LoteController {
             .catch(error => res.status(400).json({ error }));
     }
 
-    public updateLote = (req: Request, res: Response) => {
+    public updateLote = async (req: Request, res: Response) => {
         const id_lote = req.params.id;
-        const [error, updateLoteDto] = UpdateLoteDto.update({ ...req.body});
+        const [error, updateLoteDto] = UpdateLoteDto.update({ ...req.body });
         if (error) {
             return res.status(400).json({ error });
         }
@@ -152,7 +162,7 @@ export class LoteController {
 
         // 4. Crea el DTO y valida
         const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
-        if(!createLoteDto){
+        if (!createLoteDto) {
             return res.status(400).json({ error });
         }
         new CreateLoteFromMuestra(

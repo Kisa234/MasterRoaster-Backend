@@ -19,7 +19,6 @@ export class HistorialEntity {
         if (!id_entidad) throw new Error('id_entidad property is required');
         if (!id_user) throw new Error('id_user property is required');
         if (!accion) throw new Error('accion property is required');
-        if (!comentario) throw new Error('comentario property is required');
 
 
         const newFechaRegistro = new Date(fecha_registro);

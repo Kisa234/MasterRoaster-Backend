@@ -19,6 +19,10 @@ import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
 import { AnalisisDefectosDataSourceImpl } from '../../infrastructure/datasources/analisisDefectos.datasource.impl';
 import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositories/analisisDefectos.repository.impl';
+import { auditMiddleware } from '../../infrastructure/middlewares/audit.middleware';
+import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
+import { HistorialRepositoryImpl } from '../../infrastructure/repositories/historial.repository.impl';
+import { HistorialDataSourceImpl } from '../../infrastructure/datasources/historial.datasource.impl';
 
 export class LoteRoutes{
 
@@ -53,7 +57,10 @@ export class LoteRoutes{
         const userRepository = new UserRepositoryImpl(userDatasource);
 
         const pedidoDatasource = new  PedidoDataSourceImpl();
-        const pedidoRepository = new PedidoDataSourceImpl();
+        const pedidoRepository = new PedidoRepositoryImpl(pedidoDatasource);
+
+        const historialDatasource = new HistorialDataSourceImpl();
+        const historialRepository = new HistorialRepositoryImpl(historialDatasource);
         
         // Use cases
         const createLoteUseCase = new CreateLote(loteRepository, userRepository, pedidoRepository);
@@ -71,23 +78,24 @@ export class LoteRoutes{
             analisisDefectosRepository,
             loteRepository,
             userRepository,
-            pedidoRepository
+            pedidoRepository,
+            historialRepository
         );
 
-        router.post('/', authMiddleware, loteController.createLote);
+        router.post('/', authMiddleware, auditMiddleware('Lote', 'CREATE'),loteController.createLote);
         router.post('/rapido', loteController.createLoteRapido);
         router.post('/muestra/:id',authMiddleware ,loteController.createLoteFromMuestra);
         router.post('/fusionar', loteController.FusionarLotes);
         router.post('/blend', loteController.blendLotes);
-        router.get('/', loteController.getLotes);
+        router.put('/:id', loteController.updateLote);
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
         router.get('/roaster', loteController.getLotesRoaster);
-        router.get('/:id', loteController.getLoteById);
-        router.put('/:id', loteController.updateLote);
-        router.delete('/:id', loteController.deleteLote);
         router.get('/user/:id', loteController.getLotesByUserId);
         router.get('/byLote/:id',loteController.getUserByLote);
+        router.get('/:id', loteController.getLoteById);
+        router.get('/', loteController.getLotes);
+        router.delete('/:id', loteController.deleteLote);
 
         return router;
     }

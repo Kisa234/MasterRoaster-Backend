@@ -270,7 +270,7 @@ model Historial {
   id_entidad     String
   id_user        String
   accion         String
-  comentario     String
+  comentario     String?
   objeto_antes   Json?  
   fecha_registro DateTime @default(now())
 
