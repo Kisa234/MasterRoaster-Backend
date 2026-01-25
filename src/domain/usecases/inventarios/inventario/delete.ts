@@ -1,5 +1,5 @@
-import { InventarioEntity } from "../../entities/inventario.entity";
-import { InventarioRepository } from "../../repository/inventario.repository";
+import { InventarioEntity } from "../../../entities/inventario.entity";
+import { InventarioRepository } from "../../../repository/inventario.repository";
 
 export interface DeleteInventarioUseCase {
     execute(id: string): Promise<InventarioEntity>;

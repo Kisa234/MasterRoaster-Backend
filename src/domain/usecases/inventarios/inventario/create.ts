@@ -1,6 +1,7 @@
-import { CreateInventarioDto } from "../../dtos/inventarios/inventario/create";
-import { InventarioEntity } from "../../entities/inventario.entity";
-import { InventarioRepository } from "../../repository/inventario.repository";
+import { CreateInventarioDto } from "../../../dtos/inventarios/inventario/create";
+import { InventarioEntity } from "../../../entities/inventario.entity";
+import { InventarioRepository } from "../../../repository/inventario.repository";
+
 
 export interface CreateInventarioUseCase {
     execute(data: CreateInventarioDto): Promise<InventarioEntity>;

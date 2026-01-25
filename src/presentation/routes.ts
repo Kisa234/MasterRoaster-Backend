@@ -31,6 +31,7 @@ import { RolPermisoRoutes } from "./roles-permiso/rol-permiso/routes";
 import { AlmacenRoutes } from "./almacen/almacen/routes";
 import { MovimientoAlmacenRoutes } from "./almacen/almacen-movimiento/routes";
 import { InventarioLoteRoutes } from "./inventarios/inventario-lote/routes";
+import { InventarioLoteTostadoRoutes } from "./inventarios/inventarios-lote-tostado/routes";
 
 
 export class AppRoutes {
@@ -57,6 +58,7 @@ export class AppRoutes {
         
         router.use('/inventario', InventarioRoutes.routes);
         router.use('/inventario-lote', InventarioLoteRoutes.routes);
+        router.use('/inventario-lote-tostado', InventarioLoteTostadoRoutes.routes);
 
         router.use('/variedad', VariedadRoutes.routes);
         router.use('/notas', NotasRoutes.routes);

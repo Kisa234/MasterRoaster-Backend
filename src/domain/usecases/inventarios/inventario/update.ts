@@ -1,6 +1,7 @@
-import { UpdateInventarioDto } from "../../dtos/inventarios/inventario/update";
-import { InventarioEntity } from "../../entities/inventario.entity";
-import { InventarioRepository } from "../../repository/inventario.repository";
+import { UpdateInventarioDto } from "../../../dtos/inventarios/inventario/update";
+import { InventarioEntity } from "../../../entities/inventario.entity";
+import { InventarioRepository } from "../../../repository/inventario.repository";
+
 
 export interface UpdateInventarioUseCase {
     execute(id: string, data: UpdateInventarioDto): Promise<InventarioEntity | null>;
