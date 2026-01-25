@@ -101,14 +101,14 @@ export class LoteController {
             this.userRepository,
             this.pedidoRepository
         ).execute(createLoteRapidoDto!)
-            .then(lote => res.json(lote))
-            .catch(error => res.status(400).json({ error }));
-    }
-
-    public getLoteById = (req: Request, res: Response) => {
-        new GetLoteById(this.loteRepository)
-            .execute(req.params.id)
-            .then(lote => res.json(lote))
+            .then(lote => {
+                this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: lote.id_lote,
+                    id_user: req.user!.id
+                });
+                res.json(lote)
+            })
             .catch(error => res.status(400).json({ error }));
     }
 
@@ -118,23 +118,35 @@ export class LoteController {
         if (error) {
             return res.status(400).json({ error });
         }
+        const lote_before = await this.loteRepository.getLoteById(id_lote);
         new UpdateLote(this.loteRepository)
             .execute(req.params.id, updateLoteDto!)
-            .then(lote => res.json(lote))
+            .then(lote => 
+                {
+                    this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    objeto_antes: JSON.stringify(lote_before),
+                    id_entidad: lote.id_lote,
+                    id_user: req.user!.id,
+                    comentario: req.body.hcomentario
+                });
+                    res.json(lote)
+                })
             .catch(error => res.status(400).json({ error }));
     }
 
     public deleteLote = (req: Request, res: Response) => {
         new DeleteLote(this.loteRepository)
             .execute(req.params.id)
-            .then(lote => res.json(lote))
-            .catch(error => res.status(400).json({ error }));
-    }
-
-    public getLotes = (req: Request, res: Response) => {
-        new GetLotes(this.loteRepository)
-            .execute()
-            .then(lotes => res.json(lotes))
+            .then(lote => {
+                this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: lote!.id_lote,
+                    id_user: req.user!.id,
+                    comentario: req.body.hcomentario
+                });
+                res.json(lote)
+            })
             .catch(error => res.status(400).json({ error }));
     }
 
@@ -176,10 +188,53 @@ export class LoteController {
             this.loteRepository
         )
             .execute(id_muestra, createLoteDto)
+            .then(lote => {
+                this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: lote!.id_lote,
+                    id_user: req.user!.id,
+                });
+                res.json(lote);
+            })
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public blendLotes = async (req: Request, res: Response) => {
+        console.log('hola');
+        const [error, dto] = BlendLotesDto.create(req.body);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+        new BlendLotes(
+            this.loteRepository,
+            this.pedidoRepository,
+            this.userRepository
+        )
+            .execute(dto!)
             .then(lote => res.json(lote))
             .catch(error => res.status(400).json({ error }));
     }
 
+    public FusionarLotes = async (req: Request, res: Response) => {
+        const [error, dto] = FusionarLotesDto.create(req.body);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
+        new FusionarLotes(
+            this.loteRepository
+        )
+            .execute(dto!)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getLoteById = (req: Request, res: Response) => {
+        new GetLoteById(this.loteRepository)
+            .execute(req.params.id)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
+    }
     public getLotesByUserId = (req: Request, res: Response) => {
         new GetLotes(this.loteRepository)
             .execute()
@@ -206,32 +261,10 @@ export class LoteController {
             .catch(error => res.status(400).json({ error }));
 
     }
-    public blendLotes = async (req: Request, res: Response) => {
-        console.log('hola');
-        const [error, dto] = BlendLotesDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error });
-        }
-        new BlendLotes(
-            this.loteRepository,
-            this.pedidoRepository,
-            this.userRepository
-        )
-            .execute(dto!)
-            .then(lote => res.json(lote))
-            .catch(error => res.status(400).json({ error }));
-    }
-    public FusionarLotes = async (req: Request, res: Response) => {
-        const [error, dto] = FusionarLotesDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error });
-        }
-
-        new FusionarLotes(
-            this.loteRepository
-        )
-            .execute(dto!)
-            .then(lote => res.json(lote))
+    public getLotes = (req: Request, res: Response) => {
+        new GetLotes(this.loteRepository)
+            .execute()
+            .then(lotes => res.json(lotes))
             .catch(error => res.status(400).json({ error }));
     }
     public getLotesRoaster = async (req: Request, res: Response) => {

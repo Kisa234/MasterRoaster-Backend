@@ -9,12 +9,15 @@ import { UpdateMuestra } from "../../domain/usecases/muestra/update-muestra";
 import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
 import { GetMuestras as GetAllMuestra } from "../../domain/usecases/muestra/get-muestras";
 import { UserRepository } from "../../domain/repository/user.repository";
+import { HistorialRepository } from "../../domain/repository/historial.repository";
 
 export class MuestraController {
 
   constructor(
     private readonly muestraRepository: MuestraRepository,
     private readonly userRepository: UserRepository,
+    private readonly historialRepository: HistorialRepository
+    
   ) { }
 
   public createMuestra = (req: Request, res: Response) => {
@@ -48,18 +51,16 @@ export class MuestraController {
     // 5. Ejecuta el caso de uso
     new CreateMuestra(this.muestraRepository, this.userRepository)
       .execute(createMuestraDto!)
-      .then((muestra) => res.json(muestra))
+      .then((muestra) => {
+        this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: muestra.id_muestra,
+                    id_user: req.user!.id
+                });
+                res.json(muestra);
+      })
       .catch((error) => res.status(400).json({ error }));
   };
-
-
-  public getMuestraById = (req: Request, res: Response) => {
-    new GetMuestra(this.muestraRepository)
-      .execute(req.params.id)
-      .then(muestra => res.json(muestra))
-      .catch(error => res.status(400).json({ error }));
-
-  }
 
   public updateMuestra = (req: Request, res: Response) => {
     const id_muestra = req.params.id;
@@ -67,19 +68,50 @@ export class MuestraController {
     if (error) {
       return res.status(400).json({ error });
     }
+    const muestra_before = this.muestraRepository.getMuestraById(id_muestra);
     new UpdateMuestra(this.muestraRepository)
       .execute(id_muestra, updateMuestraDto!)
-      .then(muestra => res.json(muestra))
+      .then((muestra) => {
+        this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    objeto_antes: JSON.stringify(muestra_before),
+                    id_entidad: muestra.id_muestra,
+                    id_user: req.user!.id,
+                    comentario: req.body.hcomentario
+                });
+                res.json(muestra);
+      })
       .catch(error => res.status(400).json({ error }));
 
 
+  }
+
+   public completeMuestra = (req: Request, res: Response) => {
+    const id_muestra = req.params.id;
+    this.muestraRepository.completeMuestra(id_muestra)
+      .then((muestra) => {
+        this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: muestra.id_muestra,
+                    id_user: req.user!.id,
+                });
+                res.json(muestra);
+      })
+      .catch(error => res.status(400).json({ error })); 
   }
 
   public deleteMuestra = (req: Request, res: Response) => {
     const id_muestra = req.params.id;
     new DeleteMuestra(this.muestraRepository)
       .execute(id_muestra)
-      .then(muestra => res.json(muestra))
+      .then((muestra) => {
+        this.historialRepository.createHistorial({
+                    ...req.auditContext!,
+                    id_entidad: muestra.id_muestra,
+                    id_user: req.user!.id,
+                });
+                res.json(muestra);
+      })
       .catch(error => res.status(400).json({ error }));
   }
 
@@ -90,11 +122,14 @@ export class MuestraController {
       .catch(error => res.status(400).json({ error }));
   }
 
-  public completeMuestra = (req: Request, res: Response) => {
-    const id_muestra = req.params.id;
-    this.muestraRepository.completeMuestra(id_muestra)
+    public getMuestraById = (req: Request, res: Response) => {
+    new GetMuestra(this.muestraRepository)
+      .execute(req.params.id)
       .then(muestra => res.json(muestra))
-      .catch(error => res.status(400).json({ error })); 
+      .catch(error => res.status(400).json({ error }));
+
   }
+
+ 
   
 }

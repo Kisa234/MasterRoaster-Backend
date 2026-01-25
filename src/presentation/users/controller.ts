@@ -82,10 +82,9 @@ export class UserController {
   public login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-
     try {
-      const { accessToken, refreshToken, user } = await new AuthUser(this.userRepository)
-        .execute(email, password);
+      const { accessToken, refreshToken, user } =
+        await new AuthUser(this.userRepository).execute(email, password);
 
       return res.json({
         accessToken,
@@ -93,40 +92,49 @@ export class UserController {
         user: {
           id_user: user.id_user,
           email: user.email,
-          rol: user.rol
+          rolId: user.id_rol
         }
       });
+
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
     }
   };
 
+
+
   public refresh = async (req: Request, res: Response) => {
-    // Ahora esperamos el refreshToken en el body
     const { refreshToken } = req.body;
+
     if (!refreshToken) {
       return res.status(401).json({ error: 'Refresh token no presente' });
     }
 
     try {
-      const newAccessToken = await new RefreshAccessToken().execute(refreshToken);
-      // Opcional: también emitir un nuevo refreshToken si así lo quieres
-      return res.json({ accessToken: newAccessToken });
+      const newAccessToken =
+        await new RefreshAccessToken().execute(refreshToken);
+
+      return res.json({
+        accessToken: newAccessToken
+      });
+
     } catch (error: any) {
       return res.status(403).json({ error: error.message });
     }
   };
 
+
+
   public getSessionInfo = async (req: Request, res: Response) => {
     // authMiddleware ya habrá leído el Bearer token y rellenado req.user
-    const user = req.user as { id: string; email: string; rol: string };
+    const user = req.user as { id: string; email: string; rolId: string };
     if (!user) {
       return res.status(401).json({ message: 'No autenticado' });
     }
     return res.json({
       id: user.id,
       email: user.email,
-      rol: user.rol
+      rolId: user.rolId
     });
   };
 

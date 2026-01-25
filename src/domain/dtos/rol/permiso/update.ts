@@ -3,6 +3,7 @@ export class UpdatePermisoDto {
     private constructor(
         public readonly id_permiso: string,
         public readonly codigo?: string,
+        public readonly modulo?: string,
         public readonly descripcion?: string,
     ) {}
 
@@ -11,18 +12,20 @@ export class UpdatePermisoDto {
 
         if (this.codigo) returnObj.codigo = this.codigo;
         if (this.descripcion) returnObj.descripcion = this.descripcion;
+        if (this.modulo) returnObj.modulo = this.modulo;
 
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, UpdatePermisoDto?] {
-        const { id_permiso, codigo, descripcion } = props;
+        const { id_permiso, codigo, modulo, descripcion } = props;
 
         if (!id_permiso) return ['id_permiso property is required', undefined];
 
         return [undefined, new UpdatePermisoDto(
             id_permiso,
             codigo,
+            modulo,
             descripcion
         )];
     }

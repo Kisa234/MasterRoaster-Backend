@@ -40,11 +40,14 @@ export class AuthUser implements AuthUserUseCase {
     if (!valid) throw new Error('Contraseña incorrecta');
 
     const accessToken = jwt.sign(
-      { id: user.id_user, email: user.email, rol: user.rol },
+      {
+        id: user.id_user,
+        email: user.email,
+        rolId: user.id_rol, // UUID
+      },
       envs.JWT_SECRET,
       { expiresIn: '1d' }
     );
-
     const refreshToken = jwt.sign(
       { id: user.id_user },
       envs.JWT_REFRESH_SECRET,
