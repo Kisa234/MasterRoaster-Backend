@@ -28,6 +28,7 @@ import { CambioRoutes } from "./cambio/routes";
 import { RolRoutes } from "./roles-permiso/rol/routes";
 import { PermisoRoutes } from "./roles-permiso/permiso/routes";
 import { RolPermisoRoutes } from "./roles-permiso/rol-permiso/routes";
+import { AlmacenRoutes } from "./almacen/almacen/routes";
 
 
 export class AppRoutes {
@@ -44,6 +45,8 @@ export class AppRoutes {
         router.use('/lote', LoteRoutes.routes);
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
+
+        router.use('/almacen', AlmacenRoutes.routes);
 
 
         router.use('/variedad', VariedadRoutes.routes);
