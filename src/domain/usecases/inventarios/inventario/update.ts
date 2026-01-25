@@ -1,4 +1,4 @@
-import { UpdateInventarioDto } from "../../dtos/inventario/update";
+import { UpdateInventarioDto } from "../../dtos/inventarios/inventario/update";
 import { InventarioEntity } from "../../entities/inventario.entity";
 import { InventarioRepository } from "../../repository/inventario.repository";
 

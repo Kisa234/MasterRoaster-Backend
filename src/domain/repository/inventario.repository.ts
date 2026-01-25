@@ -1,5 +1,5 @@
-import { CreateInventarioDto } from "../dtos/inventario/create";
-import { UpdateInventarioDto } from "../dtos/inventario/update";
+import { CreateInventarioDto } from "../dtos/inventarios/inventario/create";
+import { UpdateInventarioDto } from "../dtos/inventarios/inventario/update";
 import { InventarioEntity } from "../entities/inventario.entity";
 
 export abstract class InventarioRepository {

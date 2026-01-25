@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { InventarioRepository } from "../../domain/repository/inventario.repository";
-import { CreateInventarioDto } from "../../domain/dtos/inventario/create";
-import { UpdateInventarioDto } from "../../domain/dtos/inventario/update";
+import { InventarioRepository } from "../../../domain/repository/inventario.repository";
+import { CreateInventarioDto } from "../../../domain/dtos/inventarios/inventario/create";
+import { UpdateInventarioDto } from "../../../domain/dtos/inventarios/inventario/update";
 
 import { CreateInventario } from "../../domain/usecases/inventario/create";
 import { GetInventarioById } from "../../domain/usecases/inventario/get-by-id";

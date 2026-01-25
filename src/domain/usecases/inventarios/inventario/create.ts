@@ -1,4 +1,4 @@
-import { CreateInventarioDto } from "../../dtos/inventario/create";
+import { CreateInventarioDto } from "../../dtos/inventarios/inventario/create";
 import { InventarioEntity } from "../../entities/inventario.entity";
 import { InventarioRepository } from "../../repository/inventario.repository";
 

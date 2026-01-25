@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { InventarioController } from "./controller";
-import { InventarioDataSourceImpl } from "../../infrastructure/datasources/inventario.datasource.impl";
-import { InventarioRepositoryImpl } from "../../infrastructure/repositories/inventario.repository.impl";
+import { InventarioDataSourceImpl } from "../../../infrastructure/datasources/inventario.datasource.impl";
+import { InventarioRepositoryImpl } from "../../../infrastructure/repositories/inventario.repository.impl";
 
 export class InventarioRoutes {
   static get routes() {

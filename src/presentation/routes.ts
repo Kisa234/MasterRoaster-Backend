@@ -18,7 +18,7 @@ import { NotasRoutes } from "./notas/routes";
 import { FichaEnvioRoutes } from "./fichaEnvio/routes";
 import { ProductoComponenteRoutes } from "./producto-componente/routes";
 import { ProductoRoutes } from "./producto/routes";
-import { InventarioRoutes } from "./inventario/routes";
+import { InventarioRoutes } from "./inventarios/inventario/routes";
 import { CategoriaRoutes } from "./categoria/routes";
 import { BoxTemplateRoutes } from "./box-template/routes";
 import { BoxOpcionRoutes } from "./box-opcion/routes";
@@ -30,6 +30,7 @@ import { PermisoRoutes } from "./roles-permiso/permiso/routes";
 import { RolPermisoRoutes } from "./roles-permiso/rol-permiso/routes";
 import { AlmacenRoutes } from "./almacen/almacen/routes";
 import { MovimientoAlmacenRoutes } from "./almacen/almacen-movimiento/routes";
+import { InventarioLoteRoutes } from "./inventarios/inventario-lote/routes";
 
 
 export class AppRoutes {
@@ -42,14 +43,20 @@ export class AppRoutes {
         router.use('/analisisRapido', AnalisisRapidoRoutes.routes);
         router.use('/analisisSensorial', AnalisisSensorialRoutes.routes);
         router.use('/analisisDefectos', AnalisisDefectosRoutes.routes);
-
+        
         router.use('/lote', LoteRoutes.routes);
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
 
+        router.use('/producto', ProductoRoutes.routes);
+        router.use('/categoria', CategoriaRoutes.routes);
+        router.use('/productoComponente', ProductoComponenteRoutes.routes);
+        
         router.use('/almacen', AlmacenRoutes.routes);
         router.use('/movimiento-almacen', MovimientoAlmacenRoutes.routes);
-
+        
+        router.use('/inventario', InventarioRoutes.routes);
+        router.use('/inventario-lote', InventarioLoteRoutes.routes);
 
         router.use('/variedad', VariedadRoutes.routes);
         router.use('/notas', NotasRoutes.routes);
@@ -71,10 +78,6 @@ export class AppRoutes {
 
         router.use('/p', PersonalizadoRoutes.routes);
 
-        router.use('/productoComponente', ProductoComponenteRoutes.routes);
-        router.use('/producto', ProductoRoutes.routes);
-        router.use('/inventario', InventarioRoutes.routes);
-        router.use('/categoria', CategoriaRoutes.routes);
 
 
         router.use('/box-template', BoxTemplateRoutes.routes);

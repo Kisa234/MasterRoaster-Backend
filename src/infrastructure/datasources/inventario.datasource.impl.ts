@@ -1,7 +1,7 @@
 import { prisma } from "../../data/postgres";
 import { InventarioDataSource } from "../../domain/datasources/inventario.datasource";
-import { CreateInventarioDto } from "../../domain/dtos/inventario/create";
-import { UpdateInventarioDto } from "../../domain/dtos/inventario/update";
+import { CreateInventarioDto } from "../../domain/dtos/inventarios/inventario/create";
+import { UpdateInventarioDto } from "../../domain/dtos/inventarios/inventario/update";
 import { InventarioEntity } from "../../domain/entities/inventario.entity";
 
 export class InventarioDataSourceImpl implements InventarioDataSource {
