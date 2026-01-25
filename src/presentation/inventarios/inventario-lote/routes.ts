@@ -18,10 +18,8 @@ export class InventarioLoteRoutes {
 
     // ---- Routes ----
     router.post("/", controller.createInventario);
-
     router.get("/almacen/:id_almacen", controller.getByAlmacen);
     router.get("/lote/:id_lote/almacen/:id_almacen", controller.getByLoteAndAlmacen);
-
     router.put("/:id_inventario", controller.updateInventario);
 
     return router;
