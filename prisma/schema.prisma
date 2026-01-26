@@ -368,7 +368,6 @@ model Producto {
 model IngresoProducto {
   id_ingreso  String  @id @default(uuid())
   id_producto String
-  id_variante String?
   id_almacen  String
 
   cantidad      Int
