@@ -48,7 +48,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 break
             case 'Suscripcion':
                 return this.pedidoRepository.completarPedido(id_pedido);
-                break; 
+                break;
             default:
                 throw new Error('Tipo de pedido inválido');
         }
@@ -91,13 +91,8 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             // marcar pedido como completado
             return this.pedidoRepository.completarPedido(pedidoId);
         } else {
-            // actualizar lote existente
-            // obtener pedidos
-            const pedidos = await this.pedidoRepository.getPedidosByCliente(pedido.id_user);
-            // obtener el pedido relacionado con este lote original y tipo de pedido
-            const pedidoRelacionado = pedidos.find(p => p.id_lote === loteOrigen.id_lote && p.tipo_pedido === pedido.tipo_pedido);
             // obtener el lote nuevo relacionado
-            const loteNuevoRelacionado = await this.loteRepository.getLoteById(pedidoRelacionado!.id_nuevoLote!);
+            const loteNuevoRelacionado = await this.loteRepository.getLoteById(hasLote);
             // actualizar peso del lote nuevo
             const nuevoPeso = loteNuevoRelacionado!.peso + pedido.cantidad;
             const [error, updateLoteDto] = UpdateLoteDto.update(
@@ -151,13 +146,8 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             // marcar pedido como completado
             return this.pedidoRepository.completarPedido(pedidoId);
         } else {
-            // actualizar lote existente
-            // obtener pedidos
-            const pedidos = await this.pedidoRepository.getPedidosByCliente(pedido.id_user);
-            // obtener el pedido relacionado con este lote original y tipo de pedido
-            const pedidoRelacionado = pedidos.find(p => p.id_lote === loteOrigen.id_lote && p.tipo_pedido === pedido.tipo_pedido);
             // obtener el lote nuevo relacionado
-            const loteNuevoRelacionado = await this.loteRepository.getLoteById(pedidoRelacionado!.id_nuevoLote!);
+            const loteNuevoRelacionado = await this.loteRepository.getLoteById(hasLote);
             // actualizar peso del lote nuevo
             const nuevoPeso = loteNuevoRelacionado!.peso + pedido.cantidad;
             const [error, updateLoteDto] = UpdateLoteDto.update(
@@ -212,14 +202,20 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     }
 
 
-    async verifyIfUserHasLote(id_user: string, id_lote_origen: string, tipo_lote: string): Promise<Boolean> {
-        const lote = await this.loteRepository.getLoteById(id_lote_origen);
-        if (!lote) throw new Error("Lote no válido");
-
-        return lote.id_user === id_user && lote.tipo_lote === tipo_lote;
+    async verifyIfUserHasLote(id_user: string, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
+        // obtener lotes del usuario
+        const lotes = await this.loteRepository.getLotesByUserId(id_user);
+        // verificar si alguno tiene el mismo lote origen y tipo de lote
+        for (const lote of lotes) {
+            if (lote.id_lote.includes(id_lote_origen) && lote.tipo_lote === tipo_lote) {
+                return lote.id_lote;
+            }
+        }
+        return null;
     }
-
-
-
-
 }
+
+
+
+
+

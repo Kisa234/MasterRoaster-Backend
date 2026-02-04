@@ -80,6 +80,7 @@ export class CreateLote implements CreateLoteUseCase {
         const user = await this.userRepository.getUserById(dto.id_user!);
         if (user) {
             if (user?.rol === 'cliente') {
+                
                 const partesNombre = user.nombre.trim().split(' ');
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
