@@ -106,6 +106,7 @@ model Almacen {
   movimientosDestino MovimientoAlmacen[] @relation("MovimientoDestino")
   inventarioInsumos  InventarioInsumo[]
   ingresoProductos   IngresoProducto[]
+  pedidos            Pedido[]            @relation("almacen")
 }
 
 enum TipoMovimiento {
@@ -366,7 +367,7 @@ model Producto {
 }
 
 model IngresoProducto {
-  id_ingreso  String  @id @default(uuid())
+  id_ingreso  String @id @default(uuid())
   id_producto String
   id_almacen  String
 
@@ -534,6 +535,7 @@ model Pedido {
   id_lote              String?
   id_nuevoLote         String?
   id_nuevoLote_tostado String?   @unique
+  id_almacen           String?
   comentario           String?
   pesos                Float[]
   fecha_tueste         DateTime?
@@ -557,6 +559,8 @@ model Pedido {
   loteTostado       LoteTostado? @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
   // Relación con lote tostado de origen 
   loteTostadoOrigen LoteTostado? @relation("PedidoLoteTostadoOrigen", fields: [id_lote_tostado], references: [id_lote_tostado])
+  //  Relacion con el almacen del lote 
+  Almacen           Almacen?     @relation("almacen", fields: [id_almacen], references: [id_almacen])
   // Relación con Usuario como quien lo creó
   creadoPor         User?        @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
   // Relación con Usuario como quien lo completóq

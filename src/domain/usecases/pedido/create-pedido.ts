@@ -11,6 +11,9 @@ import { AnalisisFisicoRepository } from '../../repository/analisisFisico.reposi
 import { AnalisisFisicoEntity } from '../../entities/analisisFisico.entity';
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { UpdateUserDto } from "../../dtos/user/update";
+import { InventarioLoteRepository } from "../../repository/inventario-lote.repository";
+import { InventarioLoteTostadoRepository } from "../../repository/inventario-lote-tostado.repository";
+import { UpdateInventarioLoteDto } from "../../dtos/inventarios/inventario-lote/update";
 
 
 export interface CreatePedidoUseCase {
@@ -21,7 +24,9 @@ export class CreatePedido implements CreatePedidoUseCase {
     constructor(
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly inventarioLoteRepository :InventarioLoteRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly inventarioLoteTostadoRepository :InventarioLoteTostadoRepository,        
         private readonly clienteRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
         private readonly analisisRepository: AnalisisRepository,
@@ -57,7 +62,11 @@ export class CreatePedido implements CreatePedidoUseCase {
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
-        if (lote.peso < dto.cantidad) throw new Error("Stock insuficiente");
+        // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
+        const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(lote.id_lote, dto.id_almacen!);
+        if (!inventarioLote || inventarioLote.cantidad_kg < dto.cantidad) {
+            throw new Error("Stock insuficiente en el almacén");
+        }
 
         const cliente = await this.clienteRepository.getUserById(dto.id_user);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
@@ -70,8 +79,13 @@ export class CreatePedido implements CreatePedidoUseCase {
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
-        const cantidadVerde = dto.cantidad * 1.15;
-        if (lote.peso < cantidadVerde) throw new Error("Stock insuficiente");
+        
+        // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
+        const cantidadVerde = dto.cantidad * 1.1765;
+        const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(lote.id_lote, dto.id_almacen!);
+        if (!inventarioLote || inventarioLote.cantidad_kg < cantidadVerde) {
+            throw new Error("Stock insuficiente en el almacén");
+        }
 
         const cliente = await this.clienteRepository.getUserById(dto.id_user);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
@@ -80,21 +94,30 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     async ordenTueste(dto: CreatePedidoDto): Promise<PedidoEntity> {
+        // 1. Validar que el cliente existe y no está eliminado
+        const user = await this.clienteRepository.getUserById(dto.id_user);
+        if (!user || user.eliminado) {
+            throw new Error('El cliente no existe o está eliminado');
+        }
+
+        // 2. Validar que el lote existe, no está eliminado y es del tipo correcto
+
         if (dto.id_lote == null) { throw new Error('El id_lote es requerido para una orden de tueste'); }
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) { throw new Error('Lote no válido'); }
 
-        // 1. Verificar que hay suficiente peso en el lote 
-        if (lote.peso < dto.cantidad) {
+        // 3. Verificar que hay suficiente peso en el lote 
+        const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(lote.id_lote, dto.id_almacen!);
+        if (!inventarioLote) { throw new Error('No se encontró el inventario para el lote y almacén especificados'); }
+        if (inventarioLote.cantidad_kg < dto.cantidad) {
             throw new Error('No hay suficiente cantidad en el lote');
         }
-        // actualizar peso del lote original si es lote verde
-        if (lote.tipo_lote === 'Lote Verde') {
-            const nuevoPesoLote = lote.peso - dto.cantidad;
-            const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
-            console.log('Actualizando lote:', lote.id_lote, 'Nuevo peso:', nuevoPesoLote);
 
-            await this.loteRepository.updateLote(lote.id_lote, updateLoteDto!);
+        // 4. actualizar peso del lote original si es lote verde
+        if (lote.tipo_lote === 'Lote Verde') {
+            const nuevoPesoLote = inventarioLote.cantidad_kg - dto.cantidad;
+            const [, updateInventarioLoteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoLote });
+            await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
 
             //eliminar lote si el nuevo peso es  0 
             if (nuevoPesoLote == 0) {
@@ -102,12 +125,6 @@ export class CreatePedido implements CreatePedidoUseCase {
             }
         }
 
-
-        // 2. Validar que el cliente existe y no está eliminado
-        const user = await this.clienteRepository.getUserById(dto.id_user);
-        if (!user || user.eliminado) {
-            throw new Error('El cliente no existe o está eliminado');
-        }
 
         // 3. Validar que el lote tiene un análisis asociado
         let analisisFisico: AnalisisFisicoEntity | null = null;
@@ -156,30 +173,32 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     async maquilaValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
 
-        console.log(dto);
+        // 1. Validar cliente
+        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        if (!cliente || cliente.eliminado) {
+            throw new Error("Cliente no válido");
+        }
 
-        // 1. Verificar que el lote tostado exista
+        // 2. Verificar que el lote tostado exista
         const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.id_lote_tostado!);
         if (!loteTostado || loteTostado.peso < 0) {
             throw new Error("Lote tostado no válido o eliminado");
         }
 
-        // Validar campos requeridos
+        // 3. Validar campos requeridos
         if (!dto.gramaje) throw new Error('El gramaje es requerido para pedidos de maquila');
         if (!dto.cantidad) throw new Error('La cantidad de bolsas es requerida para pedidos de maquila');
         if (dto.cantidad <= 0) throw new Error('La cantidad de bolsas debe ser mayor a 0');
         if (dto.gramaje <= 0) throw new Error('El gramaje debe ser mayor a 0');
 
-        // calcular el total en gramos y pasar a kilos
+        //4. calcular el total en gramos y verificar que el lote tostado tenga suficiente peso para la cantidad solicitada
         const totalSolicitadoKg = (dto.cantidad * dto.gramaje);
-        if (loteTostado.peso < totalSolicitadoKg) {
-            throw new Error(`Stock insuficiente. Solo hay ${loteTostado.peso} kg disponibles`);
+        const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(loteTostado.id_lote_tostado, dto.id_almacen!);
+        if (!inventarioLoteTostado) {
+            throw new Error('No se encontró el inventario para el lote tostado y almacén especificados');
         }
-
-        // 3. Validar cliente
-        const cliente = await this.clienteRepository.getUserById(dto.id_user);
-        if (!cliente || cliente.eliminado) {
-            throw new Error("Cliente no válido");
+        if (inventarioLoteTostado.cantidad_kg < totalSolicitadoKg) {
+            throw new Error(`Stock insuficiente. Solo hay ${inventarioLoteTostado.cantidad_kg} kg disponibles`);
         }
 
         // 4. Crear pedido de maquila

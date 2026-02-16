@@ -10,6 +10,7 @@ export class CreatePedidoDto {
     public readonly id_lote?: string,
     public readonly id_nuevoLote?: string,
     public readonly id_nuevoLote_tostado?: string,
+    public readonly id_almacen?: string,
     public readonly pesos?: number[],
     public readonly tostadora?: string,
     public readonly fecha_tueste?: Date,
@@ -30,6 +31,7 @@ export class CreatePedidoDto {
       id_lote,
       id_nuevoLote,
       id_nuevoLote_tostado,
+      id_almacen,
       pesos,
       tostadora,
       fecha_tueste,
@@ -46,6 +48,10 @@ export class CreatePedidoDto {
 
     if (['Venta Verde', 'Tostado Verde', 'Orden Tueste'].includes(tipo_pedido) && !id_lote)
       return ['El ID del lote es requerido para este tipo de pedido', undefined];
+
+if (['Venta Verde', 'Tostado Verde', 'Orden Tueste'].includes(tipo_pedido) && !id_almacen)
+      return ['El ID del almacén es requerido para este tipo de pedido', undefined];
+
 
     if (tipo_pedido === 'Maquila') {
       if (!id_lote_tostado)
@@ -68,6 +74,7 @@ export class CreatePedidoDto {
       id_lote,
       id_nuevoLote,
       id_nuevoLote_tostado,
+      id_almacen,
       pesos,
       tostadora,
       fechaTuesteDate,

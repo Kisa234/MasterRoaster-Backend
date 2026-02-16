@@ -22,12 +22,15 @@ import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-l
 import { InventarioRepository } from '../../domain/repository/inventario.repository';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
+import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
+import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
 
 export class PedidoController {
 
     constructor(
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly inventarioLoteRepository: InventarioLoteRepository,
         private readonly userRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
         private readonly analisisRepository: AnalisisRepository,
@@ -35,6 +38,7 @@ export class PedidoController {
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
         private readonly inventarioRepository: InventarioRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository
 
     ) {
     }
@@ -52,7 +56,9 @@ export class PedidoController {
         new CreatePedido(
             this.pedidoRepository,
             this.loteRepository,
+            this.inventarioLoteRepository,
             this.loteTostadoRepository,
+            this.inventarioLoteTostadoRepository,
             this.userRepository,
             this.tuesteRepository,
             this.analisisRepository,
@@ -131,6 +137,8 @@ export class PedidoController {
             this.pedidoRepository,
             this.loteRepository,
             this.loteTostadoRepository,
+            this.inventarioLoteRepository,
+            this.inventarioLoteTostadoRepository,
             this.duplicateLoteUseCase,
             this.inventarioRepository
         )

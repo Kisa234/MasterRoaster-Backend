@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { AlmacenController } from "./controller";
-import { AlmacenDataSourceImpl } from "../../../infrastructure/datasources/almacen.datasource.impl";
+
 import { AlmacenRepositoryImpl } from "../../../infrastructure/repositories/almacen.repository.impl";
 
 export class AlmacenRoutes {

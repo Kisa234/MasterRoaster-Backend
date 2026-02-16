@@ -9,6 +9,7 @@ export class UpdatePedidoDto {
     public readonly id_lote?: string,
     public readonly id_nuevoLote?: string,
     public readonly id_nuevoLote_tostado?: string,
+    public readonly id_almacen?: string,
     public readonly pesos?: number[],
     public readonly tostadora?: string,
     public readonly fecha_tueste?: Date,
@@ -26,12 +27,14 @@ export class UpdatePedidoDto {
     if (this.comentario) returnObj.comentario = this.comentario;
     if (this.id_nuevoLote) returnObj.id_nuevoLote = this.id_nuevoLote;
     if (this.id_nuevoLote_tostado) returnObj.id_nuevoLote_tostado = this.id_nuevoLote_tostado;
+    if (this.id_almacen) returnObj.id_almacen = this.id_almacen;
     if (this.pesos) returnObj.pesos = this.pesos;
     if (this.tostadora) returnObj.tostadora = this.tostadora;
     if (this.fecha_tueste) returnObj.fecha_tueste = this.fecha_tueste;
     if (this.molienda) returnObj.molienda = this.molienda;
     if (this.gramaje) returnObj.gramaje = this.gramaje;
     if (this.facturado !== undefined) returnObj.facturado = this.facturado;
+
 
     return returnObj;
   }
@@ -47,6 +50,7 @@ export class UpdatePedidoDto {
       id_lote,
       id_nuevoLote,
       id_nuevoLote_tostado,
+      id_almacen,
       pesos,
       tostadora,
       fecha_tueste,
@@ -69,6 +73,7 @@ export class UpdatePedidoDto {
         id_lote,
         id_nuevoLote,
         id_nuevoLote_tostado,
+        id_almacen,
         pesos,
         tostadora,
         fechaTuesteDate,

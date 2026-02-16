@@ -14,7 +14,6 @@ export class IngresoProductoDataSourceImpl
     const ingreso = await prisma.ingresoProducto.create({
       data: {
         id_producto: dto.id_producto,
-        id_variante: dto.id_variante,
         id_almacen: dto.id_almacen,
         cantidad: dto.cantidad,
         precio_compra: dto.precio_compra,

@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { InventarioRepository } from "../../../domain/repository/inventario.repository";
 import { CreateInventarioDto } from "../../../domain/dtos/inventarios/inventario/create";
 import { UpdateInventarioDto } from "../../../domain/dtos/inventarios/inventario/update";
+import { CreateInventario } from "../../../domain/usecases/inventarios/inventario/create";
+import { GetInventarioById } from "../../../domain/usecases/inventarios/inventario/get-by-id";
+import { GetAllInventario } from "../../../domain/usecases/inventarios/inventario/get-all";
+import { UpdateInventario } from "../../../domain/usecases/inventarios/inventario/update";
+import { DeleteInventario } from "../../../domain/usecases/inventarios/inventario/delete";
 
-import { CreateInventario } from "../../domain/usecases/inventario/create";
-import { GetInventarioById } from "../../domain/usecases/inventario/get-by-id";
-import { UpdateInventario } from "../../domain/usecases/inventario/update";
-import { DeleteInventario } from "../../domain/usecases/inventario/delete";
-import { GetAllInventario } from "../../domain/usecases/inventario/get-all";
+
 
 
 export class InventarioController {

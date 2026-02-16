@@ -96,7 +96,6 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lotes = await prisma.lote.findMany({
       where: {
         id_user: id,
-        eliminado: false
       }
     });
     if (!lotes) throw new Error("No existen lotes para el usuario");
