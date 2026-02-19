@@ -14,4 +14,5 @@ export abstract class RolDataSource {
     abstract deleteRol(id: string): Promise<RolEntity>;
 
     abstract getAllRoles(): Promise<RolEntity[]>;
+
 }

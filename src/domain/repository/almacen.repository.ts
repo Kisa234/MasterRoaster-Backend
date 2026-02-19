@@ -1,6 +1,7 @@
 import { CreateAlmacenDto } from "../dtos/almacen/almacen/create";
 import { UpdateAlmacenDto } from "../dtos/almacen/almacen/update";
 import { AlmacenEntity } from "../entities/almacen.entity";
+import { UpdateAlmacen } from "../usecases/almacen/almacen/update";
 
 export abstract class AlmacenRepository {
 

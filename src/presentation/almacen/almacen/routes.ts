@@ -9,7 +9,7 @@ export class AlmacenRoutes {
   static get routes(): Router {
     const router = Router();
 
-    // Infra
+    // Repositories
     const almacenDatasource = new AlmacenDataSourceImpl();
     const almacenRepository = new AlmacenRepositoryImpl(almacenDatasource);
 

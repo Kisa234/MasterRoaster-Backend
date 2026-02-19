@@ -1,3 +1,4 @@
+import { AssignRoleToUser } from './../../domain/usecases/user/assign-rol-user';
 import { AuthUser } from './../../domain/usecases/user/auth-user';
 import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repository/user.repository';
@@ -70,6 +71,15 @@ export class UserController {
     new GetUsersRol(this.userRepository)
       .execute(role)
       .then(users => res.json(users))
+      .catch(error => res.status(400).json({ error }));
+  }
+
+  public AssignRoleToUser = async (req: Request, res: Response) => {
+    const user_id = req.params.id_user;
+    const role_id = req.params.id_rol;
+    new AssignRoleToUser(this.userRepository)
+      .execute(user_id, role_id)
+      .then(user => res.json(user))
       .catch(error => res.status(400).json({ error }));
   }
 

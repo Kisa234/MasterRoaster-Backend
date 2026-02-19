@@ -1,4 +1,4 @@
-export class UpdateAlmacenDto {
+   export class UpdateAlmacenDto {
 
   private constructor(
     public readonly nombre?: string,
@@ -36,8 +36,8 @@ export class UpdateAlmacenDto {
     return [
       undefined,
       new UpdateAlmacenDto(
-        nombre,
-        descripcion,
+        nombre !== undefined ? nombre.trim() : undefined,
+        descripcion === undefined ? undefined : (descripcion === null ? null : descripcion.trim()),
         activo
       )
     ];

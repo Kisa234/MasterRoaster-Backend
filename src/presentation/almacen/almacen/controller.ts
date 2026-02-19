@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 
 import { CreateAlmacenDto } from "../../../domain/dtos/almacen/almacen/create";
-import { UpdateAlmacenDto } from "../../../domain/dtos/almacen/almacen/update";
-import { AlmacenRepository } from "../../../domain/repository/almacen.repository";
 
 import { CreateAlmacen } from "../../../domain/usecases/almacen/almacen/create";
 import { GetAlmacenById } from "../../../domain/usecases/almacen/almacen/get-by-id";
@@ -10,6 +8,8 @@ import { GetAllAlmacenes } from "../../../domain/usecases/almacen/almacen/get-al
 import { UpdateAlmacen } from "../../../domain/usecases/almacen/almacen/update";
 import { DeleteAlmacen } from "../../../domain/usecases/almacen/almacen/delete";
 import { GetAlmacenesActivos } from "../../../domain/usecases/almacen/almacen/get-active";
+import { UpdateAlmacenDto } from "../../../domain/dtos/almacen/almacen/update";
+import { AlmacenRepository } from "../../../domain/repository/almacen.repository";
 
 export class AlmacenController {
 

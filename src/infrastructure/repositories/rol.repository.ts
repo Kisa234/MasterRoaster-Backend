@@ -29,4 +29,6 @@ export class RolRepositoryImpl implements RolRepository {
     getAllRoles(): Promise<RolEntity[]> {
         return this.datasource.getAllRoles();
     }
+    
+    
 }
