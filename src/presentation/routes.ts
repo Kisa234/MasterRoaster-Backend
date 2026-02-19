@@ -34,6 +34,7 @@ import { InventarioLoteRoutes } from "./inventarios/inventario-lote/routes";
 import { InventarioLoteTostadoRoutes } from "./inventarios/inventarios-lote-tostado/routes";
 import { InventarioInsumoRoutes } from "./inventarios/inventario-insumo/routes";
 import { IngresoProductoRoutes } from "./ingreso-producto/routes";
+import { InsumoRoutes } from "./insumo/routes";
 
 
 export class AppRoutes {
@@ -50,6 +51,7 @@ export class AppRoutes {
         router.use('/lote', LoteRoutes.routes);
         router.use('/loteTostado', LoteTostadoRoutes.routes);
         router.use('/muestra', MuestraRoutes.routes);
+        router.use('/insumo', InsumoRoutes.routes);
 
         router.use('/producto', ProductoRoutes.routes);
         router.use('/categoria', CategoriaRoutes.routes);

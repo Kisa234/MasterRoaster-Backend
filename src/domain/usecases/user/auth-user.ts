@@ -21,10 +21,8 @@ export class AuthUser implements AuthUserUseCase {
 
   async execute(email: string, password: string): Promise<AuthResult> {
     const user = await this.userRepository.findByEmail(email);
-
     if (!user) throw new Error('Usuario no encontrado');
 
-    
     // Caso 1: Clientes no pueden autenticarse
     if ( user.rol === 'cliente') {
       throw new Error('No tienes permisos para acceder');
@@ -35,12 +33,9 @@ export class AuthUser implements AuthUserUseCase {
       throw new Error('Usuario no activo o eliminado');
     }
 
-    
-    
-    
     const valid = await Encryption.comparePassword(password, user.password);
     if (!valid) throw new Error('Contraseña incorrecta');
-    
+
     const accessToken = jwt.sign(
       {
         id: user.id_user,
