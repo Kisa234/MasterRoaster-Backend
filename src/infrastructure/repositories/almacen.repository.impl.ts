@@ -7,29 +7,30 @@ import { AlmacenRepository } from "../../domain/repository/almacen.repository";
 export class AlmacenRepositoryImpl implements AlmacenRepository {
 
   constructor(
-    private readonly almacenDatasource: AlmacenDataSource
+    private readonly almacen: AlmacenDataSource
   ) {}
 
-  createAlmacen(dto: CreateAlmacenDto): Promise<AlmacenEntity> {
-    return this.almacenDatasource.createAlmacen(dto);
+  createAlmacen(createAlmacenDto: CreateAlmacenDto): Promise<AlmacenEntity> {
+    return this.almacen.createAlmacen(createAlmacenDto);
   }
 
   getAlmacenById(id_almacen: string): Promise<AlmacenEntity | null> {
-    return this.almacenDatasource.getAlmacenById(id_almacen);
+    return this.almacen.getAlmacenById(id_almacen);
   }
 
-  updateAlmacen(
-    id_almacen: string,
-    dto: UpdateAlmacenDto
-  ): Promise<AlmacenEntity> {
-    return this.almacenDatasource.updateAlmacen(id_almacen, dto);
+  updateAlmacen(id_almacen: string, updateAlmacenDto: UpdateAlmacenDto): Promise<AlmacenEntity> {
+    return this.almacen.updateAlmacen(id_almacen, updateAlmacenDto);
   }
 
   deleteAlmacen(id_almacen: string): Promise<AlmacenEntity> {
-    return this.almacenDatasource.deleteAlmacen(id_almacen);
+    return this.almacen.deleteAlmacen(id_almacen);
   }
 
-  getAllAlmacenes(activo?: boolean): Promise<AlmacenEntity[]> {
-    return this.almacenDatasource.getAllAlmacenes(activo);
+  getAllAlmacenes(): Promise<AlmacenEntity[]> {
+    return this.almacen.getAllAlmacenes();
+  }
+
+  getAlmacenesActivos(): Promise<AlmacenEntity[]> {
+    return this.almacen.getAlmacenesActivos();
   }
 }

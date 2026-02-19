@@ -25,6 +25,11 @@ import { InventarioRepositoryImpl } from '../../infrastructure/repositories/inve
 import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
 import { LoteTostadoDataSourceImpl } from '../../infrastructure/datasources/loteTostado.datasource.impl';
 import { LoteTostadoRepositoryImpl } from '../../infrastructure/repositories/loteTostado.repository.impl';
+import { InventarioLoteRepositoryImpl } from '../../infrastructure/repositories/inventario-lote.repository.impl';
+import { InventarioLoteDataSourceImpl } from '../../infrastructure/datasources/inventario-lote.datasource.impl';
+import { InventarioLoteTostadoDataSource } from '../../domain/datasources/inventario-lote-tostado.datasource';
+import { InventarioLoteTostadoRepositoryImpl } from '../../infrastructure/repositories/inventario-lote-tostado.repository.impl';
+import { InventarioLoteTostadoDataSourceImpl } from '../../infrastructure/datasources/inventario-lote-tostado.datasource.impl';
 
 export class PedidoRoutes {
 
@@ -40,9 +45,16 @@ export class PedidoRoutes {
         // Lote
         const LoteDatasource = new LoteDataSourceImpl();
         const LoteRepository = new LoteRepositoryImpl(LoteDatasource);
+        // LoteInventario
+        const inventarioLoteDatasource = new InventarioLoteDataSourceImpl();
+        const inventarioLoteRepository = new InventarioLoteRepositoryImpl(inventarioLoteDatasource);
         // Tueste
         const TuesteDatasource = new TuesteDataSourceImpl();
         const TuesteRepository = new TuesteRepositoryImpl(TuesteDatasource);
+
+        // TuesteInventario
+        const inventarioTostadoDatasource = new InventarioLoteTostadoDataSourceImpl();
+        const inventarioTostadoRepository = new InventarioLoteTostadoRepositoryImpl(inventarioTostadoDatasource);
         // User
         const Userdatasource = new UserDataSourceImpl();
         const UserRepository = new UserRepositoryImpl(Userdatasource);
@@ -81,17 +93,19 @@ export class PedidoRoutes {
         const controller = new PedidoController(
             PedidoRepository,
             LoteRepository,
+            inventarioLoteRepository,
             UserRepository,
             TuesteRepository,
             AnalisisRepository,
             AnalisisFisicoRepository,
             duplicateLote,
             InventarioRepository,
-            LoteTostadoRepository
+            LoteTostadoRepository,
+            inventarioTostadoRepository,
         );
 
         // Definición de rutas
-        
+
         router.get('/orden/tueste', controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', controller.getPedidosByEstado);

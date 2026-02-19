@@ -2,30 +2,20 @@ import { UpdateAlmacenDto } from "../../../dtos/almacen/almacen/update";
 import { AlmacenEntity } from "../../../entities/almacen.entity";
 import { AlmacenRepository } from "../../../repository/almacen.repository";
 
-export interface UpdateAlmacenUseCase {
-  execute(id_almacen: string, dto: UpdateAlmacenDto): Promise<AlmacenEntity>;
-}
-
-export class UpdateAlmacen implements UpdateAlmacenUseCase {
+export class UpdateAlmacen {
 
   constructor(
     private readonly almacenRepository: AlmacenRepository
   ) {}
 
-  async execute(
+  execute(
     id_almacen: string,
-    dto: UpdateAlmacenDto
+    updateAlmacenDto: UpdateAlmacenDto
   ): Promise<AlmacenEntity> {
 
-    if (!id_almacen) {
-      throw new Error('id_almacen es requerido');
-    }
+    if (!id_almacen) throw new Error('id_almacen es requerido');
+    if (!updateAlmacenDto) throw new Error('updateAlmacenDto es requerido');
 
-    // validación mínima: que tenga algo que actualizar
-    if (Object.keys(dto.values).length === 0) {
-      throw new Error('No hay campos para actualizar');
-    }
-
-    return await this.almacenRepository.updateAlmacen(id_almacen, dto);
+    return this.almacenRepository.updateAlmacen(id_almacen, updateAlmacenDto);
   }
 }
