@@ -80,11 +80,11 @@ export class LoteRoutes{
             historialRepository
         );
 
-        router.post('/', authMiddleware,checkPermission('LOTE_CREATE') , auditMiddleware('Lote', 'CREATE'),loteController.createLote);
-        router.post('/rapido', authMiddleware,checkPermission('LOTE_CREATE'),auditMiddleware('Lote', 'CREATE'), loteController.createLoteRapido);
-        router.post('/muestra/:id',authMiddleware,checkPermission('LOTE_CREATE'), auditMiddleware('Lote', 'CREATE') ,loteController.createLoteFromMuestra);
-        router.put('/:id', authMiddleware,checkPermission('LOTE_UPDATE'),auditMiddleware('Lote', 'UPDATE'), loteController.updateLote);
-        router.delete('/:id', authMiddleware, checkPermission('LOTE_DELETE'),auditMiddleware('Lote', 'DELETE'),loteController.deleteLote);
+        router.post('/', authMiddleware,checkPermission('inventario.lotes_verdes.create') , auditMiddleware('Lote', 'CREATE'),loteController.createLote);
+        router.post('/rapido', authMiddleware,checkPermission('inventario.lotes_verdes.create'),auditMiddleware('Lote', 'CREATE'), loteController.createLoteRapido);
+        router.post('/muestra/:id',authMiddleware,checkPermission('inventario.lotes_verdes.create'), auditMiddleware('Lote', 'CREATE') ,loteController.createLoteFromMuestra);
+        router.put('/:id', authMiddleware,checkPermission('inventario.lotes_verdes.update'),auditMiddleware('Lote', 'UPDATE'), loteController.updateLote);
+        router.delete('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.delete'),auditMiddleware('Lote', 'DELETE'),loteController.deleteLote);
         
         router.post('/fusionar',authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.FusionarLotes);
         router.post('/blend',authMiddleware,auditMiddleware('Lote', 'CREATE'),  loteController.blendLotes);

@@ -20,27 +20,36 @@ export const checkPermission = (permissionCode: string) => {
         });
       }
 
-      // 3️⃣ Validar permiso
-      const permiso = await prisma.rolPermiso.findFirst({
+      const permiso = await prisma.permiso.findUnique({
         where: {
-          id_rol: user.rolId,
-          permiso: {
-            codigo: permissionCode,
-          },
-        },
-        select: {
-          id_permiso: true,
+          codigo: permissionCode,
         },
       });
 
+      // validar que el permiso exista 
+
       if (!permiso) {
+        return res.status(500).json({
+          message: 'Permiso no existe en la base de datos',
+          permissionCode,
+        });
+      }
+
+      // Validar permiso
+      const rol_permiso = await prisma.rolPermiso.findFirst({
+        where: {
+          id_rol: user.rolId,
+          id_permiso:  permiso.id_permiso
+          
+      }});
+
+      if (!rol_permiso) {
         return res.status(403).json({
           message: 'No tienes permiso para esta acción',
           permissionRequired: permissionCode,
         });
       }
 
-      // 4️⃣ OK
       next();
     } catch (error) {
       console.error('Permission middleware error:', error);
