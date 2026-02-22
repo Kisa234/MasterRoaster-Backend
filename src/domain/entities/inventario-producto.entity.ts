@@ -1,6 +1,6 @@
 import { Molienda } from "@prisma/client";
 
-export class InventarioEntity {
+export class InventarioProductoEntity {
     constructor(
         public id_inventario: string,
         public id_producto: string,
@@ -13,7 +13,7 @@ export class InventarioEntity {
         public fecha_editado?: Date | null,
     ) { }
 
-    public static fromObject(obj: { [key: string]: any }): InventarioEntity {
+    public static fromObject(obj: { [key: string]: any }): InventarioProductoEntity {
         const {
             id_inventario,
             id_producto,
@@ -41,7 +41,7 @@ export class InventarioEntity {
             throw new Error('fecha_editado no es válida');
         }
 
-        return new InventarioEntity(
+        return new InventarioProductoEntity(
             id_inventario,
             id_producto,
             id_lote_tostado,

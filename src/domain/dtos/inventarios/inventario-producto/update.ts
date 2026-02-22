@@ -1,6 +1,6 @@
 import { Molienda } from "@prisma/client";
 
-export class UpdateInventarioDto {
+export class UpdateInventarioProductoDto {
     private constructor(
         public readonly id_inventario?: string,
         public readonly id_producto?: string,
@@ -22,7 +22,7 @@ export class UpdateInventarioDto {
         return obj;
     }
 
-    static update(props: { [key: string]: any }): [string?, UpdateInventarioDto?] {
+    static update(props: { [key: string]: any }): [string?, UpdateInventarioProductoDto?] {
         const {
             id_inventario,
             id_producto,
@@ -38,7 +38,7 @@ export class UpdateInventarioDto {
 
         return [
             undefined,
-            new UpdateInventarioDto(id_inventario, id_producto, id_lote_tostado, cantidad, gramaje, molienda, unidad_medida)
+            new UpdateInventarioProductoDto(id_inventario, id_producto, id_lote_tostado, cantidad, gramaje, molienda, unidad_medida)
         ];
     }
 }

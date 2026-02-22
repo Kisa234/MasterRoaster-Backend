@@ -4,7 +4,7 @@ import { LoteRepository } from "../../repository/lote.repository";
 import { PedidoRepository } from "../../repository/pedido.repository";
 import { DuplicateLoteUseCase } from './../lote/lote/duplicar-lote';
 import { UpdatePedidoDto } from '../../dtos/pedido/update';
-import { InventarioRepository } from "../../repository/inventario.repository";
+import { InventarioProductoRepository } from "../../repository/inventario-producto.repository";
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { UpdateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/update";
 import { InventarioLoteRepository } from "../../repository/inventario-lote.repository";
@@ -24,7 +24,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         private readonly inventarioLoteRepository: InventarioLoteRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
-        private readonly inventarioRepository: InventarioRepository,
+        private readonly inventarioRepository: InventarioProductoRepository,
     ) { }
 
     async execute(id_pedido: string): Promise<PedidoEntity> {

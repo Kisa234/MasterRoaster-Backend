@@ -1,6 +1,6 @@
 import { Molienda } from "@prisma/client";
 
-export class CreateInventarioDto {
+export class CreateInventarioProductoDto {
     private constructor(
         public readonly id_producto: string,
         public readonly id_almacen:string,
@@ -11,7 +11,7 @@ export class CreateInventarioDto {
         public readonly unidad_medida?: string,
     ) {}
 
-    static create(props: { [key: string]: any }): [string?, CreateInventarioDto?] {
+    static create(props: { [key: string]: any }): [string?, CreateInventarioProductoDto?] {
         const {
             id_producto,
             id_almacen,
@@ -29,7 +29,7 @@ export class CreateInventarioDto {
 
         return [
             undefined,
-            new CreateInventarioDto(id_producto,id_almacen, id_lote_tostado, cantidad, gramaje, molienda, unidad_medida)
+            new CreateInventarioProductoDto(id_producto,id_almacen, id_lote_tostado, cantidad, gramaje, molienda, unidad_medida)
         ];
     }
 }

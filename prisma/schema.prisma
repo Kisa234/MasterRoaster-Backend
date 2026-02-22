@@ -97,7 +97,7 @@ model Almacen {
   created_at  DateTime @default(now())
 
   // Relaciones
-  inventarioProductos Inventario[]
+  inventarioProductos InventarioProducto[]
   inventarioLotes     InventarioLote[]
   inventarioMuestras  InventarioMuestra[]
   inventarioTostados  InventarioLoteTostado[]
@@ -265,7 +265,7 @@ model LoteTostado {
   usuario User?   @relation(fields: [id_user], references: [id_user])
   envio   Envio[]
 
-  inventarios            Inventario[]
+  inventarios            InventarioProducto[]
   inventarioLoteTostados InventarioLoteTostado[]
 }
 
@@ -288,13 +288,23 @@ model InventarioLoteTostado {
 model Insumo {
   id_insumo     String   @id @default(uuid())
   nombre        String
-  categoria     String // "Utensilios", "Empaques", "Limpieza"
   descripcion   String?
-  unidad_medida String // "unidad", "paquete"
+  unidad_medida String
   activo        Boolean  @default(true)
   created_at    DateTime @default(now())
 
-  inventarios InventarioInsumo[]
+  id_categoria     String
+  categoria     CategoriaInsumo @relation(fields: [id_categoria], references: [id_categoria])
+
+  inventarios     InventarioInsumo[]
+}
+
+model CategoriaInsumo {
+  id_categoria String  @id @default(uuid())
+  nombre       String  @unique
+  activo       Boolean @default(true)
+
+  insumos Insumo[]
 }
 
 model InventarioInsumo {
@@ -359,7 +369,7 @@ model Producto {
 
   ingresos IngresoProducto[]
 
-  inventarios   Inventario[]
+  inventarios   InventarioProducto[]
   categoria     Categoria?           @relation(fields: [id_categoria], references: [id_categoria])
   componentes   ProductoComponente[] @relation("ProductoCombo")
   parteDeCombos ProductoComponente[] @relation("ProductoParte")
@@ -379,7 +389,7 @@ model IngresoProducto {
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
 }
 
-model Inventario {
+model InventarioProducto {
   id_inventario   String    @id @default(uuid())
   id_producto     String
   id_almacen      String

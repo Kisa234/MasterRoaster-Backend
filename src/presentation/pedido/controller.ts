@@ -19,7 +19,7 @@ import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico
 import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
 import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-pedidos-tueste-fecha";
 import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-lote';
-import { InventarioRepository } from '../../domain/repository/inventario.repository';
+import { InventarioProductoRepository } from '../../domain/repository/inventario-producto.repository';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
 import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
@@ -36,7 +36,7 @@ export class PedidoController {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
-        private readonly inventarioRepository: InventarioRepository,
+        private readonly inventarioRepository: InventarioProductoRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository
 

@@ -18,7 +18,7 @@ import { NotasRoutes } from "./notas/routes";
 import { FichaEnvioRoutes } from "./fichaEnvio/routes";
 import { ProductoComponenteRoutes } from "./producto-componente/routes";
 import { ProductoRoutes } from "./producto/routes";
-import { InventarioRoutes } from "./inventarios/inventario/routes";
+import { InventarioProductosRoutes } from "./inventarios/inventario-producto/routes";
 import { CategoriaRoutes } from "./categoria/routes";
 import { BoxTemplateRoutes } from "./box-template/routes";
 import { BoxOpcionRoutes } from "./box-opcion/routes";
@@ -35,6 +35,7 @@ import { InventarioLoteTostadoRoutes } from "./inventarios/inventarios-lote-tost
 import { InventarioInsumoRoutes } from "./inventarios/inventario-insumo/routes";
 import { IngresoProductoRoutes } from "./ingreso-producto/routes";
 import { InsumoRoutes } from "./insumo/routes";
+import { InventarioMuestraRoutes } from "./inventarios/inventario-muestra/routes";
 
 
 export class AppRoutes {
@@ -62,7 +63,8 @@ export class AppRoutes {
         router.use('/almacen', AlmacenRoutes.routes);
         router.use('/movimiento-almacen', MovimientoAlmacenRoutes.routes);
         
-        router.use('/inventario', InventarioRoutes.routes);
+        router.use('/inventario-muestra', InventarioMuestraRoutes.routes);
+        router.use('/inventario-producto', InventarioProductosRoutes.routes);
         router.use('/inventario-lote', InventarioLoteRoutes.routes);
         router.use('/inventario-lote-tostado', InventarioLoteTostadoRoutes.routes);
         router.use('/inventario-insumo', InventarioInsumoRoutes.routes);
