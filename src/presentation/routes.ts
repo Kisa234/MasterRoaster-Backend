@@ -36,6 +36,7 @@ import { InventarioInsumoRoutes } from "./inventarios/inventario-insumo/routes";
 import { IngresoProductoRoutes } from "./ingreso-producto/routes";
 import { InsumoRoutes } from "./insumo/routes";
 import { InventarioMuestraRoutes } from "./inventarios/inventario-muestra/routes";
+import { categoriaInsumoRoutes } from "./categoria-insumo.ts/routes";
 
 
 export class AppRoutes {
@@ -56,6 +57,7 @@ export class AppRoutes {
 
         router.use('/producto', ProductoRoutes.routes);
         router.use('/categoria', CategoriaRoutes.routes);
+        router.use('/categoria-insumo', categoriaInsumoRoutes.routes);  
         router.use('/productoComponente', ProductoComponenteRoutes.routes);
         router.use('/ingreso-producto', IngresoProductoRoutes.routes);
 

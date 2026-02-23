@@ -3,7 +3,7 @@ export class InsumoEntity {
   constructor(
     public id_insumo: string,
     public nombre: string,
-    public categoria: string,
+    public id_categoria: string,
     public unidad_medida: string,
     public descripcion?: string,
     public activo?: boolean,
@@ -14,7 +14,7 @@ export class InsumoEntity {
     const {
       id_insumo,
       nombre,
-      categoria,
+      id_categoria,
       descripcion,
       unidad_medida,
       activo,
@@ -23,7 +23,7 @@ export class InsumoEntity {
 
     if (!id_insumo) throw new Error('id_insumo es requerido');
     if (!nombre) throw new Error('nombre es requerido');
-    if (!categoria) throw new Error('categoria es requerida');
+    if (!id_categoria) throw new Error('categoria es requerida');
     if (!unidad_medida) throw new Error('unidad_medida es requerida');
 
     let newCreatedAt: Date | undefined = undefined;
@@ -35,7 +35,7 @@ export class InsumoEntity {
     return new InsumoEntity(
       String(id_insumo),
       String(nombre).trim(),
-      String(categoria).trim(),
+      String(id_categoria).trim(),
       String(unidad_medida).trim(),
       descripcion !== undefined && descripcion !== null ? String(descripcion) : undefined,
       activo !== undefined ? Boolean(activo) : undefined,

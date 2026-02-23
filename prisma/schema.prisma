@@ -101,11 +101,11 @@ model Almacen {
   inventarioLotes     InventarioLote[]
   inventarioMuestras  InventarioMuestra[]
   inventarioTostados  InventarioLoteTostado[]
+  inventarioInsumos  InventarioInsumo[]
 
+  ingresoProductos   IngresoProducto[]
   movimientosOrigen  MovimientoAlmacen[] @relation("MovimientoOrigen")
   movimientosDestino MovimientoAlmacen[] @relation("MovimientoDestino")
-  inventarioInsumos  InventarioInsumo[]
-  ingresoProductos   IngresoProducto[]
   pedidos            Pedido[]            @relation("almacen")
 }
 
