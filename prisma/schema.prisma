@@ -347,7 +347,7 @@ model Producto {
   descripcion String?
 
   // Identidad comercial
-  marca  String?
+  id_marca String?
   modelo String?
   color  String?
 
@@ -374,6 +374,18 @@ model Producto {
   componentes   ProductoComponente[] @relation("ProductoCombo")
   parteDeCombos ProductoComponente[] @relation("ProductoParte")
   pedidos       Pedido[]
+  marca    Marca? @relation(fields: [id_marca], references: [id_marca])
+}
+
+model Marca {
+  id_marca       String   @id @default(uuid())
+  nombre         String   @unique
+  descripcion    String?
+  activo         Boolean  @default(true)
+  fecha_registro DateTime @default(now())
+  fecha_editado  DateTime?
+
+  productos Producto[]
 }
 
 model IngresoProducto {
