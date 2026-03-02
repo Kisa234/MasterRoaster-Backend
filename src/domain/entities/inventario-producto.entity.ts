@@ -1,9 +1,11 @@
 import { Molienda } from "@prisma/client";
 
+
 export class InventarioProductoEntity {
     constructor(
         public id_inventario: string,
         public id_producto: string,
+        public id_almacen: string,
         public id_lote_tostado: string | null,
         public cantidad: number,
         public gramaje: number | null,
@@ -17,6 +19,7 @@ export class InventarioProductoEntity {
         const {
             id_inventario,
             id_producto,
+            id_almacen,
             id_lote_tostado,
             cantidad,
             gramaje,
@@ -28,6 +31,7 @@ export class InventarioProductoEntity {
 
         if (!id_inventario) throw new Error('id_inventario property is required');
         if (!id_producto) throw new Error('id_producto property is required');
+        if (!id_almacen) throw new Error('id_almacen property is required');
         if (!cantidad) throw new Error('cantidad property is required');
 
 
@@ -44,6 +48,7 @@ export class InventarioProductoEntity {
         return new InventarioProductoEntity(
             id_inventario,
             id_producto,
+            id_almacen,
             id_lote_tostado,
             cantidad,
             gramaje,

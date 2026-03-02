@@ -4,7 +4,7 @@ import { UpdateInventarioProductoDto } from "../../domain/dtos/inventarios/inven
 import { InventarioProductoEntity } from "../../domain/entities/inventario-producto.entity";
 import { InventarioProductoRepository } from "../../domain/repository/inventario-producto.repository";
 
-export class InventarioRepositoryProductoImpl implements InventarioProductoRepository {
+export class InventarioProductoRepositoryImpl implements InventarioProductoRepository {
 
     constructor(private dataSource: InventarioProductoDataSource) {}
     createInventario(createInventarioDto: CreateInventarioProductoDto): Promise<InventarioProductoEntity> {

@@ -21,7 +21,6 @@ import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lot
 import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 import { DuplicateLote } from '../../domain/usecases/lote/lote/duplicar-lote';
 import { InventarioProductoDataSourceImpl } from '../../infrastructure/datasources/inventario-producto.datasource.impl';
-import { InventarioRepositoryProductoImpl } from '../../infrastructure/repositories/inventario-producto.repository.impl';
 import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
 import { LoteTostadoDataSourceImpl } from '../../infrastructure/datasources/loteTostado.datasource.impl';
 import { LoteTostadoRepositoryImpl } from '../../infrastructure/repositories/loteTostado.repository.impl';
@@ -30,6 +29,7 @@ import { InventarioLoteDataSourceImpl } from '../../infrastructure/datasources/i
 import { InventarioLoteTostadoDataSource } from '../../domain/datasources/inventario-lote-tostado.datasource';
 import { InventarioLoteTostadoRepositoryImpl } from '../../infrastructure/repositories/inventario-lote-tostado.repository.impl';
 import { InventarioLoteTostadoDataSourceImpl } from '../../infrastructure/datasources/inventario-lote-tostado.datasource.impl';
+import { InventarioProductoRepositoryImpl } from '../../infrastructure/repositories/inventario-producto.repository.impl';
 
 export class PedidoRoutes {
 
@@ -81,7 +81,7 @@ export class PedidoRoutes {
 
         // Inventario
         const InventarioDatasource = new InventarioProductoDataSourceImpl();
-        const InventarioRepository = new InventarioRepositoryProductoImpl(InventarioDatasource);
+        const InventarioRepository = new InventarioProductoRepositoryImpl(InventarioDatasource);
 
         // LoteTostado
         const LoteTostadoDatasource = new LoteTostadoDataSourceImpl();

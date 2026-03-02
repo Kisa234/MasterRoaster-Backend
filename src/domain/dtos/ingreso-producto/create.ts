@@ -5,10 +5,11 @@ export class CreateIngresoProductoDto {
     public readonly id_almacen: string,
     public readonly cantidad: number,
     public readonly precio_compra: number,
+    public readonly id_user: string
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateIngresoProductoDto?] {
-    const { id_producto, id_variante, id_almacen, cantidad, precio_compra } = props;
+    const { id_producto, id_variante, id_almacen, cantidad, precio_compra, id_user } = props;
 
     if (!id_producto) return ['id_producto es requerido', undefined];
     if (!id_almacen) return ['id_almacen es requerido', undefined];
@@ -28,7 +29,8 @@ export class CreateIngresoProductoDto {
         id_variante ? String(id_variante) : null,
         String(id_almacen),
         nCantidad,
-        nPrecio
+        nPrecio,
+        id_user
       )
     ];
   }

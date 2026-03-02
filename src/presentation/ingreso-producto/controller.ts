@@ -6,18 +6,37 @@ import { GetIngresoProductoByAlmacen } from "../../domain/usecases/ingreso-produ
 import { GetIngresoProductoByProducto } from "../../domain/usecases/ingreso-producto/get-by-producto";
 import { UpdateIngresoProductoDto } from "../../domain/dtos/ingreso-producto/update";
 import { UpdateIngresoProducto } from "../../domain/usecases/ingreso-producto/update";
+import { MovimientoAlmacenRepository } from "../../domain/repository/movimiento-almacen.repository";
+import { InventarioProductoRepository } from "../../domain/repository/inventario-producto.repository";
+import { AlmacenRepository } from "../../domain/repository/almacen.repository";
 
 export class IngresoProductoController {
 
   constructor(
-    private readonly ingresoRepository: IngresoProductoRepository
-  ) {}
+    private readonly ingresoRepository: IngresoProductoRepository,
+    private readonly almacenRepository: AlmacenRepository,
+    private readonly inventarioProductoRepository: InventarioProductoRepository,
+    private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
+  ) { }
 
   public createIngreso = (req: Request, res: Response) => {
-    const [error, dto] = CreateIngresoProductoDto.create(req.body);
-    if (error) return res.status(400).json({ error });
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Usuario no autenticado' });
+    }
 
-    new CreateIngresoProducto(this.ingresoRepository)
+    const [error, dto] = CreateIngresoProductoDto.create({
+      ...req.body,
+      id_user: req.user.id
+    });
+    console.log('Ingreso DTO:', { error, dto });
+    if (error) return res.status(400).json({ error });
+    new CreateIngresoProducto(
+      this.ingresoRepository,
+      this.almacenRepository,
+      this.inventarioProductoRepository,
+      this.movimientoAlmacenRepository
+
+    )
       .execute(dto!)
       .then(ingreso => res.json(ingreso))
       .catch(err => res.status(400).json({ error: err?.message ?? String(err) }));

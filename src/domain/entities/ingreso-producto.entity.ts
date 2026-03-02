@@ -38,7 +38,7 @@ export class IngresoProductoEntity {
     return new IngresoProductoEntity(
       id_ingreso,
       id_producto,
-      id_variante ?? null,
+      id_variante,
       id_almacen,
       cantidad,
       precio_compra,

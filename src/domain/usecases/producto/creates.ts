@@ -16,10 +16,8 @@ export class CreateProducto implements CreateProductoUseCase {
 
 
         const [error, dto] = CreateProductoDto.create({
+            ...data,
             id_producto,
-            nombre: data.nombre,
-            descripcion: data.descripcion,
-            id_categoria: data.id_categoria,
         });
         if (error) throw new Error(error);
 

@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { InventarioProductoController } from "./controller";
 import { InventarioProductoDataSourceImpl } from "../../../infrastructure/datasources/inventario-producto.datasource.impl";
-import { InventarioRepositoryProductoImpl } from "../../../infrastructure/repositories/inventario-producto.repository.impl";
+import { InventarioProductoRepositoryImpl } from "../../../infrastructure/repositories/inventario-producto.repository.impl";
 
 export class InventarioProductosRoutes {
   static get routes() {
     const router = Router();
 
     const datasource = new InventarioProductoDataSourceImpl();
-    const repository = new InventarioRepositoryProductoImpl(datasource);
+    const repository = new InventarioProductoRepositoryImpl(datasource);
     const controller = new InventarioProductoController(repository);
 
     router.post("/", controller.createInventario);
