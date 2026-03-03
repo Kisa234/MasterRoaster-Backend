@@ -91,11 +91,13 @@ export class LoteRoutes{
         
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
+        router.get('/inventario', loteController.getLoteInventario);
         router.get('/roaster', loteController.getLotesRoaster);
         router.get('/user/:id', loteController.getLotesByUserId);
         router.get('/byLote/:id',loteController.getUserByLote);
         router.get('/:id', loteController.getLoteById);
         router.get('/', loteController.getLotes);
+
 
         return router;
     }

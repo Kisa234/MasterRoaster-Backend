@@ -28,6 +28,7 @@ import { FusionarLotesDto } from '../../domain/dtos/lotes/lote/fusionar-lotes';
 import { GetLoteRoaster } from '../../domain/usecases/lote/lote/get-lote-roaster';
 import { AnalisisDefectosRespository } from '../../domain/repository/analisisDefectos.repository';
 import { HistorialRepository } from '../../domain/repository/historial.repository';
+import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
 
 
 export class LoteController {
@@ -272,6 +273,13 @@ export class LoteController {
             this.loteRepository,
             this.userRepository
         )
+            .execute()
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error })
+            )
+    }
+    public getLoteInventario = async (req: Request, res: Response) => {
+        new GetLoteInventario(this.loteRepository)
             .execute()
             .then(lotes => res.json(lotes))
             .catch(error => res.status(400).json({ error })

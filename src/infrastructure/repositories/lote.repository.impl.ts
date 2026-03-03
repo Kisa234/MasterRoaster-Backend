@@ -2,7 +2,7 @@ import { LoteDataSource } from "../../domain/datasources/lote.datasource";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { CreateLoteRapidoDto } from "../../domain/dtos/lotes/lote/create-rapido";
 import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
-import { LoteEntity } from "../../domain/entities/lote.entity";
+import { LoteConInventarioEntity, LoteEntity } from "../../domain/entities/lote.entity";
 import { LoteRepository } from "../../domain/repository/lote.repository";
 
 export class LoteRepositoryImpl  implements LoteRepository {
@@ -43,6 +43,8 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getUserByLote(id: string): Promise<string> {
         return this.datasource.getUserByLote(id);
     }
-
+    getLotesConInventario(): Promise<LoteConInventarioEntity[]> {
+        return this.datasource.getLotesConInventario(); 
+    }
 
 }

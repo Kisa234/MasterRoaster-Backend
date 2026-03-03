@@ -1,6 +1,6 @@
 import { create } from 'domain';
 import { CreateLoteDto } from "../dtos/lotes/lote/create";
-import { LoteEntity } from "../entities/lote.entity";
+import { LoteConInventarioEntity, LoteEntity } from "../entities/lote.entity";
 import { UpdateLoteDto } from '../dtos/lotes/lote/update';
 import { CreateLoteRapidoDto } from '../dtos/lotes/lote/create-rapido';
 
@@ -16,5 +16,5 @@ export abstract class LoteDataSource {
     abstract createLoteFromMuestra(id: string,dto:CreateLoteDto): Promise<LoteEntity>;
     abstract getLotesByUserId(id: string): Promise<LoteEntity[]>;
     abstract getUserByLote(id:string):Promise<string>;
-
+    abstract getLotesConInventario(): Promise<LoteConInventarioEntity[]>;
   }
