@@ -151,6 +151,26 @@ export class LoteDataSourceImpl implements LoteDataSource {
     return lotes.map(l => LoteConInventarioEntity.fromObject(l));
   }
 
+  async getLoteConInventarioById(id: string): Promise<LoteConInventarioEntity | null> {
+  const lote = await prisma.lote.findFirst({
+    where: {
+      id_lote: id,
+      eliminado: false,
+      tipo_lote: 'Lote Verde',
+    },
+    include: {
+      inventarioLotes: {
+        include: {
+          almacen: true,
+        },
+      },
+    },
+  });
+
+  if (!lote) return null;
+
+  return LoteConInventarioEntity.fromObject(lote);
+}
 
 
 

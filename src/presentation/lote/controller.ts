@@ -29,6 +29,7 @@ import { GetLoteRoaster } from '../../domain/usecases/lote/lote/get-lote-roaster
 import { AnalisisDefectosRespository } from '../../domain/repository/analisisDefectos.repository';
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
+import { GetLoteInventarioById } from '../../domain/usecases/lote/lote/get-lote-inventario-id';
 
 
 export class LoteController {
@@ -282,6 +283,15 @@ export class LoteController {
         new GetLoteInventario(this.loteRepository)
             .execute()
             .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error })
+            )
+    }
+
+    public getLoteInventarioById = async (req: Request, res: Response) => {
+        const id = req.params.id;
+        new GetLoteInventarioById(this.loteRepository)
+            .execute(id)
+            .then(lote => res.json(lote))
             .catch(error => res.status(400).json({ error })
             )
     }
