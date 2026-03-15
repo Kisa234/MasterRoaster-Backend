@@ -2,10 +2,11 @@ import { prisma } from "../../data/postgres";
 import { LoteTostadoDataSource } from "../../domain/datasources/loteTostado.datasource";
 import { CreateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/create";
 import { UpdateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/update";
-import { LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
+import { LoteTostadoConLoteEntity, LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
 
 
 export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
+
 
     async createLoteTostado(createLoteTostadoDto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
         const loteTostado = await prisma.loteTostado.create({
@@ -29,7 +30,7 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
                 id_lote_tostado: id
             },
             data: updateLoteTostadoDto
-            
+
         });
         return LoteTostadoEntity.fromObject(updateLote);
     }
@@ -39,7 +40,7 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
             where: {
                 id_lote_tostado: id
             },
-            data:{
+            data: {
                 eliminado: true
             }
         })
@@ -58,7 +59,7 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
             }
         });
         if (!lote) throw new Error("Lote not found");
-        
+
         const lotesTostados = await prisma.loteTostado.findMany({
             where: {
                 id_lote: id,
@@ -68,4 +69,20 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
         if (!lotesTostados) return [];
         return lotesTostados.map(lote => LoteTostadoEntity.fromObject(lote));
     }
+
+    async GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]> {
+        const lotesTostados = await prisma.loteTostado.findMany({
+            where: {
+                eliminado: false
+            },
+            include: {
+                lote: true
+            }
+        });
+
+        return lotesTostados.map(lote =>
+            LoteTostadoConLoteEntity.fromObject(lote)
+        );
+    }
+
 }

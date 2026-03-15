@@ -38,6 +38,7 @@ export class LoteTostadoRoutes {
         router.post('/', authMiddleware,auditMiddleware('Lote Tostado', 'CREATE'), loteController.createLoteTostado);
         router.put('/:id', authMiddleware,auditMiddleware('Lote Tostado', 'UPDATE'), loteController.updateLoteTostado);
         router.delete('/:id', authMiddleware,auditMiddleware('Lote Tostado', 'DELETE'), loteController.deleteLoteTostado);
+        router.get('/lote-con-lote', loteController.getLotesTostadoandLote);
         router.get('/ficha/:id', loteController.getFichaTueste);
         router.get('/', loteController.getLotesTostados);
         router.get('/:id', loteController.getLoteTostadoById);

@@ -13,6 +13,7 @@ import { GetFichaTueste } from "../../domain/usecases/lote/lote-tostado/ficha-tu
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
 import { HistorialRepository } from "../../domain/repository/historial.repository";
+import { GetLotesTostadoConLote } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-con-lote";
 
 export class LoteTostadoController {
     constructor(
@@ -89,5 +90,12 @@ export class LoteTostadoController {
             .then( ficha => res.json(ficha))
             .catch( error => res.status(400).json({ error }));
     }
+
+    public getLotesTostadoandLote = (req:Request , res : Response) => {
+        new GetLotesTostadoConLote(this.loteTostadoRepository)
+            .execute()
+            .then( lotes => res.json(lotes))
+            .catch( error => res.status(400).json({ error }));
+        }
 
 }

@@ -30,6 +30,7 @@ import { AnalisisDefectosRespository } from '../../domain/repository/analisisDef
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
 import { GetLoteInventarioById } from '../../domain/usecases/lote/lote/get-lote-inventario-id';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 
 export class LoteController {
@@ -128,6 +129,7 @@ export class LoteController {
                     this.historialRepository.createHistorial({
                     ...req.auditContext!,
                     objeto_antes: JSON.stringify(lote_before),
+                    objeto_despues: JSON.stringify(lote),
                     id_entidad: lote.id_lote,
                     id_user: req.user!.id,
                     comentario: req.body.hcomentario

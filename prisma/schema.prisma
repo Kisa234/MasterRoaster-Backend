@@ -527,6 +527,7 @@ model Historial {
   accion         String
   comentario     String?
   objeto_antes   Json?
+  objeto_despues Json?
   fecha_registro DateTime @default(now())
 
   user User @relation(fields: [id_user], references: [id_user])

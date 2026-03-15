@@ -6,10 +6,11 @@ export class CreateHistorialDto {
         public accion: string,
         public comentario?: string,
         public objeto_antes?: any | null,
+        public objeto_despues?: any | null,
     ) { }
 
     static create ( props: { [key: string]: any } ): [string?, CreateHistorialDto?] {
-        const { entidad, id_entidad, id_user, accion, comentario, objeto_antes } = props;
+        const { entidad, id_entidad, id_user, accion, comentario, objeto_antes, objeto_despues } = props;
 
         return [undefined,
             new CreateHistorialDto(
@@ -19,6 +20,7 @@ export class CreateHistorialDto {
                 accion,
                 comentario,
                 objeto_antes,
+                objeto_despues,
             )
         ]
             
