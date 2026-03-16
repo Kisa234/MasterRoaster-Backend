@@ -1,5 +1,4 @@
 import { FusionarLotes } from './../../domain/usecases/lote/lote/fusionar-lote';
-import { error } from 'console';
 import { Request, Response } from "express";
 import { CreateLoteDto } from "../../domain/dtos/lotes/lote/create";
 import { LoteRepository } from "../../domain/repository/lote.repository";
@@ -30,7 +29,7 @@ import { AnalisisDefectosRespository } from '../../domain/repository/analisisDef
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
 import { GetLoteInventarioById } from '../../domain/usecases/lote/lote/get-lote-inventario-id';
-import { JsonWebTokenError } from 'jsonwebtoken';
+import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
 
 
 export class LoteController {
@@ -46,7 +45,9 @@ export class LoteController {
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
         private readonly pedidoRepository: PedidoRepository,
-        private readonly historialRepository: HistorialRepository
+        private readonly historialRepository: HistorialRepository,
+        private readonly inventarioLoteRepository: InventarioLoteRepository
+        
     ) { }
 
     public createLote = (req: Request, res: Response) => {
@@ -54,6 +55,7 @@ export class LoteController {
         if (!req.user?.id) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
+
 
         // 2. Decide de dónde viene el id_user:
         //    - Si el DTO entrante trae un id_user válido lo usamos.
@@ -88,7 +90,12 @@ export class LoteController {
                     id_entidad: lote.id_lote,
                     id_user: req.user!.id
                 });
-                res.json(lote);
+                this.inventarioLoteRepository.createInventario({
+                    id_lote:lote.id_lote,
+                    id_almacen:req.body.almacen,
+                    cantidad_kg:lote.peso
+                })
+                res.json(lote)
             })
             .catch(error => res.status(400).json({ error }));
     }
@@ -198,7 +205,12 @@ export class LoteController {
                     id_entidad: lote!.id_lote,
                     id_user: req.user!.id,
                 });
-                res.json(lote);
+                this.inventarioLoteRepository.createInventario({
+                    id_lote:lote.id_lote,
+                    id_almacen:req.body.almacen,
+                    cantidad_kg:lote.peso
+                })
+                res.json(lote)
             })
             .catch(error => res.status(400).json({ error }));
     }

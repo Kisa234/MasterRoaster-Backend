@@ -1,3 +1,5 @@
+import { InventarioLoteRepositoryImpl } from './../../infrastructure/repositories/inventario-lote.repository.impl';
+import { InventarioLoteDataSourceImpl } from './../../infrastructure/datasources/inventario-lote.datasource.impl';
 import { LoteAnalisisDataSourceImpl } from './../../infrastructure/datasources/lote-analisis.datasource.impl';
 import { LoteAnalisisRepositoryImpl } from './../../infrastructure/repositories/lote-analisis.repository.impl';
 import { CreateLote, CreateLoteUseCase } from './../../domain/usecases/lote/lote/create-lote';
@@ -62,6 +64,9 @@ export class LoteRoutes{
 
         const historialDatasource = new HistorialDataSourceImpl();
         const historialRepository = new HistorialRepositoryImpl(historialDatasource);
+
+        const inventarioLoteDatasource = new InventarioLoteDataSourceImpl();
+        const inventarioLoteRepository = new InventarioLoteRepositoryImpl(inventarioLoteDatasource);
         
         // Use cases
         const createLoteUseCase = new CreateLote(loteRepository, userRepository, pedidoRepository);
@@ -77,7 +82,8 @@ export class LoteRoutes{
             loteRepository,
             userRepository,
             pedidoRepository,
-            historialRepository
+            historialRepository,
+            inventarioLoteRepository
         );
 
         router.post('/', authMiddleware,checkPermission('inventario.lotes_verdes.create') , auditMiddleware('Lote', 'CREATE'),loteController.createLote);

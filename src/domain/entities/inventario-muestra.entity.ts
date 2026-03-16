@@ -7,6 +7,7 @@ export class InventarioMuestraEntity {
     public peso: number,
     public fecha_registro: Date,
     public fecha_editado?: Date,
+    public almacen?: any,
   ) {}
 
   static fromObject(obj: { [key: string]: any }): InventarioMuestraEntity {
@@ -18,6 +19,7 @@ export class InventarioMuestraEntity {
       peso,
       fecha_registro,
       fecha_editado,
+      almacen,
     } = obj;
 
     if (!id_inventario) throw new Error('id_inventario property is required');
@@ -51,7 +53,8 @@ export class InventarioMuestraEntity {
       id_almacen,
       peso,
       fr,
-      fe
+      fe,
+      almacen
     );
   }
 }

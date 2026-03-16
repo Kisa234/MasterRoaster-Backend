@@ -2,13 +2,13 @@ import { MuestraRepository } from '../../domain/repository/muestra.repository';
 import { MuestraDataSource } from '../../domain/datasources/muestra.datasource';
 import { CreateMuestraDto } from '../../domain/dtos/muestra/create';
 import { UpdateMuestraDto } from '../../domain/dtos/muestra/update';
-import { MuestraEntity } from '../../domain/entities/muestra.entity';
+import { MuestraConInventarioEntity, MuestraEntity } from '../../domain/entities/muestra.entity';
 
-export class MuestraRepositoryImpl implements MuestraRepository{
+export class MuestraRepositoryImpl implements MuestraRepository {
 
     constructor(
         private readonly muestraDataSource: MuestraDataSource
-    ){}
+    ) { }
     createMuestra(createMuestraDto: CreateMuestraDto): Promise<MuestraEntity> {
         return this.muestraDataSource.createMuestra(createMuestraDto);
     }
@@ -29,6 +29,9 @@ export class MuestraRepositoryImpl implements MuestraRepository{
     }
     completeMuestra(id: string): Promise<MuestraEntity> {
         return this.muestraDataSource.completeMuestra(id);
+    }
+    getMuestrasConInventario(): Promise<MuestraConInventarioEntity[]> {
+        return this.muestraDataSource.getMuestrasConInventario();
     }
 
 }

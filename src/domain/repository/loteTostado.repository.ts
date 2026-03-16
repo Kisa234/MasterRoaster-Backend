@@ -1,4 +1,4 @@
-import { LoteTostadoConLoteEntity, LoteTostadoEntity } from "../entities/loteTostado.entity";
+import { LoteTostadoConInventarioEntity, LoteTostadoConLoteEntity, LoteTostadoEntity } from "../entities/loteTostado.entity";
 import { CreateLoteTostadoDto } from '../dtos/lotes/lote-tostado/create';
 import { UpdateLoteTostadoDto } from "../dtos/lotes/lote-tostado/update";
 
@@ -10,5 +10,7 @@ export abstract class LoteTostadoRepository {
     abstract getLoteTostados(): Promise<LoteTostadoEntity[]>;
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
     abstract GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]>;
+    abstract getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]>
+    
     
 }

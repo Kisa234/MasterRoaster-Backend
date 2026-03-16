@@ -10,14 +10,17 @@ import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
 import { GetMuestras as GetAllMuestra } from "../../domain/usecases/muestra/get-muestras";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { HistorialRepository } from "../../domain/repository/historial.repository";
+import { GetMuestrasConInventario } from "../../domain/usecases/muestra/muestra-inventario";
+import { InventarioMuestraRepository } from "../../domain/repository/inventario-muestra.repository";
 
 export class MuestraController {
 
   constructor(
     private readonly muestraRepository: MuestraRepository,
     private readonly userRepository: UserRepository,
-    private readonly historialRepository: HistorialRepository
-    
+    private readonly historialRepository: HistorialRepository,
+    private readonly inventarioMuestraRepository : InventarioMuestraRepository
+
   ) { }
 
   public createMuestra = (req: Request, res: Response) => {
@@ -53,11 +56,16 @@ export class MuestraController {
       .execute(createMuestraDto!)
       .then((muestra) => {
         this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: muestra.id_muestra,
-                    id_user: req.user!.id
-                });
-                res.json(muestra);
+          ...req.auditContext!,
+          id_entidad: muestra.id_muestra,
+          id_user: req.user!.id
+        });
+        this.inventarioMuestraRepository.createInventario({
+          id_muestra:muestra.id_muestra,
+          id_almacen:req.body.almacen,
+          peso: muestra.peso
+        })
+        res.json(muestra);
       })
       .catch((error) => res.status(400).json({ error }));
   };
@@ -73,31 +81,31 @@ export class MuestraController {
       .execute(id_muestra, updateMuestraDto!)
       .then((muestra) => {
         this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    objeto_antes: JSON.stringify(muestra_before),
-                    id_entidad: muestra.id_muestra,
-                    id_user: req.user!.id,
-                    comentario: req.body.hcomentario
-                });
-                res.json(muestra);
+          ...req.auditContext!,
+          objeto_antes: JSON.stringify(muestra_before),
+          id_entidad: muestra.id_muestra,
+          id_user: req.user!.id,
+          comentario: req.body.hcomentario
+        });
+        res.json(muestra);
       })
       .catch(error => res.status(400).json({ error }));
 
 
   }
 
-   public completeMuestra = (req: Request, res: Response) => {
+  public completeMuestra = (req: Request, res: Response) => {
     const id_muestra = req.params.id;
     this.muestraRepository.completeMuestra(id_muestra)
       .then((muestra) => {
         this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: muestra.id_muestra,
-                    id_user: req.user!.id,
-                });
-                res.json(muestra);
+          ...req.auditContext!,
+          id_entidad: muestra.id_muestra,
+          id_user: req.user!.id,
+        });
+        res.json(muestra);
       })
-      .catch(error => res.status(400).json({ error })); 
+      .catch(error => res.status(400).json({ error }));
   }
 
   public deleteMuestra = (req: Request, res: Response) => {
@@ -106,11 +114,11 @@ export class MuestraController {
       .execute(id_muestra)
       .then((muestra) => {
         this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: muestra.id_muestra,
-                    id_user: req.user!.id,
-                });
-                res.json(muestra);
+          ...req.auditContext!,
+          id_entidad: muestra.id_muestra,
+          id_user: req.user!.id,
+        });
+        res.json(muestra);
       })
       .catch(error => res.status(400).json({ error }));
   }
@@ -122,7 +130,7 @@ export class MuestraController {
       .catch(error => res.status(400).json({ error }));
   }
 
-    public getMuestraById = (req: Request, res: Response) => {
+  public getMuestraById = (req: Request, res: Response) => {
     new GetMuestra(this.muestraRepository)
       .execute(req.params.id)
       .then(muestra => res.json(muestra))
@@ -130,6 +138,15 @@ export class MuestraController {
 
   }
 
- 
-  
+  public getMuestrasConInventario = (req: Request, res: Response) => {
+    new GetMuestrasConInventario(this.muestraRepository)
+      .execute()
+      .then(muestras => {
+        res.json(muestras)
+      }
+      )
+      .catch(error => res.status(400).json({ error }));
+
+  }
+
 }

@@ -2,7 +2,7 @@ import { prisma } from "../../data/postgres";
 import { LoteTostadoDataSource } from "../../domain/datasources/loteTostado.datasource";
 import { CreateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/create";
 import { UpdateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/update";
-import { LoteTostadoConLoteEntity, LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
+import { LoteTostadoConInventarioEntity, LoteTostadoConLoteEntity, LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
 
 
 export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
@@ -82,6 +82,23 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
 
         return lotesTostados.map(lote =>
             LoteTostadoConLoteEntity.fromObject(lote)
+        );
+    }
+
+    async getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]> {
+        const lotesTostados = await prisma.loteTostado.findMany({
+            include: {
+                lote: true,
+                inventarioLoteTostados: {
+                    include: {
+                        almacen: true
+                    }
+                }
+            }
+        });
+
+        return lotesTostados.map(l =>
+            LoteTostadoConInventarioEntity.fromObject(l)
         );
     }
 
