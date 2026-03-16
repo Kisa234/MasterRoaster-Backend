@@ -147,7 +147,7 @@ export class LoteTostadoConInventarioEntity {
       id_analisis_rapido,
       entregado,
       lote,
-      inventarioLotesTostados = []
+      inventarioLoteTostados = []
     } = obj;
 
     if (!id_lote_tostado) throw new Error('id_lote_tostado property is required');
@@ -179,7 +179,7 @@ export class LoteTostadoConInventarioEntity {
       newFechaRegistro,
       id_user,
       LoteEntity.fromObject(lote),
-      inventarioLotesTostados.map((inv: any) =>
+      inventarioLoteTostados.map((inv: any) =>
         InventarioLoteTostadoEntity.fromObject(inv)
       ),
       id_analisis_rapido,

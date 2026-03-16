@@ -53,7 +53,7 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
                 estado_pedido: estado,
                 eliminado: false
             },
-            orderBy:{
+            orderBy: {
                 fecha_tueste: 'desc'
             }
         });
@@ -89,14 +89,27 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
 
 
     }
+
     async getAllPedidos(): Promise<PedidoEntity[]> {
         const pedidos = await prisma.pedido.findMany({
             where: {
                 eliminado: false,
-                estado_pedido: { not: 'Completado' }
-            }
+            },
+            include: {
+                cliente: {
+                    select: {
+                        nombre: true,
+                    },
+                },
+            },
         });
-        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+
+        return pedidos.map((pedido) =>
+            PedidoEntity.fromObject({
+                ...pedido,
+                usuario_nombre: pedido.cliente?.nombre ?? null,
+            })
+        );
     }
 
     async getHistoricoPedidos(): Promise<PedidoEntity[]> {
@@ -186,7 +199,7 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
                 id_pedido: id_pedido
             },
             data: {
-                facturado : state
+                facturado: state
             }
         })
         return PedidoEntity.fromObject(pedido);

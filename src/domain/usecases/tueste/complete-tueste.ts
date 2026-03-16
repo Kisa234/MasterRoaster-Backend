@@ -8,6 +8,8 @@ import { CompleteTuesteDto } from '../../dtos/tueste/complete';
 import { UpdatePedidoDto } from '../../dtos/pedido/update';
 import { TuesteEntity } from '../../entities/tueste.entity';
 import { UpdateTuesteDto } from '../../dtos/tueste/update';
+import { InventarioLoteRepository } from '../../repository/inventario-lote.repository';
+import { InventarioLoteTostadoRepository } from '../../repository/inventario-lote-tostado.repository';
 
 export interface CompleteTuesteUseCase {
     execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;
@@ -18,7 +20,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         private readonly tuesteRepository: TuesteRepository,
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
-        private readonly createLoteTostado: CreateLoteTostado
+        private readonly createLoteTostado: CreateLoteTostado,
     ) {}
 
     async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
@@ -90,6 +92,9 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         if (!updatePedido) throw new Error("Error generando DTO para lote tostado");
 
         await this.pedidoRepository.updatePedido(pedido.id_pedido, updatePedido);
+
+        // 9. Crear Inventario de Lote Tostado 
+        // obtener el almacen del lote verde 
         return TuesteEntity.fromObject(tuesteCompletado);
     }
 }

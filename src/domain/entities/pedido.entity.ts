@@ -25,7 +25,10 @@ export class PedidoEntity {
     public creado_por_id?: string,
     public completado_por_id?: string,
     public fecha_completado?: Date,
-  ) {}
+
+    public usuario_nombre?: string | null,
+
+  ) { }
 
   static fromObject(obj: { [key: string]: any }): PedidoEntity {
     const {
@@ -52,6 +55,8 @@ export class PedidoEntity {
       creado_por_id,
       completado_por_id,
       fecha_completado,
+
+      usuario_nombre
     } = obj;
 
     // Validaciones esenciales
@@ -92,6 +97,7 @@ export class PedidoEntity {
       creado_por_id,
       completado_por_id,
       fecha_completado,
+      usuario_nombre
     );
   }
 }

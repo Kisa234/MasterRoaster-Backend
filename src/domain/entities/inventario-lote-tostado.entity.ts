@@ -1,5 +1,6 @@
-export class InventarioLoteTostadoEntity {
+import { AlmacenEntity } from "./almacen.entity";
 
+export class InventarioLoteTostadoEntity {
   constructor(
     public id_inventario: string,
     public id_lote_tostado: string,
@@ -7,10 +8,10 @@ export class InventarioLoteTostadoEntity {
     public cantidad_kg: number,
     public fecha_registro: Date,
     public fecha_editado?: Date,
+    public almacen?: AlmacenEntity
   ) {}
 
   static fromObject(obj: { [key: string]: any }): InventarioLoteTostadoEntity {
-
     const {
       id_inventario,
       id_lote_tostado,
@@ -18,31 +19,21 @@ export class InventarioLoteTostadoEntity {
       cantidad_kg,
       fecha_registro,
       fecha_editado,
+      almacen
     } = obj;
 
     if (!id_inventario) throw new Error('id_inventario property is required');
     if (!id_lote_tostado) throw new Error('id_lote_tostado property is required');
     if (!id_almacen) throw new Error('id_almacen property is required');
 
-    if (cantidad_kg === undefined || cantidad_kg === null) {
-      throw new Error('cantidad_kg property is required');
-    }
-    if (typeof cantidad_kg !== 'number' || isNaN(cantidad_kg) || cantidad_kg < 0) {
-      throw new Error('cantidad_kg must be a number >= 0');
+    const newFechaRegistro = new Date(fecha_registro);
+    if (isNaN(newFechaRegistro.getTime())) {
+      throw new Error('fecha_registro no es válida');
     }
 
-    if (!fecha_registro) throw new Error('fecha_registro property is required');
-    const fr = new Date(fecha_registro);
-    if (isNaN(fr.getTime())) {
-      throw new Error('fecha_registro is not a valid date');
-    }
-
-    let fe: Date | undefined;
-    if (fecha_editado) {
-      fe = new Date(fecha_editado);
-      if (isNaN(fe.getTime())) {
-        throw new Error('fecha_editado is not a valid date');
-      }
+    const newFechaEditado = fecha_editado ? new Date(fecha_editado) : undefined;
+    if (fecha_editado && isNaN(newFechaEditado!.getTime())) {
+      throw new Error('fecha_editado no es válida');
     }
 
     return new InventarioLoteTostadoEntity(
@@ -50,8 +41,9 @@ export class InventarioLoteTostadoEntity {
       id_lote_tostado,
       id_almacen,
       cantidad_kg,
-      fr,
-      fe
+      newFechaRegistro,
+      newFechaEditado,
+      almacen ? AlmacenEntity.fromObject(almacen) : undefined
     );
   }
 }

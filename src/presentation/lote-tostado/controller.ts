@@ -103,7 +103,6 @@ export class LoteTostadoController {
         new GetLotesTostadosConInventario(this.loteTostadoRepository)
             .execute()
             .then(data => {
-                console.log(data); 
                 res.json(data)
             })
             .catch(error => res.status(400).json({ error }));
