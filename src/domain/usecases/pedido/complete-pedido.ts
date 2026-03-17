@@ -11,9 +11,10 @@ import { InventarioLoteRepository } from "../../repository/inventario-lote.repos
 import { InventarioLoteTostadoRepository } from "../../repository/inventario-lote-tostado.repository";
 import { UpdateInventarioLoteDto } from "../../dtos/inventarios/inventario-lote/update";
 import { UpdateInventarioLoteTostadoDto } from "../../dtos/inventarios/inventario-lote-tostado/update";
+import { HistorialRepository } from "../../repository/historial.repository";
 
 export interface CompletarPedidoUseCase {
-    execute(id_pedido: string): Promise<PedidoEntity>;
+    execute(id_pedido: string, id_completado_por:string): Promise<PedidoEntity>;
 }
 
 export class CompletarPedido implements CompletarPedidoUseCase {
@@ -25,9 +26,11 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
         private readonly inventarioRepository: InventarioProductoRepository,
+        private readonly historialRepository: HistorialRepository,
+        
     ) { }
 
-    async execute(id_pedido: string): Promise<PedidoEntity> {
+    async execute(id_pedido: string, id_completado_por:string): Promise<PedidoEntity> {
         const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
         if (!pedido || pedido.eliminado) {
             throw new Error('El pedido no existe o fue eliminado');
@@ -41,19 +44,19 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         // Acciones según tipo de pedido
         switch (pedido.tipo_pedido) {
             case 'Venta Verde':
-                return this.ventaVerdeCompletion(pedido.id_pedido);
+                return this.ventaVerdeCompletion(pedido.id_pedido , id_completado_por);
                 break;
             case 'Tostado Verde':
-                return this.tostadoVerdeCompletion(pedido.id_pedido);
+                return this.tostadoVerdeCompletion(pedido.id_pedido , id_completado_por);
                 break;
             case 'Orden Tueste':
-                return this.pedidoRepository.completarPedido(id_pedido);
+                return this.pedidoRepository.completarPedido(id_pedido, id_completado_por);
                 break
             case 'Maquila':
-                return this.maquilaCompletion(pedido.id_pedido);
+                return this.maquilaCompletion(pedido.id_pedido, id_completado_por);
                 break
             case 'Suscripcion':
-                return this.pedidoRepository.completarPedido(id_pedido);
+                return this.pedidoRepository.completarPedido(id_pedido, id_completado_por);
                 break;
             default:
                 throw new Error('Tipo de pedido inválido');
@@ -62,7 +65,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     }
 
 
-    async ventaVerdeCompletion(pedidoId: string) {
+    async ventaVerdeCompletion(pedidoId: string, id_completado_por:string) {
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
         if (!pedido || pedido.estado_pedido !== "Pendiente") throw new Error("Pedido no válido");
 
@@ -76,34 +79,50 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             throw new Error("Stock insuficiente en el almacén");
         }
 
-        // restar stock en lote origen
-        const nuevoPesoLote = inventarioLote.cantidad_kg - pedido.cantidad;
-        const [, updateInventarioLoteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoLote });
-        await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
-        //eliminar lote si el nuevo peso es  0 
-        if (nuevoPesoLote == 0) {
-            await this.loteRepository.deleteLote(loteOrigen.id_lote);
-        }
 
         // crear lote destino o actualizar existente
         // Verificar si el cliente ya tiene un lote nuevo creado desde este mismo lote original y del mismo tipo de pedido
         const hasLote = await this.verifyIfUserHasLote(pedido.id_user, loteOrigen.id_lote, 'Lote Verde');
-        if (!hasLote) {
+        console.log(hasLote);
+        if (!hasLote || hasLote == null) {
             // crear nuevo lote
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false);
             // crear un inventario para el nuevo lote 
+            console.log('1')
             const nuevoInventarioLote = await this.inventarioLoteRepository.createInventario({
                 id_lote: nuevoLoteDestino.id_lote!,
                 id_almacen: pedido.id_almacen!,
                 cantidad_kg: pedido.cantidad,
             });
+            console.log('2')
+            // generar historial de creacion 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote",
+                id_entidad: nuevoLoteDestino.id_lote,
+                id_user: id_completado_por,
+                accion: "CREATE",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+            })
+            console.log('3')
+            // generar historial de ingreso 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote",
+                id_entidad: nuevoLoteDestino.id_lote!,
+                id_user: id_completado_por,
+                accion: "INGRESO",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+            })
+            console.log('4')
+            
             // actualizar pedido
             const [, updatePedidoDto] = UpdatePedidoDto.update({
                 id_nuevoLote: await nuevoLoteDestino.id_lote,
             });
+            console.log('5')
             await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
-            // marcar pedido como completado
-            return this.pedidoRepository.completarPedido(pedidoId);
+            console.log('6')
+            
+
         } else {
             // actualizar lote existente
             // actualizar stock del lote existente en su inventario correspondiente
@@ -120,35 +139,45 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 if (error) throw new Error(`Error al actualizar lote: ${error}`);
                 await this.loteRepository.updateLote(loteExistente.id_lote, updateLoteDto!);
             }
-            // marcar pedido como completado
-            return this.pedidoRepository.completarPedido(pedidoId);
+
+            // generar historial de ingreso 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote",
+                id_entidad: loteExistente.id_lote!,
+                id_user: id_completado_por,
+                accion: "INGRESO",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+
+            })
 
         }
 
+        // restar stock en lote origen
+        const nuevoPesoLote = inventarioLote.cantidad_kg - pedido.cantidad;
+        const [, updateInventarioLoteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoLote });
+        await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
+        //eliminar lote si el nuevo peso es  0 
+        if (nuevoPesoLote == 0) {
+            // se elimina el lote pero no el inventario
+            await this.loteRepository.deleteLote(loteOrigen.id_lote);
+        }
 
-
+        // marcar pedido como completado
+        return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
     }
 
-    async tostadoVerdeCompletion(pedidoId: string) {
+    async tostadoVerdeCompletion(pedidoId: string, id_completado_por:string) {
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
         if (!pedido || pedido.estado_pedido !== "Pendiente") throw new Error("Pedido no válido");
 
         const loteOrigen = await this.loteRepository.getLoteById(pedido.id_lote!);
         if (!loteOrigen) throw new Error("Lote origen no válido");
 
-       // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
+        // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
         const cantidadVerde = pedido.cantidad * 1.1765;
         const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(loteOrigen.id_lote, pedido.id_almacen!);
         if (!inventarioLote || inventarioLote.cantidad_kg < cantidadVerde) {
             throw new Error("Stock insuficiente en el almacén");
-        }
-         // restar stock en lote origen
-        const nuevoPesoLote = inventarioLote.cantidad_kg - cantidadVerde;
-        const [, updateInventarioLoteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoLote });
-        await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
-        //eliminar lote si el nuevo peso es  0 
-        if (nuevoPesoLote == 0) {
-            await this.loteRepository.deleteLote(loteOrigen.id_lote);
         }
 
         // crear lote destino o actualizar existente
@@ -163,14 +192,31 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 id_almacen: pedido.id_almacen!,
                 cantidad_kg: pedido.cantidad,
             });
+
+            // generar historial de creacion 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote Tostado",
+                id_entidad: nuevoLoteDestino.id_lote,
+                id_user: id_completado_por,
+                accion: "CREATE",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+            })
+
+            // generar historial de ingreso 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote",
+                id_entidad: nuevoLoteDestino.id_lote,
+                id_user: id_completado_por,
+                accion: "INGRESO",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+
+            })
+
             // actualizar pedido
             const [, updatePedidoDto] = UpdatePedidoDto.update({
                 id_nuevoLote: await nuevoLoteDestino.id_lote,
             });
             await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
-
-            // marcar pedido como completado
-            return this.pedidoRepository.completarPedido(pedidoId);
         } else {
             // actualizar lote existente
             // actualizar stock del lote existente en su inventario correspondiente
@@ -187,13 +233,34 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 if (error) throw new Error(`Error al actualizar lote: ${error}`);
                 await this.loteRepository.updateLote(loteExistente.id_lote, updateLoteDto!);
             }
-            // marcar pedido como completado
-            return this.pedidoRepository.completarPedido(pedidoId);
 
+            // generar historial de ingreso 
+            await this.historialRepository.createHistorial({
+                entidad: "Lote Tostado",
+                id_entidad: loteExistente.id_lote,
+                id_user: id_completado_por,
+                accion: "INGRESO",
+                comentario : pedido.cantidad.toLocaleString() + 'gr'
+
+
+            })
         }
+
+
+        // restar stock en lote origen
+        const nuevoPesoLote = inventarioLote.cantidad_kg - cantidadVerde;
+        const [, updateInventarioLoteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoLote });
+        await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
+        //eliminar lote si el nuevo peso es  0 
+        if (nuevoPesoLote == 0) {
+            await this.loteRepository.deleteLote(loteOrigen.id_lote);
+        }
+
+        // marcar pedido como completado
+        return this.pedidoRepository.completarPedido(pedidoId,id_completado_por);
     }
 
-    async maquilaCompletion(pedidoId: string) {
+    async maquilaCompletion(pedidoId: string, id_completado_por:string) {
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
         // 1. Validar que el pedido exista, esté pendiente y tenga los datos necesarios para maquila
         if (!pedido || pedido.estado_pedido !== "Pendiente")
@@ -240,10 +307,10 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         });
 
         // 🔹 6. Marcar pedido como completado
-        return this.pedidoRepository.completarPedido(pedidoId);
+        return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
     }
 
-    async verifyIfUserHasLote(id_user: string,id_lote_origen: string,tipo_lote: string): Promise<string | null> {
+    async verifyIfUserHasLote(id_user: string, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
 
         // 1️. Buscar pedidos del cliente
         const pedidos = await this.pedidoRepository.getPedidosByCliente(id_user);
@@ -259,6 +326,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         const loteRelacionado = lotes.find(
             l => l.id_lote.includes(id_lote_origen) && l.tipo_lote === tipo_lote
         );
+
 
         return loteRelacionado?.id_lote ?? null;
     }

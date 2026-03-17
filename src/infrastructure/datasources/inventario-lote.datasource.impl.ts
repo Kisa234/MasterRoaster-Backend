@@ -11,11 +11,7 @@ export class InventarioLoteDataSourceImpl implements InventarioLoteDataSource {
   ): Promise<InventarioLoteEntity> {
 
     const inventario = await prisma.inventarioLote.create({
-      data: {
-        id_lote: dto.id_lote,
-        id_almacen: dto.id_almacen,
-        cantidad_kg: dto.cantidad_kg,
-      },
+      data: dto
     });
 
     return InventarioLoteEntity.fromObject(inventario);

@@ -10,7 +10,7 @@ export abstract class PedidoDatasource {
     abstract deletePedido(id: string): Promise<PedidoEntity>;
     abstract getPedidosByEstado(estado: string): Promise<PedidoEntity[]>;
     abstract getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]>;
-    abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
+    abstract completarPedido(id_pedido: string, id_completado_por:string): Promise<PedidoEntity>;
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract getHistoricoPedidos(): Promise<PedidoEntity[]>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;

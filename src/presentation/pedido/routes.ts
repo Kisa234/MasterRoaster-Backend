@@ -1,3 +1,6 @@
+import { HistorialRepositoryImpl } from './../../infrastructure/repositories/historial.repository.impl';
+import { HistorialDataSourceImpl } from './../../infrastructure/datasources/historial.datasource.impl';
+import { Historial } from '@prisma/client';
 import { Router } from 'express';
 import { PedidoController } from './controller';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
@@ -87,6 +90,9 @@ export class PedidoRoutes {
         const LoteTostadoDatasource = new LoteTostadoDataSourceImpl();
         const LoteTostadoRepository = new LoteTostadoRepositoryImpl(LoteTostadoDatasource);
 
+        const HistorialDataSource = new HistorialDataSourceImpl();
+        const HistorialRepository = new HistorialRepositoryImpl(HistorialDataSource);
+
         const createLote = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
         const duplicateLote = new DuplicateLote(LoteRepository, createLote, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
 
@@ -102,17 +108,18 @@ export class PedidoRoutes {
             InventarioRepository,
             LoteTostadoRepository,
             inventarioTostadoRepository,
+            HistorialRepository
         );
 
         // Definición de rutas
 
-        router.get('/orden/tueste', controller.getPedidosOrdenTueste);
-        router.get('/orden/tueste/:fecha', controller.getPedidosOrdenTuesteByFecha);
-        router.get('/estado/:estado', controller.getPedidosByEstado);
-        router.get('/cliente/:cliente_id', controller.getPedidosByCliente);
-        router.get('/lote/:id_lote', controller.GetPedidosByLote);
-        router.put('/completar/:id', controller.completarPedido);
-        router.put('/facturar/:id_pedido', controller.SetPedidoFacturado)
+        router.get('/orden/tueste', authMiddleware, controller.getPedidosOrdenTueste);
+        router.get('/orden/tueste/:fecha', authMiddleware, controller.getPedidosOrdenTuesteByFecha);
+        router.get('/estado/:estado',authMiddleware, controller.getPedidosByEstado);
+        router.get('/cliente/:cliente_id',authMiddleware, controller.getPedidosByCliente);
+        router.get('/lote/:id_lote',authMiddleware, controller.GetPedidosByLote);
+        router.put('/completar/:id',authMiddleware, controller.completarPedido);
+        router.put('/facturar/:id_pedido',authMiddleware, controller.SetPedidoFacturado);
 
 
         router.post('/', controller.createPedido);

@@ -17,7 +17,7 @@ import { UpdateInventarioLoteDto } from "../../dtos/inventarios/inventario-lote/
 
 
 export interface CreatePedidoUseCase {
-    execute(createPedidoDto: CreatePedidoDto): Promise<PedidoEntity>;
+    execute(createPedidoDto: CreatePedidoDto, id_completado_por:string): Promise<PedidoEntity>;
 }
 
 export class CreatePedido implements CreatePedidoUseCase {
@@ -34,7 +34,7 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     ) { }
 
-    async execute(dto: CreatePedidoDto): Promise<PedidoEntity> {
+    async execute(dto: CreatePedidoDto, id_completado_por:string): Promise<PedidoEntity> {
         //dependiendo del tipo de pedido 
         switch (dto.tipo_pedido) {
             case 'Venta Verde':
@@ -50,7 +50,7 @@ export class CreatePedido implements CreatePedidoUseCase {
                 return this.maquilaValidations(dto);
                 break;
             case 'Suscripcion':
-                return this.suscripcionValidations(dto);
+                return this.suscripcionValidations(dto, id_completado_por);
                 break;
             default:
                 throw new Error('Tipo de pedido inválido');
@@ -62,11 +62,13 @@ export class CreatePedido implements CreatePedidoUseCase {
         const lote = await this.loteRepository.getLoteById(dto.id_lote!);
         if (!lote || lote.eliminado) throw new Error("Lote no válido");
 
+        // verificar que el lote tenga un inventario
         // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
         const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(lote.id_lote, dto.id_almacen!);
         if (!inventarioLote || inventarioLote.cantidad_kg < dto.cantidad) {
             throw new Error("Stock insuficiente en el almacén");
         }
+
 
         const cliente = await this.clienteRepository.getUserById(dto.id_user);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
@@ -207,7 +209,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         return pedido;
     }
 
-    async suscripcionValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
+    async suscripcionValidations(dto: CreatePedidoDto, id_completado_por:string): Promise<PedidoEntity> {
 
         // Validar cliente
         const cliente = await this.clienteRepository.getUserById(dto.id_user);
@@ -224,7 +226,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         const pedido = await this.pedidoRepository.createPedido(dto);
 
         // completar el pedido automáticamente
-        await this.pedidoRepository.completarPedido(pedido.id_pedido);
+        await this.pedidoRepository.completarPedido(pedido.id_pedido, id_completado_por);
 
         return pedido;
 

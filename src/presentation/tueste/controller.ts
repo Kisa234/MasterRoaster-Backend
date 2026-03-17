@@ -49,6 +49,12 @@ export class TuesteController {
     };
 
     public completarTostados = async (req: Request, res: Response) => {
+        // verificamos que el usuario este autenticado
+        if (!req.user?.id) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+        const id_completado_por = req.user?.id as string;
+
         const id_tueste = req.params.id;
         const [error, completeTuesteDto] = CompleteTuesteDto.update(req.body);
         if (error) {
@@ -61,7 +67,7 @@ export class TuesteController {
             this.createLoteTostado
             
             )
-            .execute(id_tueste, completeTuesteDto!)
+            .execute(id_tueste, completeTuesteDto!, id_completado_por)
             .then( tueste => res.json(tueste))
             .catch( error => res.status(400).json({ error}));
     }

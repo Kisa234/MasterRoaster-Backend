@@ -36,8 +36,8 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosByCliente(cliente_id);
     }
-    completarPedido(id_pedido: string): Promise<PedidoEntity> {
-        return this.pedidoDataSource.completarPedido(id_pedido);
+    completarPedido(id_pedido: string, id_completado_por:string): Promise<PedidoEntity> {
+        return this.pedidoDataSource.completarPedido(id_pedido, id_completado_por);
     }
     getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosOrdenTueste();

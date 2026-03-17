@@ -12,7 +12,7 @@ import { InventarioLoteRepository } from '../../repository/inventario-lote.repos
 import { InventarioLoteTostadoRepository } from '../../repository/inventario-lote-tostado.repository';
 
 export interface CompleteTuesteUseCase {
-    execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;
+    execute(id_tueste: string, completeTuesteDto:CompleteTuesteDto , id_completado_por: string): Promise<TuesteEntity>;
 }
 
 export class CompleteTueste implements CompleteTuesteUseCase {
@@ -23,7 +23,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         private readonly createLoteTostado: CreateLoteTostado,
     ) {}
 
-    async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
+    async execute(id_tueste: string,completeTuesteDto:CompleteTuesteDto, id_completado_por:string): Promise<TuesteEntity> {
         //1. verificar si el tueste existe
         const tueste = await this.tuesteRepository.getTuesteById(id_tueste);
         if (!tueste) throw new Error("Tueste no encontrado");
@@ -43,7 +43,7 @@ export class CompleteTueste implements CompleteTuesteUseCase {
         // 4. si todos los tuestes estan completados, completar el pedido
         const pedido = await this.pedidoRepository.getPedidoById(tueste.id_pedido);
         if (!pedido) throw new Error("Pedido no encontrado");
-        this.pedidoRepository.completarPedido(pedido.id_pedido);
+        this.pedidoRepository.completarPedido(pedido.id_pedido , id_completado_por);
         
         //5. actualizar lote si es Tostado Verde
         let pesoTotalTostado = tuestesDelPedido.reduce((total, t) => total + t.peso_salida!, 0);

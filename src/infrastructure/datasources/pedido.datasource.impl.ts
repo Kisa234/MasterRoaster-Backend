@@ -77,11 +77,14 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
     }
 
 
-    async completarPedido(id: string): Promise<PedidoEntity> {
+    async completarPedido(id: string, id_completado_por:string): Promise<PedidoEntity> {
         const pedido = await this.getPedidoById(id);
         const pedidoCompletado = await prisma.pedido.update({
             where: { id_pedido: id },
-            data: { estado_pedido: 'Completado' }
+            data: { 
+                estado_pedido: 'Completado',
+                completado_por_id: id_completado_por
+            }
         });
         return PedidoEntity.fromObject(pedidoCompletado);
 

@@ -11,7 +11,7 @@ export abstract class PedidoRepository {
     abstract getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]>;
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract getHistoricoPedidos(): Promise<PedidoEntity[]>;
-    abstract completarPedido(id_pedido: string): Promise<PedidoEntity>;
+    abstract completarPedido(id_pedido: string, id_completado_por:string): Promise<PedidoEntity>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;
     abstract GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]>;
     abstract getPedidosByLote(id_lote: string): Promise<PedidoEntity[]>;

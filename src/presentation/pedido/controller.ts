@@ -24,6 +24,7 @@ import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repos
 import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
 import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
 import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
+import { HistorialRepository } from '../../domain/repository/historial.repository';
 
 export class PedidoController {
 
@@ -38,16 +39,20 @@ export class PedidoController {
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
         private readonly inventarioRepository: InventarioProductoRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
-        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository
+        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
+        private readonly historialRepository: HistorialRepository
 
     ) {
     }
 
     public createPedido = async (req: Request, res: Response) => {
+        if (!req.user?.id) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
         // Inyectamos el usuario autenticado directamente aquí
-        // const body = { ...req.body, creado_por_id: req.user!.id };
-
-        const [error, createPedidoDto] = CreatePedidoDto.create(req.body);
+        const body = { ...req.body, creado_por_id: req.user?.id as string };
+        const id_completado_por = req.user?.id as string;
+        const [error, createPedidoDto] = CreatePedidoDto.create(body);
         if (error) {
             return res.status(400).json({ error });
         }
@@ -64,7 +69,29 @@ export class PedidoController {
             this.analisisRepository,
             this.analisisFisicoRepository
         )
-            .execute(createPedidoDto!)
+            .execute(createPedidoDto!, id_completado_por)
+            .then(pedido => res.json(pedido))
+            .catch(error => res.status(400).json({ error }));
+    };
+
+    public completarPedido = async (req: Request, res: Response) => {
+        if (!req.user?.id) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+        const body = { ...req.body, creado_por_id: req.user?.id as string };
+        const id_completado_por = req.user?.id as string;
+        const id_pedido = req.params.id;
+        new CompletarPedido(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.loteTostadoRepository,
+            this.inventarioLoteRepository,
+            this.inventarioLoteTostadoRepository,
+            this.duplicateLoteUseCase,
+            this.inventarioRepository,
+            this.historialRepository
+        )
+            .execute(id_pedido, id_completado_por)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
     };
@@ -132,20 +159,7 @@ export class PedidoController {
             .catch(error => res.status(400).json({ error }));
     };
 
-    public completarPedido = async (req: Request, res: Response) => {
-        new CompletarPedido(
-            this.pedidoRepository,
-            this.loteRepository,
-            this.loteTostadoRepository,
-            this.inventarioLoteRepository,
-            this.inventarioLoteTostadoRepository,
-            this.duplicateLoteUseCase,
-            this.inventarioRepository
-        )
-            .execute(req.params.id)
-            .then(pedido => res.json(pedido))
-            .catch(error => res.status(400).json({ error }));
-    };
+
     public getPedidosOrdenTueste = async (req: Request, res: Response) => {
         new GetPedidosOrdenTueste(this.pedidoRepository)
             .execute()
