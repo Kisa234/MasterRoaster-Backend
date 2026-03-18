@@ -7,4 +7,6 @@ export abstract class InventarioInsumoRepository {
   abstract updateInventario(id_inventario: string, dto: UpdateInventarioInsumoDto): Promise<InventarioInsumoEntity>;
   abstract getByInsumoAndAlmacen(id_insumo: string, id_almacen: string): Promise<InventarioInsumoEntity | null>;
   abstract getByAlmacen(id_almacen: string): Promise<InventarioInsumoEntity[]>;
+  abstract getAllInventarios():Promise<InventarioInsumoEntity[]>;
+
 }

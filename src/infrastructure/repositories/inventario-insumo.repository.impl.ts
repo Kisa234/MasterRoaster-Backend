@@ -9,7 +9,7 @@ export class InventarioInsumoRepositoryImpl
 
   constructor(
     private readonly datasource: InventarioInsumoDataSource
-  ) {}
+  ) { }
 
   createInventario(
     dto: CreateInventarioInsumoDto
@@ -35,5 +35,9 @@ export class InventarioInsumoRepositoryImpl
     id_almacen: string
   ): Promise<InventarioInsumoEntity[]> {
     return this.datasource.getByAlmacen(id_almacen);
+  }
+
+  getAllInventarios(): Promise<InventarioInsumoEntity[]> {
+    return this.datasource.getAllInventarios();
   }
 }

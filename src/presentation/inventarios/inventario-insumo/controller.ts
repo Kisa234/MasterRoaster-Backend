@@ -7,12 +7,14 @@ import { CreateInventarioInsumo } from "../../../domain/usecases/inventarios/inv
 import { GetInventarioInsumoByAlmacen } from "../../../domain/usecases/inventarios/inventario-insumo/get-by-almacen";
 import { GetInventarioInsumoByInsumo } from "../../../domain/usecases/inventarios/inventario-insumo/get-by-insumo";
 import { UpdateInventarioInsumo } from "../../../domain/usecases/inventarios/inventario-insumo/update";
+import { GetAllInventarioInsumo } from "../../../domain/usecases/inventarios/inventario-insumo/get-all";
+import { InventarioInsumoEntity } from "../../../domain/entities/inventario-insumo.entity";
 
 export class InventarioInsumoController {
 
   constructor(
     private readonly inventarioRepository: InventarioInsumoRepository
-  ) {}
+  ) { }
 
   public createInventario = (req: Request, res: Response) => {
     const [error, dto] = CreateInventarioInsumoDto.create(req.body);
@@ -69,4 +71,15 @@ export class InventarioInsumoController {
       return res.status(400).json({ error: err?.message ?? String(err) });
     }
   };
+
+  public getAllInventarios = async (req: Request, res: Response) => {
+    try {
+      new GetAllInventarioInsumo(this.inventarioRepository)
+        .execute()
+        .then(inv => res.json(inv))
+        .catch(error => res.status(400).json({ error }));
+    } catch (err: any) {
+      return res.status(400).json({ error: err?.message ?? String(err) });
+    }
+  }
 }

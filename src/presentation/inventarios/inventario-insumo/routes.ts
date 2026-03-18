@@ -18,14 +18,10 @@ export class InventarioInsumoRoutes {
 
     // Routes
     router.post("/", controller.createInventario);
-
-    router.get("/almacen/:id_almacen", controller.getByAlmacen);
-    router.get(
-      "/insumo/:id_insumo/almacen/:id_almacen",
-      controller.getByInsumoAndAlmacen
-    );
-
     router.put("/:id_inventario", controller.updateInventario);
+    router.get('/', controller.getAllInventarios);
+    router.get("/almacen/:id_almacen", controller.getByAlmacen);
+    router.get("/insumo/:id_insumo/almacen/:id_almacen",controller.getByInsumoAndAlmacen);
 
     return router;
   }

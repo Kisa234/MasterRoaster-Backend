@@ -62,4 +62,9 @@ export class InventarioInsumoDataSourceImpl
 
     return inventarios.map(InventarioInsumoEntity.fromObject);
   }
+
+  async getAllInventarios(): Promise<InventarioInsumoEntity[]> {
+    const inventarios = await prisma.inventarioInsumo.findMany({});
+    return inventarios.map(InventarioInsumoEntity.fromObject);
+  }
 }

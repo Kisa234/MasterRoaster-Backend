@@ -88,13 +88,11 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             // crear nuevo lote
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false);
             // crear un inventario para el nuevo lote 
-            console.log('1')
             const nuevoInventarioLote = await this.inventarioLoteRepository.createInventario({
                 id_lote: nuevoLoteDestino.id_lote!,
                 id_almacen: pedido.id_almacen!,
                 cantidad_kg: pedido.cantidad,
             });
-            console.log('2')
             // generar historial de creacion 
             await this.historialRepository.createHistorial({
                 entidad: "Lote",
@@ -103,7 +101,6 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 accion: "CREATE",
                 comentario : pedido.cantidad.toLocaleString() + 'gr'
             })
-            console.log('3')
             // generar historial de ingreso 
             await this.historialRepository.createHistorial({
                 entidad: "Lote",
@@ -112,15 +109,12 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 accion: "INGRESO",
                 comentario : pedido.cantidad.toLocaleString() + 'gr'
             })
-            console.log('4')
             
             // actualizar pedido
             const [, updatePedidoDto] = UpdatePedidoDto.update({
                 id_nuevoLote: await nuevoLoteDestino.id_lote,
             });
-            console.log('5')
             await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
-            console.log('6')
             
 
         } else {
