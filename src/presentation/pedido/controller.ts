@@ -25,6 +25,7 @@ import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
 import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
 import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
 import { HistorialRepository } from '../../domain/repository/historial.repository';
+import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
 
 export class PedidoController {
 
@@ -40,7 +41,9 @@ export class PedidoController {
         private readonly inventarioRepository: InventarioProductoRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
-        private readonly historialRepository: HistorialRepository
+        private readonly historialRepository: HistorialRepository,
+        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
+        
 
     ) {
     }
@@ -89,7 +92,9 @@ export class PedidoController {
             this.inventarioLoteTostadoRepository,
             this.duplicateLoteUseCase,
             this.inventarioRepository,
-            this.historialRepository
+            this.historialRepository,
+            this.movimientoAlmacenRepository,
+            this.tuesteRepository
         )
             .execute(id_pedido, id_completado_por)
             .then(pedido => res.json(pedido))

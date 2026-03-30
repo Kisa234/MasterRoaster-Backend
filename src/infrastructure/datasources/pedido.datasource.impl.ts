@@ -83,7 +83,8 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
             where: { id_pedido: id },
             data: { 
                 estado_pedido: 'Completado',
-                completado_por_id: id_completado_por
+                completado_por_id: id_completado_por,
+                fecha_completado: new Date()    
             }
         });
         return PedidoEntity.fromObject(pedidoCompletado);

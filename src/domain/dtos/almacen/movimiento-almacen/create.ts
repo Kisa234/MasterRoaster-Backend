@@ -9,14 +9,13 @@ export class CreateMovimientoAlmacenDto {
   private constructor(
     public readonly tipo: TipoMovimiento,
     public readonly entidad: EntidadInventario,
-    public readonly id_entidad: string,
-
+    public readonly id_entidad_primario: string,
+    public readonly id_pedido:string| null,
     public readonly cantidad: number,
-
+    public readonly id_user: string,
+    public readonly id_entidad_secundario?:string,
     public readonly id_almacen_origen?: string,
     public readonly id_almacen_destino?: string,
-
-    public readonly id_user?: string, // (lo puedes setear en controller desde req.user)
     public readonly comentario?: string,
   ) {}
 
@@ -25,12 +24,14 @@ export class CreateMovimientoAlmacenDto {
     let {
       tipo,
       entidad,
-      id_entidad,
+      id_entidad_primario,
+      id_pedido,
       cantidad,
+      id_user,
       id_almacen_origen,
       id_almacen_destino,
-      id_user,
       comentario,
+      id_entidad_secundario
     } = props;
 
     // tipo
@@ -48,54 +49,64 @@ export class CreateMovimientoAlmacenDto {
     }
 
     // id_entidad
-    if (!id_entidad) return ['id_entidad es requerido', undefined];
+    if (!id_entidad_primario || !String(id_entidad_primario).trim()) {
+      return ['id_entidad es requerido', undefined];
+    }
 
     // cantidad
-    if (cantidad === undefined || cantidad === null) return ['cantidad es requerida', undefined];
+    if (cantidad === undefined || cantidad === null) {
+      return ['cantidad es requerida', undefined];
+    }
+
     const nCantidad = typeof cantidad === 'string' ? Number(cantidad) : cantidad;
     if (typeof nCantidad !== 'number' || isNaN(nCantidad) || nCantidad <= 0) {
       return ['cantidad debe ser un número positivo', undefined];
     }
 
+    // id_user (AHORA OBLIGATORIO 🔥)
+    if (!id_user || !String(id_user).trim()) {
+      return ['id_user es requerido', undefined];
+    }
+
+    // normalización
+    const o = id_almacen_origen ? String(id_almacen_origen).trim() : undefined;
+    const d = id_almacen_destino ? String(id_almacen_destino).trim() : undefined;
+
     // reglas por tipo
-    const o = id_almacen_origen ? String(id_almacen_origen) : undefined;
-    const d = id_almacen_destino ? String(id_almacen_destino) : undefined;
-
-    if (tipoValue === 'INGRESO') {
-      if (!d) return ['id_almacen_destino es requerido para INGRESO', undefined];
+    if (tipoValue === TipoMovimiento.INGRESO && !d) {
+      return ['id_almacen_destino es requerido para INGRESO', undefined];
     }
 
-    if (tipoValue === 'SALIDA') {
-      if (!o) return ['id_almacen_origen es requerido para SALIDA', undefined];
+    if (tipoValue === TipoMovimiento.SALIDA && !o) {
+      return ['id_almacen_origen es requerido para SALIDA', undefined];
     }
 
-    if (tipoValue === 'TRASLADO') {
+    if (tipoValue === TipoMovimiento.TRASLADO) {
       if (!o) return ['id_almacen_origen es requerido para TRASLADO', undefined];
       if (!d) return ['id_almacen_destino es requerido para TRASLADO', undefined];
       if (o === d) return ['En TRASLADO, origen y destino no pueden ser el mismo', undefined];
     }
 
-    if (tipoValue === 'AJUSTE') {
-      // Ajuste lo tratamos como ajuste en un almacén específico (origen)
-      if (!o) return ['id_almacen_origen es requerido para AJUSTE', undefined];
+    if (tipoValue === TipoMovimiento.AJUSTE && !o) {
+      return ['id_almacen_origen es requerido para AJUSTE', undefined];
     }
 
-    if (id_user !== undefined && typeof id_user !== 'string') {
-      return ['id_user debe ser string', undefined];
-    }
-    if (comentario !== undefined && typeof comentario !== 'string') {
+    // comentario
+    if (comentario !== undefined && comentario !== null && typeof comentario !== 'string') {
       return ['comentario debe ser texto', undefined];
     }
 
     return [undefined, new CreateMovimientoAlmacenDto(
       tipoValue,
       entidadValue,
-      String(id_entidad),
+      String(id_entidad_primario).trim(),
+      id_pedido,
       nCantidad,
+      String(id_user).trim(),
+      id_entidad_secundario,
       o,
       d,
-      id_user,
-      comentario
+      comentario?.trim() || undefined,
     )];
   }
 }

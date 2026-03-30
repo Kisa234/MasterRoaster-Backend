@@ -1,0 +1,9 @@
+export enum HistorialEntidad {
+  PEDIDO = "PEDIDO",
+  LOTE = "LOTE",
+  LOTE_TOSTADO = "LOTE_TOSTADO",
+  MUESTRA = "MUESTRA",
+  INSUMO = "INSUMO",
+  PRODUCTO = "PRODUCTO",
+  INVENTARIO = "INVENTARIO",
+}

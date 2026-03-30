@@ -30,6 +30,9 @@ import { HistorialRepository } from '../../domain/repository/historial.repositor
 import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
 import { GetLoteInventarioById } from '../../domain/usecases/lote/lote/get-lote-inventario-id';
 import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
+import { TipoMovimiento } from '../../enums/tipo-movimiento.enum';
+import { EntidadInventario } from '../../enums/entidad-inventario.enum';
+import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
 
 
 export class LoteController {
@@ -46,7 +49,8 @@ export class LoteController {
         private readonly userRepository: UserRepository,
         private readonly pedidoRepository: PedidoRepository,
         private readonly historialRepository: HistorialRepository,
-        private readonly inventarioLoteRepository: InventarioLoteRepository
+        private readonly inventarioLoteRepository: InventarioLoteRepository,
+        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
         
     ) { }
 
@@ -80,21 +84,14 @@ export class LoteController {
         new CreateLote(
             this.loteRepository,
             this.userRepository,
-            this.pedidoRepository
+            this.pedidoRepository,
+            this.historialRepository,
+            this.movimientoAlmacenRepository,
+            this.inventarioLoteRepository
 
         )
             .execute(createLoteDto!)
             .then(lote => {
-                this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: lote.id_lote,
-                    id_user: req.user!.id
-                });
-                this.inventarioLoteRepository.createInventario({
-                    id_lote:lote.id_lote,
-                    id_almacen:req.body.almacen,
-                    cantidad_kg:lote.peso
-                })
                 res.json(lote)
             })
             .catch(error => res.status(400).json({ error }));
@@ -112,11 +109,6 @@ export class LoteController {
             this.pedidoRepository
         ).execute(createLoteRapidoDto!)
             .then(lote => {
-                this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: lote.id_lote,
-                    id_user: req.user!.id
-                });
                 res.json(lote)
             })
             .catch(error => res.status(400).json({ error }));
@@ -133,14 +125,6 @@ export class LoteController {
             .execute(req.params.id, updateLoteDto!)
             .then(lote => 
                 {
-                    this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    objeto_antes: JSON.stringify(lote_before),
-                    objeto_despues: JSON.stringify(lote),
-                    id_entidad: lote.id_lote,
-                    id_user: req.user!.id,
-                    comentario: req.body.hcomentario
-                });
                     res.json(lote)
                 })
             .catch(error => res.status(400).json({ error }));
@@ -150,12 +134,6 @@ export class LoteController {
         new DeleteLote(this.loteRepository)
             .execute(req.params.id)
             .then(lote => {
-                this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: lote!.id_lote,
-                    id_user: req.user!.id,
-                    comentario: req.body.hcomentario
-                });
                 res.json(lote)
             })
             .catch(error => res.status(400).json({ error }));
@@ -200,11 +178,6 @@ export class LoteController {
         )
             .execute(id_muestra, createLoteDto)
             .then(lote => {
-                this.historialRepository.createHistorial({
-                    ...req.auditContext!,
-                    id_entidad: lote!.id_lote,
-                    id_user: req.user!.id,
-                });
                 this.inventarioLoteRepository.createInventario({
                     id_lote:lote.id_lote,
                     id_almacen:req.body.almacen,

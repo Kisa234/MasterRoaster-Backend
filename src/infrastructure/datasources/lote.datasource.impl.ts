@@ -139,7 +139,6 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lotes = await prisma.lote.findMany({
       where: {
         eliminado: false,
-        tipo_lote: 'Lote Verde',
       },
       include: {
         inventarioLotes: {
@@ -156,7 +155,6 @@ export class LoteDataSourceImpl implements LoteDataSource {
     where: {
       id_lote: id,
       eliminado: false,
-      tipo_lote: 'Lote Verde',
     },
     include: {
       inventarioLotes: {

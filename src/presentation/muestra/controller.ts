@@ -55,16 +55,6 @@ export class MuestraController {
     new CreateMuestra(this.muestraRepository, this.userRepository)
       .execute(createMuestraDto!)
       .then((muestra) => {
-        this.historialRepository.createHistorial({
-          ...req.auditContext!,
-          id_entidad: muestra.id_muestra,
-          id_user: req.user!.id
-        });
-        this.inventarioMuestraRepository.createInventario({
-          id_muestra:muestra.id_muestra,
-          id_almacen:req.body.almacen,
-          peso: muestra.peso
-        })
         res.json(muestra);
       })
       .catch((error) => res.status(400).json({ error }));
@@ -80,13 +70,6 @@ export class MuestraController {
     new UpdateMuestra(this.muestraRepository)
       .execute(id_muestra, updateMuestraDto!)
       .then((muestra) => {
-        this.historialRepository.createHistorial({
-          ...req.auditContext!,
-          objeto_antes: JSON.stringify(muestra_before),
-          id_entidad: muestra.id_muestra,
-          id_user: req.user!.id,
-          comentario: req.body.hcomentario
-        });
         res.json(muestra);
       })
       .catch(error => res.status(400).json({ error }));
@@ -98,11 +81,6 @@ export class MuestraController {
     const id_muestra = req.params.id;
     this.muestraRepository.completeMuestra(id_muestra)
       .then((muestra) => {
-        this.historialRepository.createHistorial({
-          ...req.auditContext!,
-          id_entidad: muestra.id_muestra,
-          id_user: req.user!.id,
-        });
         res.json(muestra);
       })
       .catch(error => res.status(400).json({ error }));
@@ -113,11 +91,6 @@ export class MuestraController {
     new DeleteMuestra(this.muestraRepository)
       .execute(id_muestra)
       .then((muestra) => {
-        this.historialRepository.createHistorial({
-          ...req.auditContext!,
-          id_entidad: muestra.id_muestra,
-          id_user: req.user!.id,
-        });
         res.json(muestra);
       })
       .catch(error => res.status(400).json({ error }));

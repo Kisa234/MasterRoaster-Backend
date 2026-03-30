@@ -32,10 +32,10 @@ export class MuestraRoutes {
         const muestraController = new MuestraController(muestraRepository, userRepository, historialRepository, inventarioMuestraRepository);
 
 
-        router.post('/', authMiddleware, auditMiddleware('Muestra', 'CREATE'), muestraController.createMuestra);
-        router.put('/:id', authMiddleware, auditMiddleware('Muestra', 'UPDATE'), muestraController.updateMuestra);
-        router.patch('/complete/:id', authMiddleware, auditMiddleware('Muestra', 'COMPLETE'), muestraController.completeMuestra);
-        router.delete('/:id', authMiddleware, auditMiddleware('Muestra', 'DELETE'), muestraController.deleteMuestra);
+        router.post('/', authMiddleware, muestraController.createMuestra);
+        router.put('/:id', authMiddleware, muestraController.updateMuestra);
+        router.patch('/complete/:id', authMiddleware, muestraController.completeMuestra);
+        router.delete('/:id', authMiddleware, muestraController.deleteMuestra);
         router.get('/inventario', muestraController.getMuestrasConInventario);
         router.get('/:id', muestraController.getMuestraById);
         router.get('/', muestraController.getAllMuestra);

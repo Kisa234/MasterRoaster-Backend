@@ -26,26 +26,29 @@ import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repos
 import { HistorialRepositoryImpl } from '../../infrastructure/repositories/historial.repository.impl';
 import { HistorialDataSourceImpl } from '../../infrastructure/datasources/historial.datasource.impl';
 import { checkPermission } from '../../infrastructure/middlewares/permission.middleware';
+import { MovimientoAlmacenDataSourceImpl } from './../../infrastructure/datasources/movimiento-almacen.datasource.impl';
+import { MovimientoAlmacenRepositoryImpl } from '../../infrastructure/repositories/movimiento-almacen.repository.impl';
 
-export class LoteRoutes{
 
-    static get routes():Router{
+export class LoteRoutes {
+
+    static get routes(): Router {
         const router = Router();
 
-        
+
         const LoteAnalisisDataSource = new LoteAnalisisDataSourceImpl();
         const loteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDataSource);
-        
+
         const muestraDatasource = new MuestraDataSourceImpl();
         const muestraRepository = new MuestraRepositoryImpl(muestraDatasource);
-        
+
         const analisisDatasource = new AnalisisDataSourceImpl();
         const analisisRepository = new AnalisisRepositoryImpl(analisisDatasource);
-        
+
         const analisisFisicoDataSource = new AnalisisFisicoDataSourceImpl();
         const analisisFisicoRepository = new AnalisisFisicoRepositoryImpl(analisisFisicoDataSource);
-        
-        
+
+
         const analisisSensorialDataSource = new AnalisisSensorialDataSourceImpl();
         const analisisSensorialRepository = new AnalisisSensorialRepositoryImpl(analisisSensorialDataSource);
 
@@ -55,11 +58,11 @@ export class LoteRoutes{
 
         const loteDatasource = new LoteDataSourceImpl();
         const loteRepository = new LoteRepositoryImpl(loteDatasource);
-        
+
         const userDatasource = new UserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(userDatasource);
 
-        const pedidoDatasource = new  PedidoDataSourceImpl();
+        const pedidoDatasource = new PedidoDataSourceImpl();
         const pedidoRepository = new PedidoRepositoryImpl(pedidoDatasource);
 
         const historialDatasource = new HistorialDataSourceImpl();
@@ -67,9 +70,20 @@ export class LoteRoutes{
 
         const inventarioLoteDatasource = new InventarioLoteDataSourceImpl();
         const inventarioLoteRepository = new InventarioLoteRepositoryImpl(inventarioLoteDatasource);
-        
+
+        //MovimientoAlmacen 
+        const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
+        const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
+
         // Use cases
-        const createLoteUseCase = new CreateLote(loteRepository, userRepository, pedidoRepository);
+        const createLoteUseCase = new CreateLote(
+            loteRepository, 
+            userRepository, 
+            pedidoRepository,
+            historialRepository,
+            movimientoAlmacenRepository,
+            inventarioLoteRepository
+        );
 
         const loteController = new LoteController(
             createLoteUseCase,
@@ -83,25 +97,26 @@ export class LoteRoutes{
             userRepository,
             pedidoRepository,
             historialRepository,
-            inventarioLoteRepository
+            inventarioLoteRepository,
+            movimientoAlmacenRepository
         );
 
-        router.post('/', authMiddleware,checkPermission('inventario.lotes_verdes.create') , auditMiddleware('Lote', 'CREATE'),loteController.createLote);
-        router.post('/rapido', authMiddleware,checkPermission('inventario.lotes_verdes.create'),auditMiddleware('Lote', 'CREATE'), loteController.createLoteRapido);
-        router.post('/muestra/:id',authMiddleware,checkPermission('inventario.lotes_verdes.create'), auditMiddleware('Lote', 'CREATE') ,loteController.createLoteFromMuestra);
-        router.put('/:id', authMiddleware,checkPermission('inventario.lotes_verdes.update'),auditMiddleware('Lote', 'UPDATE'), loteController.updateLote);
-        router.delete('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.delete'),auditMiddleware('Lote', 'DELETE'),loteController.deleteLote);
-        
-        router.post('/fusionar',authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.FusionarLotes);
-        router.post('/blend',authMiddleware,auditMiddleware('Lote', 'CREATE'),  loteController.blendLotes);
-        
+        router.post('/', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLote);
+        router.post('/rapido', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLoteRapido);
+        router.post('/muestra/:id', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLoteFromMuestra);
+        router.put('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.update'), loteController.updateLote);
+        router.delete('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.delete'), loteController.deleteLote);
+
+        router.post('/fusionar', authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.FusionarLotes);
+        router.post('/blend', authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.blendLotes);
+
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
         router.get('/inventario', loteController.getLoteInventario);
         router.get('/inventario/:id', loteController.getLoteInventarioById);
         router.get('/roaster', loteController.getLotesRoaster);
         router.get('/user/:id', loteController.getLotesByUserId);
-        router.get('/byLote/:id',loteController.getUserByLote);
+        router.get('/byLote/:id', loteController.getUserByLote);
         router.get('/:id', loteController.getLoteById);
         router.get('/', loteController.getLotes);
 

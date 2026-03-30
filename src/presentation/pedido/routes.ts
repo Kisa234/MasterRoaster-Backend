@@ -1,3 +1,4 @@
+import { MovimientoAlmacenDataSourceImpl } from './../../infrastructure/datasources/movimiento-almacen.datasource.impl';
 import { HistorialRepositoryImpl } from './../../infrastructure/repositories/historial.repository.impl';
 import { HistorialDataSourceImpl } from './../../infrastructure/datasources/historial.datasource.impl';
 import { Historial } from '@prisma/client';
@@ -29,10 +30,11 @@ import { LoteTostadoDataSourceImpl } from '../../infrastructure/datasources/lote
 import { LoteTostadoRepositoryImpl } from '../../infrastructure/repositories/loteTostado.repository.impl';
 import { InventarioLoteRepositoryImpl } from '../../infrastructure/repositories/inventario-lote.repository.impl';
 import { InventarioLoteDataSourceImpl } from '../../infrastructure/datasources/inventario-lote.datasource.impl';
-import { InventarioLoteTostadoDataSource } from '../../domain/datasources/inventario-lote-tostado.datasource';
 import { InventarioLoteTostadoRepositoryImpl } from '../../infrastructure/repositories/inventario-lote-tostado.repository.impl';
 import { InventarioLoteTostadoDataSourceImpl } from '../../infrastructure/datasources/inventario-lote-tostado.datasource.impl';
 import { InventarioProductoRepositoryImpl } from '../../infrastructure/repositories/inventario-producto.repository.impl';
+import { MovimientoAlmacenRepositoryImpl } from '../../infrastructure/repositories/movimiento-almacen.repository.impl';
+
 
 export class PedidoRoutes {
 
@@ -82,19 +84,33 @@ export class PedidoRoutes {
         const LoteAnalisisDatasource = new LoteAnalisisDataSourceImpl();
         const LoteAnalisisRepository = new LoteAnalisisRepositoryImpl(LoteAnalisisDatasource);
 
-        // Inventario
-        const InventarioDatasource = new InventarioProductoDataSourceImpl();
-        const InventarioRepository = new InventarioProductoRepositoryImpl(InventarioDatasource);
-
         // LoteTostado
         const LoteTostadoDatasource = new LoteTostadoDataSourceImpl();
         const LoteTostadoRepository = new LoteTostadoRepositoryImpl(LoteTostadoDatasource);
 
-        const HistorialDataSource = new HistorialDataSourceImpl();
-        const HistorialRepository = new HistorialRepositoryImpl(HistorialDataSource);
+        // Inventario
+        const InventarioDatasource = new InventarioProductoDataSourceImpl();
+        const InventarioRepository = new InventarioProductoRepositoryImpl(InventarioDatasource);
+        
+        //Historial
+        const historialDataSource = new HistorialDataSourceImpl();
+        const historialRepository = new HistorialRepositoryImpl(historialDataSource);
 
-        const createLote = new CreateLote(LoteRepository, UserRepository, PedidoRepository);
-        const duplicateLote = new DuplicateLote(LoteRepository, createLote, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
+        //MovimientoAlmacen 
+        const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
+        const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
+
+         
+        const createLoteUseCase = new CreateLote(
+            LoteRepository, 
+            UserRepository, 
+            PedidoRepository,
+            historialRepository,
+            movimientoAlmacenRepository,
+            inventarioLoteRepository
+        );
+
+        const duplicateLote = new DuplicateLote(LoteRepository, createLoteUseCase, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
 
         const controller = new PedidoController(
             PedidoRepository,
@@ -108,25 +124,26 @@ export class PedidoRoutes {
             InventarioRepository,
             LoteTostadoRepository,
             inventarioTostadoRepository,
-            HistorialRepository
+            historialRepository,
+            movimientoAlmacenRepository
         );
 
         // Definición de rutas
 
         router.get('/orden/tueste', authMiddleware, controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', authMiddleware, controller.getPedidosOrdenTuesteByFecha);
-        router.get('/estado/:estado',authMiddleware, controller.getPedidosByEstado);
-        router.get('/cliente/:cliente_id',authMiddleware, controller.getPedidosByCliente);
-        router.get('/lote/:id_lote',authMiddleware, controller.GetPedidosByLote);
-        router.put('/completar/:id',authMiddleware, controller.completarPedido);
-        router.put('/facturar/:id_pedido',authMiddleware, controller.SetPedidoFacturado);
+        router.get('/estado/:estado', authMiddleware, controller.getPedidosByEstado);
+        router.get('/cliente/:cliente_id', authMiddleware, controller.getPedidosByCliente);
+        router.get('/lote/:id_lote', authMiddleware, controller.GetPedidosByLote);
+        router.put('/completar/:id', authMiddleware, controller.completarPedido);
+        router.put('/facturar/:id_pedido', authMiddleware, controller.SetPedidoFacturado);
 
 
-        router.post('/', controller.createPedido);
-        router.get('/', controller.getAllPedidos);
-        router.get('/:id', controller.getPedidoById);
-        router.put('/:id', controller.updatePedido);
-        router.delete('/:id', controller.deletePedido);
+        router.post('/', authMiddleware, controller.createPedido);
+        router.get('/', authMiddleware, controller.getAllPedidos);
+        router.get('/:id', authMiddleware, controller.getPedidoById);
+        router.put('/:id', authMiddleware, controller.updatePedido);
+        router.delete('/:id', authMiddleware, controller.deletePedido);
         return router;
 
     }

@@ -1,5 +1,4 @@
 export class InventarioLoteEntity {
-
   constructor(
     public id_inventario: string,
     public id_lote: string,
@@ -7,10 +6,10 @@ export class InventarioLoteEntity {
     public cantidad_kg: number,
     public fecha_registro: Date,
     public fecha_editado?: Date,
+    public cantidad_tostado_kg?: number,
   ) {}
 
   static fromObject(obj: { [key: string]: any }): InventarioLoteEntity {
-
     const {
       id_inventario,
       id_lote,
@@ -18,6 +17,7 @@ export class InventarioLoteEntity {
       cantidad_kg,
       fecha_registro,
       fecha_editado,
+      cantidad_tostado_kg
     } = obj;
 
     if (!id_inventario) throw new Error('id_inventario property is required');
@@ -45,13 +45,27 @@ export class InventarioLoteEntity {
       }
     }
 
+    let ct: number | undefined;
+    if (cantidad_tostado_kg !== undefined && cantidad_tostado_kg !== null) {
+      const n = typeof cantidad_tostado_kg === 'string'
+        ? Number(cantidad_tostado_kg)
+        : cantidad_tostado_kg;
+
+      if (typeof n !== 'number' || isNaN(n) || n < 0) {
+        throw new Error('cantidad_tostado_kg must be a number >= 0');
+      }
+
+      ct = n;
+    }
+
     return new InventarioLoteEntity(
       id_inventario,
       id_lote,
       id_almacen,
       cantidad_kg,
       fr,
-      fe
+      fe,
+      ct
     );
   }
 }

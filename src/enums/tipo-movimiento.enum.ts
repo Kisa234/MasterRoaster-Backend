@@ -3,4 +3,5 @@ export enum TipoMovimiento {
   SALIDA = 'SALIDA',
   TRASLADO = 'TRASLADO',
   AJUSTE = 'AJUSTE',
+  DERIVACION = 'DERIVACION'
 }

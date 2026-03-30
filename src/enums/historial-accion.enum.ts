@@ -1,0 +1,11 @@
+export enum HistorialAccion {
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+  COMPLETE = "COMPLETE",
+  CANCEL = "CANCEL",
+  AJUSTE = "AJUSTE",
+  INGRESO = "INGRESO",
+  SALIDA = "SALIDA",
+  TRASLADO = "TRASLADO",
+}

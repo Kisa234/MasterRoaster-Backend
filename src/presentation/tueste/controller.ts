@@ -1,3 +1,4 @@
+import { CompletarPedidoUseCase } from './../../domain/usecases/pedido/complete-pedido';
 import { Request, Response } from "express";
 import { CreateTuesteDto } from "../../domain/dtos/tueste/create";
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
@@ -19,9 +20,8 @@ export class TuesteController {
 
     constructor(
         private readonly tuesteRepository: TuesteRepository,
-        private readonly createLoteTostado: CreateLoteTostado,
         private readonly pedidoRepository: PedidoRepository,
-        private readonly loteRepository: LoteRepository,
+        private readonly completarPedidoUseCase: CompletarPedidoUseCase
     ){}
 
     public createTueste = async (req: Request, res: Response) => {
@@ -62,10 +62,7 @@ export class TuesteController {
         }
         new CompleteTueste(
             this.tuesteRepository,
-            this.pedidoRepository,
-            this.loteRepository,
-            this.createLoteTostado
-            
+            this.completarPedidoUseCase
             )
             .execute(id_tueste, completeTuesteDto!, id_completado_por)
             .then( tueste => res.json(tueste))

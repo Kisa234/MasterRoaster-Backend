@@ -16,7 +16,7 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
       data: {
         tipo: dto.tipo,
         entidad: dto.entidad,
-        id_entidad: dto.id_entidad,
+        id_entidad_primario: dto.id_entidad_primario,
         cantidad: dto.cantidad,
         id_almacen_origen: dto.id_almacen_origen,
         id_almacen_destino: dto.id_almacen_destino,
@@ -70,7 +70,7 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
 
   async getMovimientosByEntidad(
     entidad: EntidadInventario,
-    id_entidad: string,
+    id_entidad_primario: string,
     from?: Date,
     to?: Date
   ): Promise<MovimientoAlmacenEntity[]> {
@@ -78,7 +78,7 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         entidad,
-        id_entidad,
+        id_entidad_primario,
         ...(from && to ? { fecha: { gte: from, lt: to } } : {}),
       },
       orderBy: { fecha: 'desc' },

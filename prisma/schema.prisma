@@ -101,7 +101,7 @@ model Almacen {
   inventarioLotes     InventarioLote[]
   inventarioMuestras  InventarioMuestra[]
   inventarioTostados  InventarioLoteTostado[]
-  inventarioInsumos  InventarioInsumo[]
+  inventarioInsumos   InventarioInsumo[]
 
   ingresoProductos   IngresoProducto[]
   movimientosOrigen  MovimientoAlmacen[] @relation("MovimientoOrigen")
@@ -114,6 +114,7 @@ enum TipoMovimiento {
   SALIDA // venta, merma, consumo
   TRASLADO // entre almacenes
   AJUSTE // corrección manual
+  DERIVACION
 }
 
 enum EntidadInventario {
@@ -125,19 +126,22 @@ enum EntidadInventario {
 }
 
 model MovimientoAlmacen {
-  id_movimiento      String            @id @default(uuid())
-  tipo               TipoMovimiento
-  entidad            EntidadInventario
-  id_entidad         String
-  id_almacen_origen  String?
-  id_almacen_destino String?
-  cantidad           Float
-  comentario         String?
-  id_user            String
-  fecha              DateTime          @default(now())
-  almacenOrigen      Almacen?          @relation("MovimientoOrigen", fields: [id_almacen_origen], references: [id_almacen])
-  almacenDestino     Almacen?          @relation("MovimientoDestino", fields: [id_almacen_destino], references: [id_almacen])
-  user               User              @relation(fields: [id_user], references: [id_user])
+  id_movimiento         String            @id @default(uuid())
+  tipo                  TipoMovimiento
+  entidad               EntidadInventario
+  id_user               String
+  id_entidad_primario   String
+  id_pedido             String?
+  cantidad              Float
+  fecha                 DateTime          @default(now())
+  id_entidad_secundario String?
+  id_almacen_origen     String?
+  id_almacen_destino    String?
+  comentario            String?
+  almacenOrigen         Almacen?          @relation("MovimientoOrigen", fields: [id_almacen_origen], references: [id_almacen])
+  almacenDestino        Almacen?          @relation("MovimientoDestino", fields: [id_almacen_destino], references: [id_almacen])
+  user                  User              @relation(fields: [id_user], references: [id_user])
+  pedido                Pedido?           @relation(fields: [id_pedido], references: [id_pedido])
 }
 
 // INVENTARIADO DE LA TOSTADURIA
@@ -228,12 +232,13 @@ model Lote {
 }
 
 model InventarioLote {
-  id_inventario  String    @id @default(uuid())
-  id_lote        String
-  id_almacen     String
-  cantidad_kg    Float
-  fecha_registro DateTime  @default(now())
-  fecha_editado  DateTime?
+  id_inventario       String    @id @default(uuid())
+  id_lote             String
+  id_almacen          String
+  cantidad_kg         Float
+  cantidad_tostado_kg Float?
+  fecha_registro      DateTime  @default(now())
+  fecha_editado       DateTime?
 
   lote    Lote    @relation(fields: [id_lote], references: [id_lote])
   almacen Almacen @relation(fields: [id_almacen], references: [id_almacen])
@@ -293,10 +298,10 @@ model Insumo {
   activo        Boolean  @default(true)
   created_at    DateTime @default(now())
 
-  id_categoria     String
-  categoria     CategoriaInsumo @relation(fields: [id_categoria], references: [id_categoria])
+  id_categoria String
+  categoria    CategoriaInsumo @relation(fields: [id_categoria], references: [id_categoria])
 
-  inventarios     InventarioInsumo[]
+  inventarios InventarioInsumo[]
 }
 
 model CategoriaInsumo {
@@ -348,8 +353,8 @@ model Producto {
 
   // Identidad comercial
   id_marca String?
-  modelo String?
-  color  String?
+  modelo   String?
+  color    String?
 
   // atributos físicos fijos
   peso_kg     Float?
@@ -374,15 +379,15 @@ model Producto {
   componentes   ProductoComponente[] @relation("ProductoCombo")
   parteDeCombos ProductoComponente[] @relation("ProductoParte")
   pedidos       Pedido[]
-  marca    Marca? @relation(fields: [id_marca], references: [id_marca])
+  marca         Marca?               @relation(fields: [id_marca], references: [id_marca])
 }
 
 model Marca {
-  id_marca       String   @id @default(uuid())
-  nombre         String   @unique
+  id_marca       String    @id @default(uuid())
+  nombre         String    @unique
   descripcion    String?
-  activo         Boolean  @default(true)
-  fecha_registro DateTime @default(now())
+  activo         Boolean   @default(true)
+  fecha_registro DateTime  @default(now())
   fecha_editado  DateTime?
 
   productos Producto[]
@@ -519,18 +524,42 @@ model IngresoCafe {
 
 // HISTORIAL DE ACCIONES POR USUARIO
 
+enum HistorialEntidad {
+  PEDIDO
+  LOTE
+  LOTE_TOSTADO
+  MUESTRA
+  INSUMO
+  PRODUCTO
+  INVENTARIO
+}
+
+enum HistorialAccion {
+  CREATE
+  UPDATE
+  DELETE
+  COMPLETE
+  CANCEL
+  AJUSTE
+  INGRESO
+  SALIDA
+  TRASLADO
+}
+
 model Historial {
-  id_historial   String   @id @default(uuid())
-  entidad        String
+  id_historial   String           @id @default(uuid())
   id_entidad     String
   id_user        String
-  accion         String
+  id_pedido      String?
+  entidad        HistorialEntidad
+  accion         HistorialAccion
   comentario     String?
   objeto_antes   Json?
   objeto_despues Json?
-  fecha_registro DateTime @default(now())
+  fecha_registro DateTime         @default(now())
 
-  user User @relation(fields: [id_user], references: [id_user])
+  user   User    @relation(fields: [id_user], references: [id_user])
+  pedido Pedido? @relation(fields: [id_pedido], references: [id_pedido])
 }
 
 model Cambios {
@@ -573,25 +602,27 @@ model Pedido {
   eliminado            Boolean   @default(false)
 
   // Relación con Usuario como Cliente
-  cliente           User         @relation("Cliente", fields: [id_user], references: [id_user])
+  cliente            User                @relation("Cliente", fields: [id_user], references: [id_user])
   // Relación con lote original
-  lote              Lote?        @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
+  lote               Lote?               @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
   // Relación con lote creado
-  loteCreado        Lote?        @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
+  loteCreado         Lote?               @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
   // Relación con lote tostado creado
-  loteTostado       LoteTostado? @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
+  loteTostado        LoteTostado?        @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
   // Relación con lote tostado de origen 
-  loteTostadoOrigen LoteTostado? @relation("PedidoLoteTostadoOrigen", fields: [id_lote_tostado], references: [id_lote_tostado])
+  loteTostadoOrigen  LoteTostado?        @relation("PedidoLoteTostadoOrigen", fields: [id_lote_tostado], references: [id_lote_tostado])
   //  Relacion con el almacen del lote 
-  Almacen           Almacen?     @relation("almacen", fields: [id_almacen], references: [id_almacen])
+  Almacen            Almacen?            @relation("almacen", fields: [id_almacen], references: [id_almacen])
   // Relación con Usuario como quien lo creó
-  creadoPor         User?        @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
+  creadoPor          User?               @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
   // Relación con Usuario como quien lo completóq
-  completadoPor     User?        @relation("PedidoCompletadoPor", fields: [completado_por_id], references: [id_user])
+  completadoPor      User?               @relation("PedidoCompletadoPor", fields: [completado_por_id], references: [id_user])
   // Relación con los tuestes realizados para este pedido
-  tueste            Tueste[]
+  tueste             Tueste[]
   // Relacion con los productos en caso de maquila
-  producto          Producto?    @relation(fields: [id_producto], references: [id_producto])
+  producto           Producto?           @relation(fields: [id_producto], references: [id_producto])
+  historials         Historial[]
+  movimientoAlmacens MovimientoAlmacen[]
 }
 
 model Tueste {
