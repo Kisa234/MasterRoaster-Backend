@@ -278,7 +278,10 @@ export class LoteController {
         const id = req.params.id;
         new GetLoteInventarioById(this.loteRepository)
             .execute(id)
-            .then(lote => res.json(lote))
+            .then(lote => {
+                
+                res.json(lote);
+            })
             .catch(error => res.status(400).json({ error })
             )
     }

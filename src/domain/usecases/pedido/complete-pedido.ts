@@ -1,3 +1,4 @@
+import { CreateLoteTostado } from './../lote/lote-tostado/create-lote-tostado';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { PedidoEntity } from "../../entities/pedido.entity";
 import { LoteRepository } from "../../repository/lote.repository";
@@ -37,7 +38,8 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         private readonly inventarioRepository: InventarioProductoRepository,
         private readonly historialRepository: HistorialRepository,
         private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
-        private readonly tuesteRepository: TuesteRepository
+        private readonly tuesteRepository: TuesteRepository,
+        private readonly createLoteTostado: CreateLoteTostado
     ) { }
 
     async execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity> {
@@ -93,7 +95,6 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         // crear lote destino o actualizar existente
         // Verificar si el cliente ya tiene un lote nuevo creado desde este mismo lote original y del mismo tipo de pedido
         const hasLote = await this.verifyIfUserHasLote(pedido.id_user, loteOrigen.id_lote, 'Lote Verde');
-        console.log(hasLote);
         if (!hasLote) {
             // crear nuevo lote
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false);
@@ -159,6 +160,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 cantidad: pedido.cantidad,
                 id_user: id_completado_por,
                 id_pedido: pedido.id_pedido,
+                comentario: `Derivación por Lote Verde en pedido`,
             });
             // en caso el lote existente este como eliminado, reactivarlo
             const loteExistente = await this.loteRepository.getLoteById(hasLote);
@@ -219,11 +221,12 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         }
 
         // validar stock de verde requerido
-        const cantidadVerde = pedido.cantidad * 1.1765;
+        const cantidadVerde = Math.ceil(pedido.cantidad * 1.1765);
         const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(
             loteOrigen.id_lote,
             pedido.id_almacen!
         );
+
 
         if (!inventarioLote || inventarioLote.cantidad_kg < cantidadVerde) {
             throw new Error("Stock insuficiente en el almacén");
@@ -266,7 +269,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 id_entidad_secundario: nuevoLoteDestino.id_lote,
                 id_almacen_origen: pedido.id_almacen,
                 id_almacen_destino: pedido.id_almacen,
-                cantidad: pedido.cantidad,
+                cantidad: cantidadVerde,
                 id_user: id_completado_por,
                 id_pedido: pedido.id_pedido,
                 comentario: `Derivación por lote tostado en pedido`,
@@ -313,10 +316,10 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 id_entidad_secundario: hasLote,
                 id_almacen_origen: pedido.id_almacen,
                 id_almacen_destino: pedido.id_almacen,
-                cantidad: pedido.cantidad,
+                cantidad: cantidadVerde,
                 id_user: id_completado_por,
                 id_pedido: pedido.id_pedido,
-                comentario: `Derivación por tostado verde en pedido`,
+                comentario: `Derivación por lote tostado en pedido`,
             });
 
             const loteExistente = await this.loteRepository.getLoteById(hasLote);
@@ -504,7 +507,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             throw new Error(createLoteTostadoError ?? "Error generando DTO de lote tostado");
         }
 
-        const loteTostado = await this.loteTostadoRepository.createLoteTostado(createLoteTostadoDto);
+        const loteTostado = await this.createLoteTostado.execute(createLoteTostadoDto);
 
         await this.inventarioLoteTostadoRepository.createInventario({
             id_lote_tostado: loteTostado.id_lote_tostado,
@@ -606,17 +609,6 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     }
 
     async verifyIfUserHasLote(id_user: string, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
-
-        // 1️. Buscar pedidos del cliente
-        const pedidos = await this.pedidoRepository.getPedidosByCliente(id_user);
-        const pedidoRelacionado = pedidos.find(
-            p => p.id_lote === id_lote_origen
-        );
-        if (pedidoRelacionado) {
-            return pedidoRelacionado.id_nuevoLote ?? null;
-        }
-
-        // 2️. Si no hay pedido, buscar directamente en lotes
         const lotes = await this.loteRepository.getLotesByUserId(id_user);
         const loteRelacionado = lotes.find(
             l => l.id_lote.includes(id_lote_origen) && l.tipo_lote === tipo_lote

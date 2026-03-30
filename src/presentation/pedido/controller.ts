@@ -26,6 +26,7 @@ import { InventarioLoteRepository } from '../../domain/repository/inventario-lot
 import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
+import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/create-lote-tostado';
 
 export class PedidoController {
 
@@ -42,7 +43,8 @@ export class PedidoController {
         private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
         private readonly historialRepository: HistorialRepository,
-        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
+        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
+        private readonly createLoteTostado: CreateLoteTostado
         
 
     ) {
@@ -94,7 +96,9 @@ export class PedidoController {
             this.inventarioRepository,
             this.historialRepository,
             this.movimientoAlmacenRepository,
-            this.tuesteRepository
+            this.tuesteRepository,
+            this.createLoteTostado
+
         )
             .execute(id_pedido, id_completado_por)
             .then(pedido => res.json(pedido))

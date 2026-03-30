@@ -85,6 +85,7 @@ export interface InventarioLoteMini {
   id_lote: string;
   id_almacen: string;
   cantidad_kg: number;
+  cantidad_tostado_kg?: number;
   fecha_registro: Date;
   fecha_editado?: Date | null;
   almacen?: {
@@ -155,6 +156,7 @@ export class LoteConInventarioEntity {
           id_lote: i.id_lote,
           id_almacen: i.id_almacen,
           cantidad_kg: Number(i.cantidad_kg ?? 0),
+          cantidad_tostado_kg: i.cantidad_tostado_kg ? Number(i.cantidad_tostado_kg) : undefined,
           fecha_registro: new Date(i.fecha_registro),
           fecha_editado: i.fecha_editado ? new Date(i.fecha_editado) : null,
           almacen: i.almacen

@@ -111,6 +111,9 @@ export class TuesteRoutes {
         const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
         const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
 
+        const createLoteTostado = new CreateLoteTostado(
+            loteTostadoRepository
+        )
 
         const createLoteUseCase = new CreateLote(
             LoteRepository,
@@ -140,6 +143,7 @@ export class TuesteRoutes {
             historialRepository,
             movimientoAlmacenRepository,
             tuesteRepository,
+            createLoteTostado
         );
 
 
