@@ -7,12 +7,13 @@ import { GetInventarioProductoById } from "../../../domain/usecases/inventarios/
 import { GetAllInventarioProducto } from "../../../domain/usecases/inventarios/inventario-producto/get-all";
 import { UpdateInventarioProducto } from "../../../domain/usecases/inventarios/inventario-producto/update";
 import { DeleteInventarioProducto } from "../../../domain/usecases/inventarios/inventario-producto/delete";
+import { GetInventarioProductoByProductoAndAlmacen } from "../../../domain/usecases/inventarios/inventario-producto/get-by-producto-and-almacen";
 
 
 
 
 export class InventarioProductoController {
-  constructor(private readonly inventarioRepository: InventarioProductoRepository) {}
+  constructor(private readonly inventarioRepository: InventarioProductoRepository) { }
 
   public createInventario = async (req: Request, res: Response) => {
     const [error, dto] = CreateInventarioProductoDto.create(req.body);
@@ -60,6 +61,21 @@ export class InventarioProductoController {
     new DeleteInventarioProducto(this.inventarioRepository)
       .execute(id)
       .then(inv => res.json(inv))
+      .catch(error => res.status(400).json({ error }));
+  };
+
+  getByProductoAndAlmacen = (req: Request, res: Response) => {
+    const { id_producto, id_almacen } = req.params;
+    const { gramaje, molienda } = req.query;
+
+    new GetInventarioProductoByProductoAndAlmacen(this.inventarioRepository)
+      .execute(
+        id_producto,
+        id_almacen,
+        gramaje ? Number(gramaje) : null,
+        molienda as any
+      )
+      .then(data => res.json(data))
       .catch(error => res.status(400).json({ error }));
   };
 }

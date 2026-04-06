@@ -1,3 +1,4 @@
+import { Molienda } from "@prisma/client";
 import { InventarioProductoDataSource } from "../../domain/datasources/inventario-producto.datasource";
 import { CreateInventarioProductoDto } from "../../domain/dtos/inventarios/inventario-producto/create";
 import { UpdateInventarioProductoDto } from "../../domain/dtos/inventarios/inventario-producto/update";
@@ -24,6 +25,9 @@ export class InventarioProductoRepositoryImpl implements InventarioProductoRepos
     }
     deleteInventario(id: string): Promise<InventarioProductoEntity> {
         return this.dataSource.deleteInventario(id);
+    }
+    getByProductoAndAlmacen(id_producto: string, id_almacen: string, gramaje?: number | null, molienda?: Molienda | null): Promise<InventarioProductoEntity | null> {
+        return this.dataSource.getByProductoAndAlmacen(id_producto, id_almacen, gramaje, molienda);
     }
 
     

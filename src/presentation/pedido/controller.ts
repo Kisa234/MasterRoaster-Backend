@@ -118,7 +118,8 @@ export class PedidoController {
             this.tuesteRepository,
             this.userRepository,
             this.analisisRepository,
-            this.analisisFisicoRepository
+            this.analisisFisicoRepository,
+            this.inventarioLoteRepository
         )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))

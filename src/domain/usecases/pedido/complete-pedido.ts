@@ -181,6 +181,15 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 });
             }
 
+            // actualizar pedido
+            const [e, updatePedidoDto] = UpdatePedidoDto.update({
+                id_lote_destino: loteExistente.id_lote,
+            });
+            if (e) {
+                throw new Error(e);
+            }
+
+            await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
 
         }
 
@@ -346,6 +355,17 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                     objeto_despues: { eliminado: false },
                 });
             }
+
+            // actualizar pedido
+            const [e, updatePedidoDto] = UpdatePedidoDto.update({
+                id_lote_destino: loteExistente.id_lote,
+            });
+            if (e) {
+                throw new Error(e);
+            }
+
+            await this.pedidoRepository.updatePedido(pedidoId, updatePedidoDto!);
+
         }
 
         // descontar verde del lote origen

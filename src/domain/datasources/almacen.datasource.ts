@@ -1,4 +1,6 @@
+import { AjustarStockAlmacenDto } from "../dtos/almacen/almacen/ajustar-stock";
 import { CreateAlmacenDto } from "../dtos/almacen/almacen/create";
+import { TrasladarStockAlmacenDto } from "../dtos/almacen/almacen/trasladar-stock";
 import { UpdateAlmacenDto } from "../dtos/almacen/almacen/update";
 import { AlmacenEntity } from "../entities/almacen.entity";
 
@@ -15,4 +17,5 @@ export abstract class AlmacenDataSource {
   abstract getAllAlmacenes(): Promise<AlmacenEntity[]>;
 
   abstract getAlmacenesActivos(): Promise<AlmacenEntity[]>;
+
 }

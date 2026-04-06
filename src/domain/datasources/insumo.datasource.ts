@@ -1,6 +1,6 @@
 import { CreateInsumoDto } from "../dtos/insumo/create";
 import { UpdateInsumoDto } from "../dtos/insumo/update";
-import { InsumoEntity } from "../entities/insumo.entity";
+import { InsumoConInventariosEntity, InsumoEntity } from "../entities/insumo.entity";
 
 export abstract class InsumoDataSource {
   abstract createInsumo(createInsumoDto: CreateInsumoDto): Promise<InsumoEntity>;
@@ -9,4 +9,6 @@ export abstract class InsumoDataSource {
   abstract deleteInsumo(id_insumo: string): Promise<InsumoEntity>;
   abstract getAllInsumos(): Promise<InsumoEntity[]>;
   abstract getInsumosActivos(): Promise<InsumoEntity[]>;
+  abstract getInsumosConInventarios(): Promise<InsumoConInventariosEntity[]>;
+  abstract getInsumoConInventariosById(id_insumo: string): Promise<InsumoConInventariosEntity | null>;
 }

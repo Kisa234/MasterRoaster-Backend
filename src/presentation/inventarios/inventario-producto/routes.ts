@@ -11,6 +11,8 @@ export class InventarioProductosRoutes {
     const repository = new InventarioProductoRepositoryImpl(datasource);
     const controller = new InventarioProductoController(repository);
 
+    router.get( "/producto/:id_producto/almacen/:id_almacen", controller.getByProductoAndAlmacen);
+
     router.post("/", controller.createInventario);
     router.get("/", controller.getAllInventarios);
     router.get("/:id", controller.getInventarioById);

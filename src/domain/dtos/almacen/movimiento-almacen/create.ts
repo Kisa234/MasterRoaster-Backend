@@ -10,13 +10,13 @@ export class CreateMovimientoAlmacenDto {
     public readonly tipo: TipoMovimiento,
     public readonly entidad: EntidadInventario,
     public readonly id_entidad_primario: string,
-    public readonly id_pedido:string| null,
     public readonly cantidad: number,
     public readonly id_user: string,
     public readonly id_entidad_secundario?:string,
     public readonly id_almacen_origen?: string,
     public readonly id_almacen_destino?: string,
     public readonly comentario?: string,
+    public readonly id_pedido?:string,
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateMovimientoAlmacenDto?] {
@@ -25,13 +25,13 @@ export class CreateMovimientoAlmacenDto {
       tipo,
       entidad,
       id_entidad_primario,
-      id_pedido,
       cantidad,
       id_user,
       id_almacen_origen,
       id_almacen_destino,
       comentario,
-      id_entidad_secundario
+      id_entidad_secundario,
+      id_pedido,
     } = props;
 
     // tipo
@@ -100,13 +100,13 @@ export class CreateMovimientoAlmacenDto {
       tipoValue,
       entidadValue,
       String(id_entidad_primario).trim(),
-      id_pedido,
       nCantidad,
       String(id_user).trim(),
       id_entidad_secundario,
       o,
       d,
       comentario?.trim() || undefined,
+      id_pedido,
     )];
   }
 }

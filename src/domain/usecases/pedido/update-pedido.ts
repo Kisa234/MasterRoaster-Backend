@@ -5,12 +5,11 @@ import { PedidoRepository } from "../../repository/pedido.repository";
 import { TuesteRepository } from "../../repository/tueste.repository";
 import { UserRepository } from "../../repository/user.repository";
 import { CreateTuesteDto } from "../../dtos/tueste/create";
-import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
-import { LoteEntity } from "../../entities/lote.entity";
 import { AnalisisRepository } from "../../repository/analisis.repository";
 import { AnalisisFisicoRepository } from "../../repository/analisisFisico.repository";
 import { AnalisisFisicoEntity } from "../../entities/analisisFisico.entity";
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
+import { InventarioLoteRepository } from '../../repository/inventario-lote.repository';
 
 export interface UpdatePedidoUseCase {
   execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity>;
@@ -25,6 +24,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     private readonly userRepository: UserRepository,
     private readonly analisisRepository: AnalisisRepository,
     private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+    private readonly inventarioLoteRepository: InventarioLoteRepository
 
   ) { }
 
@@ -56,81 +56,89 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   }
 
   private async actualizarVentaVerde(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    const idAlmacen = dto.id_almacen ?? pedido.id_almacen;
+    if (!idAlmacen) throw new Error('El pedido no tiene almacén');
 
-    const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
-    if (!loteOriginal) throw new Error('Lote original no encontrado');
+    const idLote = dto.id_lote ?? pedido.id_lote;
+    if (!idLote) throw new Error('El pedido no tiene lote');
 
-    // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if (loteOriginal.peso < dto.cantidad!) {
+    const inventario = await this.inventarioLoteRepository.getByLoteAndAlmacen(idLote, idAlmacen);
+    if (!inventario) throw new Error('Inventario del lote no encontrado');
+
+    const nuevaCantidad = dto.cantidad ?? pedido.cantidad;
+
+    if (inventario.cantidad_kg < nuevaCantidad) {
       throw new Error('No hay suficiente cantidad disponible en el lote original');
-    };
+    }
 
-    // 2. Actualizar pedido
-    await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
-    const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
   private async actualizarTostadoVerde(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    const idAlmacen = dto.id_almacen ?? pedido.id_almacen;
+    if (!idAlmacen) throw new Error('El pedido no tiene almacén');
 
-    const loteOriginal = await this.loteRepository.getLoteById(pedido.id_lote!);
-    if (!loteOriginal) throw new Error('Lote original no encontrado');
+    const idLote = dto.id_lote ?? pedido.id_lote;
+    if (!idLote) throw new Error('El pedido no tiene lote');
 
-    // 1. Validar si hay suficiente café en el lote original si la diferencia es positiva (aumento de pedido)
-    if (loteOriginal.peso < (dto.cantidad! * 1.15)) {
-      throw new Error('No hay suficiente cantidad disponible en el lote original');
+    const inventario = await this.inventarioLoteRepository.getByLoteAndAlmacen(idLote, idAlmacen);
+    if (!inventario) throw new Error('Inventario del lote no encontrado');
+
+    const nuevaCantidad = dto.cantidad ?? pedido.cantidad;
+    const cantidadVerdeNecesaria = Math.ceil(nuevaCantidad * 1.1765);
+
+    if (inventario.cantidad_kg < cantidadVerdeNecesaria) {
+      throw new Error('No hay suficiente cantidad verde disponible en el lote original');
     }
 
-    // 2. Actualizar pedido
-    await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
-    const pedidoActualizado = await this.pedidoRepository.getPedidoById(pedido.id_pedido);
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
   async editarOrdenTueste(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
-    const lote = await this.loteRepository.getLoteById(pedido.id_lote!);
+    const idLote = dto.id_lote ?? pedido.id_lote;
+    if (!idLote) throw new Error('Lote original no encontrado');
+
+    const lote = await this.loteRepository.getLoteById(idLote);
     if (!lote) throw new Error('Lote original no encontrado');
 
-    const pesoAnterior = pedido.cantidad;
-    const pesoNuevo = dto.cantidad!;
-    const diferencia = pesoNuevo - pesoAnterior;
+    const idAlmacen = dto.id_almacen ?? pedido.id_almacen;
+    if (!idAlmacen) throw new Error('El pedido no tiene almacén');
 
+    const inventario = await this.inventarioLoteRepository.getByLoteAndAlmacen(idLote, idAlmacen);
+    if (!inventario) throw new Error('Inventario del lote no encontrado');
 
-    if (diferencia > 0 && lote.peso < diferencia) {
+    const nuevaCantidad = dto.cantidad ?? pedido.cantidad;
+
+    if (inventario.cantidad_kg < nuevaCantidad) {
       throw new Error('No hay suficiente café verde disponible en el lote original');
     }
 
-    // 1. Actualizar peso en lote original
-    const nuevoPesoLote = lote.peso - diferencia;
-    const [, updateLoteDto] = UpdateLoteDto.update({ peso: nuevoPesoLote });
-    if (!updateLoteDto) throw new Error('Error generando DTO para lote original');
-    await this.loteRepository.updateLote(lote.id_lote, updateLoteDto);
+    if (lote.tipo_lote === 'Lote Tostado') {
+      const tostadoDisponible = inventario.cantidad_tostado_kg ?? 0;
+      if (tostadoDisponible < nuevaCantidad) {
+        throw new Error('No hay suficiente cantidad tostada disponible en el lote');
+      }
+    }
 
-    //2. Actualizar pedido
-    const newpedido = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
 
-    //3. eliminar tuestes anteriores
-    // verificar si la cantidad de tuestes son diferentes o los pesos son diferentes para eliminar los tuestes 
     const tuestes = await this.tuesteRepository.getTostadosByPedido(pedido.id_pedido);
     let debeRecrearTuestes = false;
 
     if (!tuestes || tuestes.length === 0) {
-      // No existen tuestes → hay que crearlos
+      debeRecrearTuestes = true;
+    } else if (!dto.pesos) {
+      debeRecrearTuestes = false;
+    } else if (tuestes.length !== dto.pesos.length) {
       debeRecrearTuestes = true;
     } else {
-      // 1. Cantidad distinta
-      if (tuestes.length !== dto.pesos!.length) {
-        debeRecrearTuestes = true;
-      } else {
-        // 2. Comparar pesos uno a uno
-        const pesosActuales = tuestes.map(t => t.peso_entrada);
-        const pesosNuevos = dto.pesos!;
-
-        for (let i = 0; i < pesosActuales.length; i++) {
-          if (pesosActuales[i] !== pesosNuevos[i]) {
-            debeRecrearTuestes = true;
-            break;
-          }
+      const pesosActuales = tuestes.map(t => t.peso_entrada);
+      for (let i = 0; i < pesosActuales.length; i++) {
+        if (pesosActuales[i] !== dto.pesos[i]) {
+          debeRecrearTuestes = true;
+          break;
         }
       }
     }
@@ -139,26 +147,17 @@ export class UpdatePedido implements UpdatePedidoUseCase {
       for (const tueste of tuestes ?? []) {
         await this.tuesteRepository.deleteTueste(tueste.id_tueste);
       }
-      // conseguir analisis
 
-      //consegir analisis fisico
       let analisisFisico: AnalisisFisicoEntity | null = null;
 
-      if (!lote.id_analisis) {
-        console.warn('El lote no tiene un análisis asociado, usando valores por defecto');
-      } else {
+      if (lote.id_analisis) {
         const analisis = await this.analisisRepository.getAnalisisById(lote.id_analisis);
-        if (!analisis) {
-          console.warn(`No se encontró el análisis ${lote.id_analisis}, usando valores por defecto`);
-        } else {
+        if (analisis) {
           analisisFisico = await this.analisisFisicoRepository
             .getAnalisisFisicoById(analisis.analisisFisico_id!);
-          if (!analisisFisico) {
-            console.warn(`No se encontró el análisis físico ${analisis.analisisFisico_id}, usando valores por defecto`);
-          }
         }
       }
-      // CREAR NUEVOS TUESTES
+
       if (!dto.pesos) throw new Error('Los pesos son requeridos');
 
       const density = analisisFisico?.densidad ?? 0;
@@ -166,26 +165,28 @@ export class UpdatePedido implements UpdatePedidoUseCase {
 
       let cant = 1;
       for (const peso of dto.pesos) {
-        const [, createTuesteDto] = CreateTuesteDto.create({
+        const [error, createTuesteDto] = CreateTuesteDto.create({
           id_lote: lote.id_lote,
           num_batch: cant,
-          fecha_tueste: dto.fecha_tueste,
-          tostadora: dto.tostadora,
-          id_cliente: dto.id_user,
+          fecha_tueste: dto.fecha_tueste ?? pedido.fecha_tueste,
+          tostadora: dto.tostadora ?? pedido.tostadora,
+          id_cliente: dto.id_user ?? pedido.id_user,
           densidad: density,
           humedad: humidity,
           peso_entrada: peso,
           id_pedido: pedido.id_pedido,
         });
 
-        await this.tuesteRepository.createTueste(createTuesteDto!);
+        if (error || !createTuesteDto) {
+          throw new Error(error ?? 'Error al crear DTO de tueste');
+        }
+
+        await this.tuesteRepository.createTueste(createTuesteDto);
         cant++;
       }
-    } else {
-      
     }
-   
-    return PedidoEntity.fromObject(newpedido!);
+
+    return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
   async editarMaquila(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {

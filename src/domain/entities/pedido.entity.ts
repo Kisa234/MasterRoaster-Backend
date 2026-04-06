@@ -25,7 +25,7 @@ export class PedidoEntity {
     public creado_por_id?: string,
     public completado_por_id?: string,
     public fecha_completado?: Date,
-
+    public id_lote_destino?: string | null,
     public usuario_nombre?: string | null,
 
   ) { }
@@ -56,6 +56,7 @@ export class PedidoEntity {
       completado_por_id,
       fecha_completado,
 
+      id_lote_destino,
       usuario_nombre
     } = obj;
 
@@ -97,6 +98,7 @@ export class PedidoEntity {
       creado_por_id,
       completado_por_id,
       fecha_completado,
+      id_lote_destino,
       usuario_nombre
     );
   }

@@ -16,6 +16,7 @@ export class UpdatePedidoDto {
     public readonly molienda?: string,
     public readonly gramaje?: number,
     public readonly facturado?: boolean,
+    public readonly id_lote_destino?: string | null,
   ) { }
 
   get values() {
@@ -34,6 +35,7 @@ export class UpdatePedidoDto {
     if (this.molienda) returnObj.molienda = this.molienda;
     if (this.gramaje) returnObj.gramaje = this.gramaje;
     if (this.facturado !== undefined) returnObj.facturado = this.facturado;
+    if (this.id_lote_destino !== undefined) returnObj.id_lote_destino = this.id_lote_destino;
 
 
     return returnObj;
@@ -57,6 +59,7 @@ export class UpdatePedidoDto {
       molienda,
       gramaje,
       facturado,
+      id_lote_destino,
     } = props;
 
     const fechaTuesteDate = fecha_tueste ? new Date(fecha_tueste) : undefined;
@@ -80,6 +83,7 @@ export class UpdatePedidoDto {
         molienda,
         gramaje,
         facturado,
+        id_lote_destino,
       ),
     ];
   }

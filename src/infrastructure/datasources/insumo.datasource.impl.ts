@@ -2,7 +2,7 @@ import { prisma } from "../../data/postgres";
 import { InsumoDataSource } from "../../domain/datasources/insumo.datasource";
 import { CreateInsumoDto } from "../../domain/dtos/insumo/create";
 import { UpdateInsumoDto } from "../../domain/dtos/insumo/update";
-import { InsumoEntity } from "../../domain/entities/insumo.entity";
+import { InsumoConInventariosEntity, InsumoEntity } from "../../domain/entities/insumo.entity";
 
 export class InsumoDataSourceImpl implements InsumoDataSource {
 
@@ -56,5 +56,45 @@ export class InsumoDataSourceImpl implements InsumoDataSource {
     });
 
     return insumos.map(i => InsumoEntity.fromObject(i));
+  }
+
+  async getInsumosConInventarios(): Promise<InsumoConInventariosEntity[]> {
+    const insumos = await prisma.insumo.findMany({
+      where: {
+        activo: true,
+      },
+      include: {
+        inventarios: {
+          include: {
+            almacen: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+    return insumos.map((insumo) =>
+      InsumoConInventariosEntity.fromObject(insumo)
+    );
+  }
+  async getInsumoConInventariosById(id_insumo: string): Promise<InsumoConInventariosEntity | null> {
+    const insumo = await prisma.insumo.findFirst({
+      where: {
+        id_insumo: id_insumo,
+        activo: true,
+      },
+      include: {
+        inventarios: {
+          include: {
+            almacen: true,
+          },
+        },
+      },
+    });
+
+    if (!insumo) return null;
+
+    return InsumoConInventariosEntity.fromObject(insumo);
   }
 }

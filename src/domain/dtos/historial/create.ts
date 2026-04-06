@@ -10,11 +10,11 @@ export class CreateHistorialDto {
     public readonly entidad: HistorialEntidad,
     public readonly id_entidad: string,
     public readonly id_user: string,
-    public readonly id_pedido: string | null,
     public readonly accion: HistorialAccion,
     public readonly comentario?: string,
     public readonly objeto_antes?: any | null,
     public readonly objeto_despues?: any | null,
+    public readonly id_pedido?: string,
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateHistorialDto?] {
@@ -23,11 +23,11 @@ export class CreateHistorialDto {
       entidad,
       id_entidad,
       id_user,
-      id_pedido,
       accion,
       comentario,
       objeto_antes,
-      objeto_despues
+      objeto_despues,
+      id_pedido,
     } = props;
 
     // entidad
@@ -63,11 +63,11 @@ export class CreateHistorialDto {
       entidadValue,
       String(id_entidad).trim(),
       String(id_user).trim(),
-      id_pedido,
       accionValue,
       comentario?.trim() || undefined,
       objeto_antes ?? null,
-      objeto_despues ?? null
+      objeto_despues ?? null,
+      id_pedido,
     )];
   }
 }

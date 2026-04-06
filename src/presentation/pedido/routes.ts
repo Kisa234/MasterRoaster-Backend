@@ -34,6 +34,7 @@ import { InventarioLoteTostadoRepositoryImpl } from '../../infrastructure/reposi
 import { InventarioLoteTostadoDataSourceImpl } from '../../infrastructure/datasources/inventario-lote-tostado.datasource.impl';
 import { InventarioProductoRepositoryImpl } from '../../infrastructure/repositories/inventario-producto.repository.impl';
 import { MovimientoAlmacenRepositoryImpl } from '../../infrastructure/repositories/movimiento-almacen.repository.impl';
+import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/create-lote-tostado';
 
 
 export class PedidoRoutes {
@@ -110,6 +111,10 @@ export class PedidoRoutes {
             inventarioLoteRepository
         );
 
+        const CreateLoteTostadoUseCase = new CreateLoteTostado(
+            LoteTostadoRepository,
+        );
+
         const duplicateLote = new DuplicateLote(LoteRepository, createLoteUseCase, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
 
         const controller = new PedidoController(
@@ -125,7 +130,8 @@ export class PedidoRoutes {
             LoteTostadoRepository,
             inventarioTostadoRepository,
             historialRepository,
-            movimientoAlmacenRepository
+            movimientoAlmacenRepository,
+            CreateLoteTostadoUseCase
         );
 
         // Definición de rutas

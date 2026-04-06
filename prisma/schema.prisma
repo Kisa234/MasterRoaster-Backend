@@ -210,24 +210,35 @@ model Lote {
   eliminado      Boolean  @default(false)
 
   // Relación con Usuario
-  user            User?            @relation(fields: [id_user], references: [id_user])
+  user User? @relation(fields: [id_user], references: [id_user])
+
   // Relación con Analisis
-  analisis        Analisis?        @relation(fields: [id_analisis], references: [id_analisis])
-  // pedidos que usan este lote como entrada
-  pedidosOrigen   Pedido[]         @relation("LoteOrigen")
-  // pedidos que generaron este lote como nuevo
-  pedidosDestino  Pedido[]         @relation("LoteCreado")
+  analisis Analisis? @relation(fields: [id_analisis], references: [id_analisis])
+
+  // pedidos que usan este lote como origen
+  pedidosOrigen Pedido[] @relation("LoteOrigen")
+
+  // pedidos que CREARON este lote
+  pedidosCreadores Pedido[] @relation("LoteCreado")
+
+  // pedidos que enviaron stock a este lote
+  pedidosDestino Pedido[] @relation("LoteDestino")
+
   // los lotes tostados por lote
-  LoteTostado     LoteTostado[]
-  // los analisis del lote como historico
+  LoteTostado LoteTostado[]
+
+  // historial de análisis
   lotesHistoricos Lote_Analisis[]
+
   // Relacion con BoxTemplates
-  boxTemplates1   BoxTemplate[]    @relation("BOX_FIJO_1")
-  boxTemplates2   BoxTemplate[]    @relation("BOX_FIJO_2")
-  boxOpcions      BoxOpcion[]
-  boxRespuestas   BoxRespuesta[]
+  boxTemplates1 BoxTemplate[]  @relation("BOX_FIJO_1")
+  boxTemplates2 BoxTemplate[]  @relation("BOX_FIJO_2")
+  boxOpcions    BoxOpcion[]
+  boxRespuestas BoxRespuesta[]
+
   // Relacion con Ingresos de Cafe
-  ingresosCafe    IngresoCafe[]
+  ingresosCafe IngresoCafe[]
+
   inventarioLotes InventarioLote[]
 }
 
@@ -586,13 +597,14 @@ model Pedido {
   id_user              String
   id_lote              String?
   id_nuevoLote         String?
+  id_lote_destino      String?
+  id_lote_tostado      String?
   id_nuevoLote_tostado String?   @unique
   id_almacen           String?
   comentario           String?
   pesos                Float[]
   fecha_tueste         DateTime?
   tostadora            String?
-  id_lote_tostado      String?
   gramaje              Int?
   molienda             Molienda?
   id_producto          String?
@@ -607,6 +619,8 @@ model Pedido {
   lote               Lote?               @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
   // Relación con lote creado
   loteCreado         Lote?               @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
+  // Relación con lote de destino
+  loteDestino        Lote?               @relation("LoteDestino", fields: [id_lote_destino], references: [id_lote])
   // Relación con lote tostado creado
   loteTostado        LoteTostado?        @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
   // Relación con lote tostado de origen 

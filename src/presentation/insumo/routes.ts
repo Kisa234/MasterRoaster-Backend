@@ -18,6 +18,8 @@ export class InsumoRoutes {
 
     // ---- Query routes (específicas primero) ----
     router.get("/activos", controller.getInsumosActivos);
+    router.get('/con-inventarios', controller.getInsumosConInventarios);
+    router.get('/con-inventarios/:id_insumo', controller.getInsumoConInventariosById);
 
     // ---- CRUD ----
     router.post("/", controller.createInsumo);
@@ -25,7 +27,6 @@ export class InsumoRoutes {
     router.get("/:id_insumo", controller.getInsumoById);
     router.patch("/:id_insumo", controller.updateInsumo);
     router.delete("/:id_insumo", controller.deleteInsumo);
-
     return router;
   }
 }
