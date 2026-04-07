@@ -89,6 +89,7 @@ export class UserController {
       .catch(error => res.status(400).json({ error }));
   }
 
+
   public login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
@@ -102,7 +103,8 @@ export class UserController {
         user: {
           id_user: user.id_user,
           email: user.email,
-          rolId: user.id_rol
+          rol: user.rol,
+          id_rol: user.id_rol
         }
       });
 
@@ -110,7 +112,6 @@ export class UserController {
       return res.status(400).json({ error: error.message });
     }
   };
-
 
 
   public refresh = async (req: Request, res: Response) => {
@@ -136,15 +137,22 @@ export class UserController {
 
 
   public getSessionInfo = async (req: Request, res: Response) => {
-    // authMiddleware ya habrá leído el Bearer token y rellenado req.user
-    const user = req.user as { id: string; email: string; rolId: string };
+    const user = req.user as {
+      id_user: string;
+      email: string;
+      id_rol: string;
+      rol?: string;
+    };
+
     if (!user) {
       return res.status(401).json({ message: 'No autenticado' });
     }
+
     return res.json({
-      id: user.id,
+      id_user: user.id_user,
       email: user.email,
-      rolId: user.rolId
+      id_rol: user.id_rol,
+      rol: user.rol ?? ''
     });
   };
 

@@ -20,13 +20,13 @@ export class IngresoProductoController {
   ) { }
 
   public createIngreso = (req: Request, res: Response) => {
-    if (!req.user?.id) {
+    if (!req.user?.id_user) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
     const [error, dto] = CreateIngresoProductoDto.create({
       ...req.body,
-      id_user: req.user.id
+      id_user: req.user.id_user
     });
     console.log('Ingreso DTO:', { error, dto });
     if (error) return res.status(400).json({ error });

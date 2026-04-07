@@ -25,6 +25,7 @@ import { InventarioLoteTostadoDataSourceImpl } from "../../../infrastructure/dat
 import { InventarioMuestraDataSourceImpl } from "../../../infrastructure/datasources/inventario-muestra.datasource.impl";
 import { InventarioProductoDataSourceImpl } from "../../../infrastructure/datasources/inventario-producto.datasource.impl";
 import { InventarioInsumoDataSourceImpl } from "../../../infrastructure/datasources/inventario-insumo.datasource.impl";
+import { authMiddleware } from "../../../infrastructure/middlewares/auth.middleware";
 
 export class AlmacenRoutes {
 
@@ -73,8 +74,8 @@ export class AlmacenRoutes {
 
     // ---- Query routes (específicas primero) ----
     router.get("/activos", controller.getAlmacenesActivos);
-    router.post("/ajustar-stock", controller.ajustarStock);
-    router.post("/trasladar-stock", controller.trasladarStock);
+    router.post("/ajustar-stock", authMiddleware, controller.ajustarStock);
+    router.post("/trasladar-stock",authMiddleware ,  controller.trasladarStock);
 
     // ---- CRUD ----
     router.post("/", controller.createAlmacen);

@@ -6,7 +6,6 @@ import { MuestraController } from "./controller";
 import { UserDataSourceImpl } from "../../infrastructure/datasources/user.datasource.impl";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository.impl";
 import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
-import { auditMiddleware } from "../../infrastructure/middlewares/audit.middleware";
 import { HistorialRepositoryImpl } from "../../infrastructure/repositories/historial.repository.impl";
 import { HistorialDataSourceImpl } from "../../infrastructure/datasources/historial.datasource.impl";
 import { InventarioMuestraRepositoryImpl } from "../../infrastructure/repositories/inventario-muestra.repository.impl";

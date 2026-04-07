@@ -21,7 +21,6 @@ import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
 import { AnalisisDefectosDataSourceImpl } from '../../infrastructure/datasources/analisisDefectos.datasource.impl';
 import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositories/analisisDefectos.repository.impl';
-import { auditMiddleware } from '../../infrastructure/middlewares/audit.middleware';
 import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 import { HistorialRepositoryImpl } from '../../infrastructure/repositories/historial.repository.impl';
 import { HistorialDataSourceImpl } from '../../infrastructure/datasources/historial.datasource.impl';
@@ -107,8 +106,8 @@ export class LoteRoutes {
         router.put('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.update'), loteController.updateLote);
         router.delete('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.delete'), loteController.deleteLote);
 
-        router.post('/fusionar', authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.FusionarLotes);
-        router.post('/blend', authMiddleware, auditMiddleware('Lote', 'CREATE'), loteController.blendLotes);
+        router.post('/fusionar', authMiddleware, loteController.FusionarLotes);
+        router.post('/blend', authMiddleware,loteController.blendLotes);
 
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);

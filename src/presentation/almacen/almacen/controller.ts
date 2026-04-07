@@ -114,7 +114,7 @@ export class AlmacenController {
   public ajustarStock = (req: Request, res: Response) => {
     const [error, ajustarStockDto] = AjustarStockAlmacenDto.create({
       ...req.body,
-      id_user: req.body.id_user ?? req.body.user?.id_user ?? req.body.userId,
+      id_user: req.user!.id_user,
     });
 
     if (error) return res.status(400).json({ error });
@@ -138,7 +138,7 @@ export class AlmacenController {
   public trasladarStock = (req: Request, res: Response) => {
     const [error, trasladarStockDto] = TrasladarStockAlmacenDto.create({
       ...req.body,
-      id_user: req.body.id_user ?? req.body.user?.id_user ?? req.body.userId,
+      id_user: req.user!.id_user,
     });
 
     if (error) return res.status(400).json({ error });

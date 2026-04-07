@@ -51,12 +51,12 @@ export class PedidoController {
     }
 
     public createPedido = async (req: Request, res: Response) => {
-        if (!req.user?.id) {
+        if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
         // Inyectamos el usuario autenticado directamente aquí
-        const body = { ...req.body, creado_por_id: req.user?.id as string };
-        const id_completado_por = req.user?.id as string;
+        const body = { ...req.body, creado_por_id: req.user?.id_user as string };
+        const id_completado_por = req.user?.id_user as string;
         const [error, createPedidoDto] = CreatePedidoDto.create(body);
         if (error) {
             return res.status(400).json({ error });
@@ -80,11 +80,11 @@ export class PedidoController {
     };
 
     public completarPedido = async (req: Request, res: Response) => {
-        if (!req.user?.id) {
+        if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
-        const body = { ...req.body, creado_por_id: req.user?.id as string };
-        const id_completado_por = req.user?.id as string;
+        const body = { ...req.body, creado_por_id: req.user?.id_user as string };
+        const id_completado_por = req.user?.id_user as string;
         const id_pedido = req.params.id;
         new CompletarPedido(
             this.pedidoRepository,

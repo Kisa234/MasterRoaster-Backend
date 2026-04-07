@@ -25,7 +25,7 @@ export class MuestraController {
 
   public createMuestra = (req: Request, res: Response) => {
     // 1. Verifica que req.user esté presente
-    if (!req.user?.id) {
+    if (!req.user?.id_user) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
@@ -35,7 +35,7 @@ export class MuestraController {
     // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
     // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
     const idUserFromBody = req.body.id_user as string | undefined;
-    const effectiveUserId = idUserFromBody ?? req.user.id;
+    const effectiveUserId = idUserFromBody ?? req.user.id_user;
 
     // 3. Arma el body final para el DTO
     const bodyWithUser = {

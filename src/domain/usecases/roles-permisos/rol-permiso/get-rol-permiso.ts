@@ -1,9 +1,10 @@
 import { CreateRolPermisoDto } from "../../../dtos/rol/rol-permiso/create";
+import { PermisoEntity } from "../../../entities/permiso.entity";
 import { RolPermisoEntity } from "../../../entities/rol-permiso.entity";
 import { RolPermisoRepository } from "../../../repository/rol-permiso.repository";
 
 export interface GetPermisosByRolUseCase {
-  execute(id_rol: string): Promise<RolPermisoEntity[]>;
+  execute(id_rol: string): Promise<PermisoEntity[]>;
 }
 
 export class GetPermisosByRol implements GetPermisosByRolUseCase  {
@@ -11,7 +12,7 @@ export class GetPermisosByRol implements GetPermisosByRolUseCase  {
     private readonly rolPermisoRepository: RolPermisoRepository,
   ) {}
 
-  async execute(id_rol: string): Promise<RolPermisoEntity[]> {
+  async execute(id_rol: string): Promise<PermisoEntity[]> {
     return this.rolPermisoRepository.getPermisosByRol(id_rol);
   }
 }

@@ -8,7 +8,6 @@ import { PedidoDataSourceImpl } from "../../infrastructure/datasources/pedido.da
 import { TuesteRepositoryImpl } from "../../infrastructure/repositories/tueste.repository.impl";
 import { HistorialDataSourceImpl } from "../../infrastructure/datasources/historial.datasource.impl";
 import { HistorialRepositoryImpl } from "../../infrastructure/repositories/historial.repository.impl";
-import { auditMiddleware } from "../../infrastructure/middlewares/audit.middleware";
 import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
 
 export class LoteTostadoRoutes {

@@ -14,7 +14,7 @@ export const checkPermission = (permissionCode: string) => {
       }
 
       // 2️⃣ Sin rol
-      if (!user.rolId) {
+      if (!user.id_rol) {
         return res.status(403).json({
           message: 'Usuario sin rol asignado',
         });
@@ -38,7 +38,7 @@ export const checkPermission = (permissionCode: string) => {
       // Validar permiso
       const rol_permiso = await prisma.rolPermiso.findFirst({
         where: {
-          id_rol: user.rolId,
+          id_rol: user.id_rol,
           id_permiso:  permiso.id_permiso
           
       }});

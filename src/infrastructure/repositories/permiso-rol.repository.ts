@@ -1,5 +1,6 @@
 import { RolPermisoDataSource } from "../../domain/datasources/rol-permiso.datasource";
 import { CreateRolPermisoDto } from "../../domain/dtos/rol/rol-permiso/create";
+import { PermisoEntity } from "../../domain/entities/permiso.entity";
 import { RolPermisoEntity } from "../../domain/entities/rol-permiso.entity";
 import { RolPermisoRepository } from "../../domain/repository/rol-permiso.repository";
 
@@ -17,7 +18,7 @@ export class RolPermisoRepositoryImpl implements RolPermisoRepository {
         return this.datasource.removePermisoFromRol(id_rol, id_permiso);
     }
 
-    getPermisosByRol(id_rol: string): Promise<RolPermisoEntity[]> {
+    getPermisosByRol(id_rol: string): Promise<PermisoEntity[]> {
         return this.datasource.getPermisosByRol(id_rol);
     }
 }
