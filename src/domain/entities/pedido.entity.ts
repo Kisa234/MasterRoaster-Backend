@@ -13,6 +13,7 @@ export class PedidoEntity {
     public id_lote?: string,
     public id_nuevoLote?: string,
     public id_nuevoLote_tostado?: string,
+    public id_almacen?: string,
     public comentario?: string,
     public pesos?: number[],
     public fecha_tueste?: Date,
@@ -24,7 +25,10 @@ export class PedidoEntity {
     public creado_por_id?: string,
     public completado_por_id?: string,
     public fecha_completado?: Date,
-  ) {}
+    public id_lote_destino?: string | null,
+    public usuario_nombre?: string | null,
+
+  ) { }
 
   static fromObject(obj: { [key: string]: any }): PedidoEntity {
     const {
@@ -39,6 +43,7 @@ export class PedidoEntity {
       id_lote,
       id_nuevoLote,
       id_nuevoLote_tostado,
+      id_almacen,
       comentario,
       pesos,
       fecha_tueste,
@@ -50,6 +55,9 @@ export class PedidoEntity {
       creado_por_id,
       completado_por_id,
       fecha_completado,
+
+      id_lote_destino,
+      usuario_nombre
     } = obj;
 
     // Validaciones esenciales
@@ -78,6 +86,7 @@ export class PedidoEntity {
       id_lote,
       id_nuevoLote,
       id_nuevoLote_tostado,
+      id_almacen,
       comentario,
       pesos,
       fecha_tueste,
@@ -89,6 +98,8 @@ export class PedidoEntity {
       creado_por_id,
       completado_por_id,
       fecha_completado,
+      id_lote_destino,
+      usuario_nombre
     );
   }
 }

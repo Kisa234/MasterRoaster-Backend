@@ -6,6 +6,9 @@ import { TuesteDataSourceImpl } from "../../infrastructure/datasources/tueste.da
 import PedidoRepositoryImpl from "../../infrastructure/repositories/pedido.repository.impl";
 import { PedidoDataSourceImpl } from "../../infrastructure/datasources/pedido.datasource.impl";
 import { TuesteRepositoryImpl } from "../../infrastructure/repositories/tueste.repository.impl";
+import { HistorialDataSourceImpl } from "../../infrastructure/datasources/historial.datasource.impl";
+import { HistorialRepositoryImpl } from "../../infrastructure/repositories/historial.repository.impl";
+import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
 
 export class LoteTostadoRoutes {
     static get routes() {
@@ -20,20 +23,27 @@ export class LoteTostadoRoutes {
         const pedidoDatasource = new PedidoDataSourceImpl();
         const pedidoRepository = new PedidoRepositoryImpl(pedidoDatasource);
 
+        const historialDatasource = new HistorialDataSourceImpl();
+        const historialRepository = new HistorialRepositoryImpl(historialDatasource);
+
+
         const loteController = new LoteTostadoController(
             loteTostadoRepository,
             tuesteRepository,
-            pedidoRepository
+            pedidoRepository,
+            historialRepository
         );
 
-        router.post('/', loteController.createLoteTostado);
+        router.post('/', authMiddleware, loteController.createLoteTostado);
+        router.put('/:id', authMiddleware, loteController.updateLoteTostado);
+        router.delete('/:id', authMiddleware, loteController.deleteLoteTostado);
+        router.get('/lote-con-lote', loteController.getLotesTostadoandLote);
+        router.get('/inventario', loteController.getLotesTostadosConInventario);
         router.get('/ficha/:id', loteController.getFichaTueste);
         router.get('/', loteController.getLotesTostados);
         router.get('/:id', loteController.getLoteTostadoById);
-        router.put('/:id', loteController.updateLoteTostado);
-        router.delete('/:id', loteController.deleteLoteTostado);
         router.get('/lote/:id', loteController.getLotesTostadoByLoteId);
-        
+
 
 
         return router;

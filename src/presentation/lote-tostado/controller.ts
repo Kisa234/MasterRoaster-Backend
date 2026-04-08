@@ -12,15 +12,20 @@ import { GetAllLoteTostado } from "../../domain/usecases/lote/lote-tostado/get-a
 import { GetFichaTueste } from "../../domain/usecases/lote/lote-tostado/ficha-tueste";
 import { TuesteRepository } from "../../domain/repository/tueste.repository";
 import { PedidoRepository } from "../../domain/repository/pedido.repository";
+import { HistorialRepository } from "../../domain/repository/historial.repository";
+import { GetLotesTostadoConLote } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-con-lote";
+import { GetLotesTostadosConInventario } from "../../domain/usecases/lote/lote-tostado/lote-inventario";
 
 export class LoteTostadoController {
     constructor(
         private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly tuesteRepository: TuesteRepository,
-        private readonly pedidoRepository: PedidoRepository
-    ){}
+        private readonly pedidoRepository: PedidoRepository,
+        private readonly historialRepository: HistorialRepository
 
-    public createLoteTostado = (req:Request , res : Response) => {
+    ) { }
+
+    public createLoteTostado = (req: Request, res: Response) => {
         const [error, createLoteTostadoDto] = CreateLoteTostadoDto.create(req.body);
         if (error) {
             return res.status(400).json({ error });
@@ -28,62 +33,78 @@ export class LoteTostadoController {
 
         new CreateLoteTostado(this.loteTostadoRepository)
             .execute(createLoteTostadoDto!)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public getLoteTostadoById = (req:Request , res : Response) => {
-        new GetLoteTostado(this.loteTostadoRepository)
-            .execute(req.params.id)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
-    }
 
-    public updateLoteTostado = (req:Request , res : Response) => {
+    public updateLoteTostado = (req: Request, res: Response) => {
         const id_lote_tostado = req.params.id;
-        const [error, updateLoteTostadoDto] = UpdateLoteTostadoDto.update({...req.body, 'id_lote_tostado ': id_lote_tostado});
+        const [error, updateLoteTostadoDto] = UpdateLoteTostadoDto.update({ ...req.body, 'id_lote_tostado ': id_lote_tostado });
         if (error) {
             return res.status(400).json({ error });
         }
         new UpdateLoteTostado(this.loteTostadoRepository)
             .execute(req.params.id, updateLoteTostadoDto!)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public deleteLoteTostado = (req:Request , res : Response) => {
+    public deleteLoteTostado = (req: Request, res: Response) => {
         const id_lote_tostado = req.params.id;
         new DeleteLoteTostado(this.loteTostadoRepository)
             .execute(id_lote_tostado)
-            .then( lote => res.json(lote))
-            .catch( error => res.status(400).json({ error }));
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public getLotesTostados = (req:Request , res : Response) => {
+    public getLotesTostados = (req: Request, res: Response) => {
         new GetAllLoteTostado(this.loteTostadoRepository)
             .execute()
-            .then( lotes => res.json(lotes))
-            .catch( error => res.status(400).json({ error }));
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
 
     }
 
-    public getLotesTostadoByLoteId = (req:Request , res : Response) => {
+    public getLoteTostadoById = (req: Request, res: Response) => {
+        new GetLoteTostado(this.loteTostadoRepository)
+            .execute(req.params.id)
+            .then(lote => res.json(lote))
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getLotesTostadoByLoteId = (req: Request, res: Response) => {
         const id_lote = req.params.id;
         new GetLotesTostadoByLote(this.loteTostadoRepository)
             .execute(id_lote)
-            .then( lotes => res.json(lotes))
-            .catch( error => res.status(400).json({ error }));
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
     }
 
-    public getFichaTueste = (req:Request , res : Response) => {
+    public getFichaTueste = (req: Request, res: Response) => {
         const id_lote_tostado = req.params.id;
         new GetFichaTueste(
             this.loteTostadoRepository,
             this.tuesteRepository,
             this.pedidoRepository)
             .execute(id_lote_tostado)
-            .then( ficha => res.json(ficha))
-            .catch( error => res.status(400).json({ error }));
+            .then(ficha => res.json(ficha))
+            .catch(error => res.status(400).json({ error }));
     }
 
+    public getLotesTostadoandLote = (req: Request, res: Response) => {
+        new GetLotesTostadoConLote(this.loteTostadoRepository)
+            .execute()
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getLotesTostadosConInventario = (req: Request, res: Response) => {
+        new GetLotesTostadosConInventario(this.loteTostadoRepository)
+            .execute()
+            .then(data => {
+                res.json(data)
+            })
+            .catch(error => res.status(400).json({ error }));
+    }
 }

@@ -11,4 +11,5 @@ export abstract class UserRepository {
     abstract findByEmail(email: string): Promise<UserEntity | null>;
     abstract getAllUsers(): Promise<UserEntity[]>;
     abstract getRole(id:string): Promise<string>;
+    abstract assignRoleToUser(id_user: string, id_rol: string): Promise<UserEntity>;
   }

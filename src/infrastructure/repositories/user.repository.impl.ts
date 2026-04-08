@@ -9,7 +9,7 @@ export class UserRepositoryImpl implements UserRepository {
 
   constructor(
     private readonly datasource: UserDataSource
-  ){}
+  ) { }
   getAllUsers(): Promise<UserEntity[]> {
     return this.datasource.getAllUsers();
   }
@@ -33,5 +33,8 @@ export class UserRepositoryImpl implements UserRepository {
   }
   getRole(id: string): Promise<string> {
     return this.datasource.getRole(id);
-  }   
+  }
+  assignRoleToUser(id_user: string, id_rol: string): Promise<UserEntity> {
+    return this.datasource.assignRoleToUser(id_user, id_rol);
+  }
 }

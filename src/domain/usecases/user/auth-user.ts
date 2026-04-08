@@ -23,28 +23,28 @@ export class AuthUser implements AuthUserUseCase {
     const user = await this.userRepository.findByEmail(email);
     if (!user) throw new Error('Usuario no encontrado');
 
-    // Caso 1: Cliente
-    if (user.rol === 'cliente') {
-      if (!user.suscripcion) {
-        throw new Error('Suscripción requerida');
-      }
-    }
-
-    // Caso 2: Admin
-    if (user.rol !== 'admin' && user.rol !== 'cliente') {
+    // Caso 1: Clientes no pueden autenticarse
+    if ( user.rol === 'cliente') {
       throw new Error('No tienes permisos para acceder');
     }
-
+    
+    // si el usuario se encuentra eliminado o inactivo, no se le permite autenticarse
+    if (user.eliminado) {
+      throw new Error('Usuario no activo o eliminado');
+    }
 
     const valid = await Encryption.comparePassword(password, user.password);
     if (!valid) throw new Error('Contraseña incorrecta');
 
     const accessToken = jwt.sign(
-      { id: user.id_user, email: user.email, rol: user.rol },
+      {
+        id: user.id_user,
+        email: user.email,
+        rolId: user.id_rol, // UUID
+      },
       envs.JWT_SECRET,
       { expiresIn: '1d' }
     );
-
     const refreshToken = jwt.sign(
       { id: user.id_user },
       envs.JWT_REFRESH_SECRET,

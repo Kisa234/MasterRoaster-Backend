@@ -9,17 +9,23 @@ import { UpdateMuestra } from "../../domain/usecases/muestra/update-muestra";
 import { DeleteMuestra } from "../../domain/usecases/muestra/detele-muestra";
 import { GetMuestras as GetAllMuestra } from "../../domain/usecases/muestra/get-muestras";
 import { UserRepository } from "../../domain/repository/user.repository";
+import { HistorialRepository } from "../../domain/repository/historial.repository";
+import { GetMuestrasConInventario } from "../../domain/usecases/muestra/muestra-inventario";
+import { InventarioMuestraRepository } from "../../domain/repository/inventario-muestra.repository";
 
 export class MuestraController {
 
   constructor(
     private readonly muestraRepository: MuestraRepository,
     private readonly userRepository: UserRepository,
+    private readonly historialRepository: HistorialRepository,
+    private readonly inventarioMuestraRepository : InventarioMuestraRepository
+
   ) { }
 
   public createMuestra = (req: Request, res: Response) => {
     // 1. Verifica que req.user esté presente
-    if (!req.user?.id) {
+    if (!req.user?.id_user) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
@@ -29,7 +35,7 @@ export class MuestraController {
     // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
     // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
     const idUserFromBody = req.body.id_user as string | undefined;
-    const effectiveUserId = idUserFromBody ?? req.user.id;
+    const effectiveUserId = idUserFromBody ?? req.user.id_user;
 
     // 3. Arma el body final para el DTO
     const bodyWithUser = {
@@ -48,18 +54,11 @@ export class MuestraController {
     // 5. Ejecuta el caso de uso
     new CreateMuestra(this.muestraRepository, this.userRepository)
       .execute(createMuestraDto!)
-      .then((muestra) => res.json(muestra))
+      .then((muestra) => {
+        res.json(muestra);
+      })
       .catch((error) => res.status(400).json({ error }));
   };
-
-
-  public getMuestraById = (req: Request, res: Response) => {
-    new GetMuestra(this.muestraRepository)
-      .execute(req.params.id)
-      .then(muestra => res.json(muestra))
-      .catch(error => res.status(400).json({ error }));
-
-  }
 
   public updateMuestra = (req: Request, res: Response) => {
     const id_muestra = req.params.id;
@@ -67,19 +66,33 @@ export class MuestraController {
     if (error) {
       return res.status(400).json({ error });
     }
+    const muestra_before = this.muestraRepository.getMuestraById(id_muestra);
     new UpdateMuestra(this.muestraRepository)
       .execute(id_muestra, updateMuestraDto!)
-      .then(muestra => res.json(muestra))
+      .then((muestra) => {
+        res.json(muestra);
+      })
       .catch(error => res.status(400).json({ error }));
 
 
+  }
+
+  public completeMuestra = (req: Request, res: Response) => {
+    const id_muestra = req.params.id;
+    this.muestraRepository.completeMuestra(id_muestra)
+      .then((muestra) => {
+        res.json(muestra);
+      })
+      .catch(error => res.status(400).json({ error }));
   }
 
   public deleteMuestra = (req: Request, res: Response) => {
     const id_muestra = req.params.id;
     new DeleteMuestra(this.muestraRepository)
       .execute(id_muestra)
-      .then(muestra => res.json(muestra))
+      .then((muestra) => {
+        res.json(muestra);
+      })
       .catch(error => res.status(400).json({ error }));
   }
 
@@ -90,11 +103,23 @@ export class MuestraController {
       .catch(error => res.status(400).json({ error }));
   }
 
-  public completeMuestra = (req: Request, res: Response) => {
-    const id_muestra = req.params.id;
-    this.muestraRepository.completeMuestra(id_muestra)
+  public getMuestraById = (req: Request, res: Response) => {
+    new GetMuestra(this.muestraRepository)
+      .execute(req.params.id)
       .then(muestra => res.json(muestra))
-      .catch(error => res.status(400).json({ error })); 
+      .catch(error => res.status(400).json({ error }));
+
   }
-  
+
+  public getMuestrasConInventario = (req: Request, res: Response) => {
+    new GetMuestrasConInventario(this.muestraRepository)
+      .execute()
+      .then(muestras => {
+        res.json(muestras)
+      }
+      )
+      .catch(error => res.status(400).json({ error }));
+
+  }
+
 }

@@ -2,15 +2,15 @@ import { prisma } from "../../data/postgres";
 import { ProductoDataSource } from "../../domain/datasources/producto.datasource";
 import { CreateProductoDto } from "../../domain/dtos/producto/create";
 import { UpdateProductoDto } from "../../domain/dtos/producto/update";
-import { ProductoEntity } from "../../domain/entities/producto.entity";
+import { ProductoConInventariosEntity, ProductoEntity } from "../../domain/entities/producto.entity";
 
 export class ProductoDataSourceImpl implements ProductoDataSource {
-  
+
   async getAllProductos(): Promise<ProductoEntity[]> {
     const productos = await prisma.producto.findMany();
     return productos.map(p => ProductoEntity.fromObject(p));
   }
-  
+
   async createProducto(createProductoDto: CreateProductoDto): Promise<ProductoEntity> {
     const producto = await prisma.producto.create({
       data: createProductoDto!
@@ -47,5 +47,49 @@ export class ProductoDataSourceImpl implements ProductoDataSource {
       where: { activo: true }
     });
     return productos.map(p => ProductoEntity.fromObject(p));
+  }
+
+  async getProductosConInventarios(): Promise<ProductoConInventariosEntity[]> {
+    const productos = await prisma.producto.findMany({
+      where: {
+        activo: true,
+      },
+      include: {
+        inventarios: {
+          include: {
+            almacen: true,
+          },
+        },
+      },
+      orderBy: {
+        fecha_registro: 'desc',
+      },
+    });
+
+    return productos.map((producto) =>
+      ProductoConInventariosEntity.fromObject(producto)
+    );
+  }
+
+  async getProductoConInventariosById(
+    id: string
+  ): Promise<ProductoConInventariosEntity | null> {
+    const producto = await prisma.producto.findFirst({
+      where: {
+        id_producto: id,
+        activo: true,
+      },
+      include: {
+        inventarios: {
+          include: {
+            almacen: true,
+          },
+        },
+      },
+    });
+
+    if (!producto) return null;
+
+    return ProductoConInventariosEntity.fromObject(producto);
   }
 }

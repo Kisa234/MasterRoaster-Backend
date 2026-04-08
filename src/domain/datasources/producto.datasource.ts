@@ -1,6 +1,7 @@
+import { GetProductoById } from './../usecases/producto/get-by-id';
 import { CreateProductoDto } from "../dtos/producto/create";
 import { UpdateProductoDto } from "../dtos/producto/update";
-import { ProductoEntity } from "../entities/producto.entity";
+import { ProductoConInventariosEntity, ProductoEntity } from "../entities/producto.entity";
 
 export abstract class ProductoDataSource {
     abstract createProducto(createProductoDto: CreateProductoDto): Promise<ProductoEntity>;
@@ -8,4 +9,6 @@ export abstract class ProductoDataSource {
     abstract getProductoById(id: string): Promise<ProductoEntity | null>;
     abstract getAllProductos(): Promise<ProductoEntity[]>;
     abstract deleteProducto(id: string): Promise<ProductoEntity>;
+    abstract getProductosConInventarios(): Promise<ProductoConInventariosEntity[]>;
+    abstract getProductoConInventariosById(id: string): Promise<ProductoConInventariosEntity | null>;
 }

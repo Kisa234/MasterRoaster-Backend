@@ -1,7 +1,6 @@
-import { LoteTostadoEntity } from "../entities/loteTostado.entity";
+import { LoteTostadoConInventarioEntity, LoteTostadoConLoteEntity, LoteTostadoEntity } from "../entities/loteTostado.entity";
 import { CreateLoteTostadoDto } from '../dtos/lotes/lote-tostado/create';
 import { UpdateLoteTostadoDto } from "../dtos/lotes/lote-tostado/update";
-import { FichaTueste } from "../entities/ficha-tueste.entity";
 
 export abstract class LoteTostadoDataSource {
     abstract createLoteTostado(createLoteTostadoDto:CreateLoteTostadoDto): Promise<LoteTostadoEntity>;
@@ -10,4 +9,6 @@ export abstract class LoteTostadoDataSource {
     abstract deleteLoteTostado(id: string): Promise<LoteTostadoEntity>;
     abstract getLoteTostados(): Promise<LoteTostadoEntity[]>;
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
+    abstract GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]>;
+    abstract getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]>
 }

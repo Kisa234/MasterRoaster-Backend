@@ -11,12 +11,14 @@ export class ProductoRoutes {
     const repository = new ProductoRepositoryImpl(datasource);
     const controller = new ProductoController(repository);
 
+    router.get('/con-inventarios', controller.getProductosConInventarios);
+    router.get('/con-inventarios/:id', controller.getProductoConInventariosById);
+    
     router.post("/", controller.createProducto);
     router.get("/", controller.getAllProductos);
     router.get("/:id", controller.getProductoById);
     router.put("/:id", controller.updateProducto);
     router.delete("/:id", controller.deleteProducto);
-
     return router;
   }
 }

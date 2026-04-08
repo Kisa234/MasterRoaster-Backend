@@ -1,7 +1,9 @@
+import { Permiso } from './../../../node_modules/.prisma/client/index.d';
 import { prisma } from "../../data/postgres";
 import { RolPermisoEntity } from "../../domain/entities/rol-permiso.entity";
 import { CreateRolPermisoDto } from "../../domain/dtos/rol/rol-permiso/create";
 import { RolPermisoDataSource } from "../../domain/datasources/rol-permiso.datasource";
+import { PermisoEntity } from '../../domain/entities/permiso.entity';
 
 export class RolPermisoDataSourceImpl implements RolPermisoDataSource {
 
@@ -24,12 +26,15 @@ export class RolPermisoDataSourceImpl implements RolPermisoDataSource {
         return RolPermisoEntity.fromObject(rolPermiso);
     }
 
-    async getPermisosByRol(id_rol: string): Promise<RolPermisoEntity[]> {
+    async getPermisosByRol(id_rol: string): Promise<PermisoEntity[]> {
         const permisos = await prisma.rolPermiso.findMany({
             where: {
                 id_rol: id_rol
+            },
+            include: {
+                permiso: true
             }
         });
-        return permisos.map(p => RolPermisoEntity.fromObject(p));
+        return permisos.map(p => PermisoEntity.fromObject(p.permiso));
     }
 }

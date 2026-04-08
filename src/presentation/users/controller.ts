@@ -1,3 +1,4 @@
+import { AssignRoleToUser } from './../../domain/usecases/user/assign-rol-user';
 import { AuthUser } from './../../domain/usecases/user/auth-user';
 import { Request, Response } from 'express';
 import { UserRepository } from '../../domain/repository/user.repository';
@@ -73,19 +74,28 @@ export class UserController {
       .catch(error => res.status(400).json({ error }));
   }
 
+  public AssignRoleToUser = async (req: Request, res: Response) => {
+    const user_id = req.params.id_user;
+    const role_id = req.params.id_rol;
+    new AssignRoleToUser(this.userRepository)
+      .execute(user_id, role_id)
+      .then(user => res.json(user))
+      .catch(error => res.status(400).json({ error }));
+  }
+
   public getAllUsers = async (req: Request, res: Response) => {
     this.userRepository.getAllUsers()
       .then(users => res.json(users))
       .catch(error => res.status(400).json({ error }));
   }
 
+
   public login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-
     try {
-      const { accessToken, refreshToken, user } = await new AuthUser(this.userRepository)
-        .execute(email, password);
+      const { accessToken, refreshToken, user } =
+        await new AuthUser(this.userRepository).execute(email, password);
 
       return res.json({
         accessToken,
@@ -93,40 +103,56 @@ export class UserController {
         user: {
           id_user: user.id_user,
           email: user.email,
-          rol: user.rol
+          rol: user.rol,
+          id_rol: user.id_rol
         }
       });
+
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
     }
   };
 
+
   public refresh = async (req: Request, res: Response) => {
-    // Ahora esperamos el refreshToken en el body
     const { refreshToken } = req.body;
+
     if (!refreshToken) {
       return res.status(401).json({ error: 'Refresh token no presente' });
     }
 
     try {
-      const newAccessToken = await new RefreshAccessToken().execute(refreshToken);
-      // Opcional: también emitir un nuevo refreshToken si así lo quieres
-      return res.json({ accessToken: newAccessToken });
+      const newAccessToken =
+        await new RefreshAccessToken().execute(refreshToken);
+
+      return res.json({
+        accessToken: newAccessToken
+      });
+
     } catch (error: any) {
       return res.status(403).json({ error: error.message });
     }
   };
 
+
+
   public getSessionInfo = async (req: Request, res: Response) => {
-    // authMiddleware ya habrá leído el Bearer token y rellenado req.user
-    const user = req.user as { id: string; email: string; rol: string };
+    const user = req.user as {
+      id_user: string;
+      email: string;
+      id_rol: string;
+      rol?: string;
+    };
+
     if (!user) {
       return res.status(401).json({ message: 'No autenticado' });
     }
+
     return res.json({
-      id: user.id,
+      id_user: user.id_user,
       email: user.email,
-      rol: user.rol
+      id_rol: user.id_rol,
+      rol: user.rol ?? ''
     });
   };
 

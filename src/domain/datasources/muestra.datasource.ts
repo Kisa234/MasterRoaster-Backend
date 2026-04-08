@@ -1,6 +1,6 @@
 import { CreateMuestraDto } from "../dtos/muestra/create";
 import { UpdateMuestraDto } from "../dtos/muestra/update";
-import { MuestraEntity } from "../entities/muestra.entity";
+import { MuestraConInventarioEntity, MuestraEntity } from "../entities/muestra.entity";
 
 export abstract class MuestraDataSource {
     
@@ -11,5 +11,5 @@ export abstract class MuestraDataSource {
     abstract completeMuestra(id:string): Promise<MuestraEntity>;
     abstract getMuestras(): Promise<MuestraEntity[]>;
     abstract getAllMuestras(): Promise<MuestraEntity[]>;
-
+    abstract getMuestrasConInventario(): Promise<MuestraConInventarioEntity[]>;
 }

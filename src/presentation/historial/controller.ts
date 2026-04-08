@@ -20,7 +20,7 @@ export class HistorialController {
             return res.status(401).json({ error: 'No autorizado' });
         }
 
-        const id_user = req.user.id;
+        const id_user = req.user.id_user;
 
         const [error2, dtoWithUser] = CreateHistorialDto.create({
             ...req.body,

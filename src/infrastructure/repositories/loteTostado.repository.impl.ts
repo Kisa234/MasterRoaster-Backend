@@ -1,7 +1,7 @@
 import { LoteTostadoDataSource } from "../../domain/datasources/loteTostado.datasource";
 import { CreateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/create";
 import { UpdateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/update";
-import { LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
+import { LoteTostadoConInventarioEntity, LoteTostadoConLoteEntity, LoteTostadoEntity } from "../../domain/entities/loteTostado.entity";
 import { LoteTostadoRepository } from "../../domain/repository/loteTostado.repository";
 
 
@@ -9,10 +9,10 @@ export class LoteTostadoRepositoryImpl implements LoteTostadoRepository {
 
     constructor(
         private readonly datasource: LoteTostadoDataSource
-    ) {}
+    ) { }
 
     createLoteTostado(createLoteTostadoDto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
-        
+
         return this.datasource.createLoteTostado(createLoteTostadoDto);
     }
     getLoteTostadoById(id: string): Promise<LoteTostadoEntity | null> {
@@ -30,6 +30,11 @@ export class LoteTostadoRepositoryImpl implements LoteTostadoRepository {
     getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]> {
         return this.datasource.getLotesTostadoByLoteId(id);
     }
-    
-    
+    GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]> {
+        return this.datasource.GetLotesTostadoandLote();
+    }
+    async getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]> {
+        return  this.datasource.getLotesTostadosConInventario();
+    }
+
 }

@@ -21,6 +21,7 @@ export class UserRoutes{
         router.get('/:id', userController.getUserById);
         router.get('/role/:role', userController.getUsersByRole);
         router.put('/:id', userController.updateUser);
+        router.put('/:id_user/role/:id_rol', userController.AssignRoleToUser);
         router.delete('/:id', userController.deleteUser);
         router.get('/', userController.getAllUsers);
 

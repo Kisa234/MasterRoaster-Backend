@@ -1,4 +1,5 @@
 import { CreateRolPermisoDto } from "../dtos/rol/rol-permiso/create";
+import { PermisoEntity } from "../entities/permiso.entity";
 import { RolPermisoEntity } from "../entities/rol-permiso.entity";
 
 
@@ -8,5 +9,5 @@ export abstract class RolPermisoDataSource {
 
     abstract removePermisoFromRol(id_rol: string, id_permiso: string): Promise<RolPermisoEntity>;
 
-    abstract getPermisosByRol(id_rol: string): Promise<RolPermisoEntity[]>;
+    abstract getPermisosByRol(id_rol: string): Promise<PermisoEntity[]>;
 }

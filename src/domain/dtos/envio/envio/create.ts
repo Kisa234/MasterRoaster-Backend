@@ -23,13 +23,6 @@ export class CreateEnvioDto {
       return [`Origen inválido. Valores permitidos: ${ORIGEN_ENVIO_VALUES.join(', ')}`, undefined];
     }
 
-    // // clasificacion
-    // if (!clasificacion) return ['Clasificación es requerida', undefined];
-    // const clasifValue = String(clasificacion).toUpperCase() as ClasificacionEnvio;
-    // if (!CLASIFICACION_ENVIO_VALUES.includes(clasifValue)) {
-    //   return [`Clasificación inválida. Valores permitidos: ${CLASIFICACION_ENVIO_VALUES.join(', ')}`, undefined];
-    // }
-
     // FKs
     if (!id_lote_tostado) return ['id_lote_tostado es requerido', undefined];
     if (!id_cliente) return ['id_cliente es requerido', undefined];

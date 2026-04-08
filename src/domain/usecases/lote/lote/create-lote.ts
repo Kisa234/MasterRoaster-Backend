@@ -4,6 +4,9 @@ import { LoteEntity } from "../../../entities/lote.entity";
 import { UserRepository } from "../../../repository/user.repository";
 import { Pedido } from "@prisma/client";
 import { PedidoRepository } from "../../../repository/pedido.repository";
+import { HistorialRepository } from "../../../repository/historial.repository";
+import { MovimientoAlmacenRepository } from "../../../repository/movimiento-almacen.repository";
+import { InventarioLoteRepository } from "../../../repository/inventario-lote.repository";
 
 
 export interface CreateLoteUseCase {
@@ -15,7 +18,10 @@ export class CreateLote implements CreateLoteUseCase {
     constructor(
         private readonly loteRepository: LoteRepository,
         private readonly userRepository: UserRepository,
-        private readonly pedidoRepository: PedidoRepository
+        private readonly pedidoRepository: PedidoRepository,
+        private readonly historialRepository: HistorialRepository,
+        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
+        private readonly inventarioLoteRepository: InventarioLoteRepository
     ) { }
 
     async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<LoteEntity> {

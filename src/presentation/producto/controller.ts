@@ -7,9 +7,12 @@ import { GetProductoById } from "../../domain/usecases/producto/get-by-id";
 import { GetAllProductos } from "../../domain/usecases/producto/get-all";
 import { UpdateProducto } from "../../domain/usecases/producto/update";
 import { DeleteProducto } from "../../domain/usecases/producto/delete";
+import { error } from "console";
+import { GetProductosConInventarios } from "../../domain/usecases/producto/producto-inventario";
+import { GetProductoConInventariosById } from "../../domain/usecases/producto/producto-inventario-id";
 
 export class ProductoController {
-    constructor(private readonly productoRepository: ProductoRepository) {}
+    constructor(private readonly productoRepository: ProductoRepository) { }
 
     public createProducto = async (req: Request, res: Response) => {
         const [error, dto] = CreateProductoDto.create(req.body);
@@ -54,4 +57,19 @@ export class ProductoController {
             .then(producto => res.json(producto))
             .catch(error => res.status(400).json({ error }));
     };
+
+    public getProductosConInventarios = async (_req: Request, res: Response) => {
+        new GetProductosConInventarios(this.productoRepository)
+            .execute()
+            .then(productos => res.json(productos))
+            .catch(error => res.status(400).json({ error }));
+    };
+
+    public getProductoConInventariosById = async (req: Request, res: Response) => {
+        const { id } = req.params;
+        new GetProductoConInventariosById(this.productoRepository)
+            .execute(id)
+            .then(producto => res.json(producto))
+            .catch(error => res.status(400).json({ error }));
+    }
 }

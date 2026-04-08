@@ -1,12 +1,12 @@
 import { CreateProductoDto } from "../../domain/dtos/producto/create";
 import { UpdateProductoDto } from "../../domain/dtos/producto/update";
-import { ProductoEntity } from "../../domain/entities/producto.entity";
+import { ProductoConInventariosEntity, ProductoEntity } from "../../domain/entities/producto.entity";
 import { ProductoRepository } from "../../domain/repository/producto.repository";
 import { ProductoDataSourceImpl } from "../datasources/producto.datasource.impl";
 
 export class ProductoRepositoryImpl implements ProductoRepository {
 
-    constructor(private readonly datasource: ProductoDataSourceImpl) {}
+    constructor(private readonly datasource: ProductoDataSourceImpl) { }
 
     createProducto(createProductoDto: CreateProductoDto): Promise<ProductoEntity> {
         return this.datasource.createProducto(createProductoDto);
@@ -22,6 +22,13 @@ export class ProductoRepositoryImpl implements ProductoRepository {
     }
     deleteProducto(id: string): Promise<ProductoEntity> {
         return this.datasource.deleteProducto(id);
+    }
+
+    getProductosConInventarios(): Promise<ProductoConInventariosEntity[]> {
+        return this.datasource.getProductosConInventarios();
+    }
+    getProductoConInventariosById(id: string): Promise<ProductoConInventariosEntity | null> {
+        return this.datasource.getProductoConInventariosById(id);
     }
 
 

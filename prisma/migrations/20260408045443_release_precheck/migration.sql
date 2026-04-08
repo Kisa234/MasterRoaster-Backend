@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Historial" ALTER COLUMN "entidad" DROP NOT NULL,
+ALTER COLUMN "accion" DROP NOT NULL;

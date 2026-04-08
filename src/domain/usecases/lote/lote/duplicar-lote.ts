@@ -42,7 +42,7 @@ export class DuplicateLote implements DuplicateLoteUseCase {
         let pesoTostado = 0;
 
         if (tueste){
-            pesoVerde = pedido.cantidad * 1.15;
+            const cantidadVerde = Math.ceil(pedido.cantidad * 1.1765);
             pesoTostado = pedido.cantidad;
         }
 

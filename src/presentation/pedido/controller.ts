@@ -19,31 +19,45 @@ import { AnalisisFisicoRepository } from "../../domain/repository/analisisFisico
 import { GetPedidosOrdenTueste } from "../../domain/usecases/pedido/get-pedidos-tueste";
 import { GetPedidosOrdenTuesteByFecha } from "../../domain/usecases/pedido/get-pedidos-tueste-fecha";
 import { DuplicateLoteUseCase } from '../../domain/usecases/lote/lote/duplicar-lote';
-import { InventarioRepository } from '../../domain/repository/inventario.repository';
+import { InventarioProductoRepository } from '../../domain/repository/inventario-producto.repository';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { SetPedidoFacturado } from '../../domain/usecases/pedido/set-facturado';
+import { InventarioLoteRepository } from '../../domain/repository/inventario-lote.repository';
+import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
+import { HistorialRepository } from '../../domain/repository/historial.repository';
+import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
+import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/create-lote-tostado';
 
 export class PedidoController {
 
     constructor(
         private readonly pedidoRepository: PedidoRepository,
         private readonly loteRepository: LoteRepository,
+        private readonly inventarioLoteRepository: InventarioLoteRepository,
         private readonly userRepository: UserRepository,
         private readonly tuesteRepository: TuesteRepository,
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
-        private readonly inventarioRepository: InventarioRepository,
+        private readonly inventarioRepository: InventarioProductoRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
+        private readonly historialRepository: HistorialRepository,
+        private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
+        private readonly createLoteTostado: CreateLoteTostado
+        
 
     ) {
     }
 
     public createPedido = async (req: Request, res: Response) => {
+        if (!req.user?.id_user) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
         // Inyectamos el usuario autenticado directamente aquí
-        // const body = { ...req.body, creado_por_id: req.user!.id };
-
-        const [error, createPedidoDto] = CreatePedidoDto.create(req.body);
+        const body = { ...req.body, creado_por_id: req.user?.id_user as string };
+        const id_completado_por = req.user?.id_user as string;
+        const [error, createPedidoDto] = CreatePedidoDto.create(body);
         if (error) {
             return res.status(400).json({ error });
         }
@@ -52,13 +66,41 @@ export class PedidoController {
         new CreatePedido(
             this.pedidoRepository,
             this.loteRepository,
+            this.inventarioLoteRepository,
             this.loteTostadoRepository,
+            this.inventarioLoteTostadoRepository,
             this.userRepository,
             this.tuesteRepository,
             this.analisisRepository,
             this.analisisFisicoRepository
         )
-            .execute(createPedidoDto!)
+            .execute(createPedidoDto!, id_completado_por)
+            .then(pedido => res.json(pedido))
+            .catch(error => res.status(400).json({ error }));
+    };
+
+    public completarPedido = async (req: Request, res: Response) => {
+        if (!req.user?.id_user) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+        const body = { ...req.body, creado_por_id: req.user?.id_user as string };
+        const id_completado_por = req.user?.id_user as string;
+        const id_pedido = req.params.id;
+        new CompletarPedido(
+            this.pedidoRepository,
+            this.loteRepository,
+            this.loteTostadoRepository,
+            this.inventarioLoteRepository,
+            this.inventarioLoteTostadoRepository,
+            this.duplicateLoteUseCase,
+            this.inventarioRepository,
+            this.historialRepository,
+            this.movimientoAlmacenRepository,
+            this.tuesteRepository,
+            this.createLoteTostado
+
+        )
+            .execute(id_pedido, id_completado_por)
             .then(pedido => res.json(pedido))
             .catch(error => res.status(400).json({ error }));
     };
@@ -76,7 +118,8 @@ export class PedidoController {
             this.tuesteRepository,
             this.userRepository,
             this.analisisRepository,
-            this.analisisFisicoRepository
+            this.analisisFisicoRepository,
+            this.inventarioLoteRepository
         )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))
@@ -126,18 +169,7 @@ export class PedidoController {
             .catch(error => res.status(400).json({ error }));
     };
 
-    public completarPedido = async (req: Request, res: Response) => {
-        new CompletarPedido(
-            this.pedidoRepository,
-            this.loteRepository,
-            this.loteTostadoRepository,
-            this.duplicateLoteUseCase,
-            this.inventarioRepository
-        )
-            .execute(req.params.id)
-            .then(pedido => res.json(pedido))
-            .catch(error => res.status(400).json({ error }));
-    };
+
     public getPedidosOrdenTueste = async (req: Request, res: Response) => {
         new GetPedidosOrdenTueste(this.pedidoRepository)
             .execute()
