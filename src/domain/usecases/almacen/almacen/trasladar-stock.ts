@@ -320,8 +320,8 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
         inventarioOrigen = await this.inventarioProductoRepository.getByProductoAndAlmacen(
           dto.id_entidad,
           dto.id_almacen_origen,
-          dto.gramaje ?? null,
-          dto.molienda ?? null
+          // dto.gramaje ?? null,
+          // dto.molienda ?? null
         );
 
         if (!inventarioOrigen) {
@@ -332,11 +332,12 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
           throw new Error("Stock insuficiente en el almacén origen");
         }
 
+
         inventarioDestino = await this.inventarioProductoRepository.getByProductoAndAlmacen(
           dto.id_entidad,
           dto.id_almacen_destino,
-          dto.gramaje ?? null,
-          dto.molienda ?? null
+          // dto.gramaje ?? null,
+          // dto.molienda ?? null
         );
 
         objetoAntes = {
@@ -353,6 +354,7 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
         if (errorOrigen || !updateOrigenDto) {
           throw new Error(errorOrigen ?? "No se pudo construir el DTO de actualización de producto origen");
         }
+
 
         await this.inventarioProductoRepository.updateInventario(
           inventarioOrigen.id_inventario,
@@ -379,8 +381,8 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
             id_producto: dto.id_entidad,
             id_almacen: dto.id_almacen_destino,
             cantidad: dto.cantidad,
-            gramaje: dto.gramaje ?? null,
-            molienda: dto.molienda ?? null,
+            // gramaje: dto.gramaje ?? null,
+            // molienda: dto.molienda ?? null,
           });
 
           if (errorCreate || !createDestinoDto) {
@@ -393,8 +395,8 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
         const inventarioOrigenActualizado = await this.inventarioProductoRepository.getByProductoAndAlmacen(
           dto.id_entidad,
           dto.id_almacen_origen,
-          dto.gramaje ?? null,
-          dto.molienda ?? null
+          // dto.gramaje ?? null,
+          // dto.molienda ?? null
         );
 
         objetoDespues = {

@@ -1,43 +1,45 @@
 import { Request, Response } from "express";
-import { IngresoProductoRepository } from "../../domain/repository/ingreso-producto.repository";
-import { CreateIngresoProductoDto } from "../../domain/dtos/ingreso-producto/create";
-import { CreateIngresoProducto } from "../../domain/usecases/ingreso-producto/create";
-import { GetIngresoProductoByAlmacen } from "../../domain/usecases/ingreso-producto/get-by-almacen";
-import { GetIngresoProductoByProducto } from "../../domain/usecases/ingreso-producto/get-by-producto";
-import { UpdateIngresoProductoDto } from "../../domain/dtos/ingreso-producto/update";
-import { UpdateIngresoProducto } from "../../domain/usecases/ingreso-producto/update";
+import { IngresoInsumoRepository } from "../../domain/repository/ingreso-insumo.repository";
+import { CreateIngresoInsumoDto } from "../../domain/dtos/ingreso-insumo/create";
+import { GetIngresoInsumoByAlmacen } from "../../domain/usecases/ingreso-insumo/get-by-almacen";
+import { GetIngresoInsumoByInsumo } from "../../domain/usecases/ingreso-insumo/get-by-insumo";
+import { UpdateIngresoInsumoDto } from "../../domain/dtos/ingreso-insumo/update";
+import { UpdateIngresoInsumo } from "../../domain/usecases/ingreso-insumo/update";
 import { MovimientoAlmacenRepository } from "../../domain/repository/movimiento-almacen.repository";
-import { InventarioProductoRepository } from "../../domain/repository/inventario-producto.repository";
+import { InventarioInsumoRepository } from "../../domain/repository/inventario-insumo.repository";
 import { AlmacenRepository } from "../../domain/repository/almacen.repository";
+import { CreateIngresoInsumo } from "../../domain/usecases/ingreso-insumo/create";
 
-export class IngresoProductoController {
+export class IngresoInsumoController {
 
   constructor(
-    private readonly ingresoRepository: IngresoProductoRepository,
+    private readonly ingresoRepository: IngresoInsumoRepository,
     private readonly almacenRepository: AlmacenRepository,
-    private readonly inventarioProductoRepository: InventarioProductoRepository,
+    private readonly inventarioInsumoRepository: InventarioInsumoRepository,
     private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
-  ) { }
+  ) {}
 
   public createIngreso = (req: Request, res: Response) => {
     if (!req.user?.id_user) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    const [error, dto] = CreateIngresoProductoDto.create({
+    const [error, dto] = CreateIngresoInsumoDto.create({
       ...req.body,
       id_user: req.user.id_user
     });
+
+
     if (error) return res.status(400).json({ error });
-    new CreateIngresoProducto(
+
+    new CreateIngresoInsumo(
       this.ingresoRepository,
       this.almacenRepository,
-      this.inventarioProductoRepository,
+      this.inventarioInsumoRepository,
       this.movimientoAlmacenRepository
-
     )
       .execute(dto!)
-      .then(ingreso => {res.json(ingreso)})
+      .then(ingreso => res.json(ingreso))
       .catch(err => res.status(400).json({ error: err?.message ?? String(err) }));
   };
 
@@ -45,7 +47,7 @@ export class IngresoProductoController {
     try {
       const { id_almacen } = req.params;
       const ingresos =
-        await new GetIngresoProductoByAlmacen(this.ingresoRepository)
+        await new GetIngresoInsumoByAlmacen(this.ingresoRepository)
           .execute(id_almacen);
 
       return res.json(ingresos);
@@ -54,12 +56,12 @@ export class IngresoProductoController {
     }
   };
 
-  public getByProducto = async (req: Request, res: Response) => {
+  public getByInsumo = async (req: Request, res: Response) => {
     try {
-      const { id_producto } = req.params;
+      const { id_insumo } = req.params;
       const ingresos =
-        await new GetIngresoProductoByProducto(this.ingresoRepository)
-          .execute(id_producto);
+        await new GetIngresoInsumoByInsumo(this.ingresoRepository)
+          .execute(id_insumo);
 
       return res.json(ingresos);
     } catch (err: any) {
@@ -70,11 +72,11 @@ export class IngresoProductoController {
   public updateIngreso = async (req: Request, res: Response) => {
     try {
       const { id_ingreso } = req.params;
-      const [error, dto] = UpdateIngresoProductoDto.update(req.body);
+      const [error, dto] = UpdateIngresoInsumoDto.update(req.body);
       if (error) return res.status(400).json({ error });
 
       const ingreso =
-        await new UpdateIngresoProducto(this.ingresoRepository)
+        await new UpdateIngresoInsumo(this.ingresoRepository)
           .execute(id_ingreso, dto!);
 
       return res.json(ingreso);

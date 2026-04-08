@@ -52,7 +52,12 @@ model User {
   ingresosCafe       IngresoCafe[]
   // Relacion con el Historial de Cambios
   cambios            Cambios[]
+  // Relacion con los Movimientos de Almacen
   movimientoAlmacens MovimientoAlmacen[]
+  // Relacion con los Ingresos de Insumos
+  ingresosInsumos    IngresoInsumo[]
+  // Relacion con los Ingresos de Productos
+  ingresosProductos  IngresoProducto[]
 }
 
 // ROLES Y PERMISOS
@@ -104,6 +109,7 @@ model Almacen {
   inventarioInsumos   InventarioInsumo[]
 
   ingresoProductos   IngresoProducto[]
+  ingresoInsumos     IngresoInsumo[]
   movimientosOrigen  MovimientoAlmacen[] @relation("MovimientoOrigen")
   movimientosDestino MovimientoAlmacen[] @relation("MovimientoDestino")
   pedidos            Pedido[]            @relation("almacen")
@@ -313,6 +319,22 @@ model Insumo {
   categoria    CategoriaInsumo @relation(fields: [id_categoria], references: [id_categoria])
 
   inventarios InventarioInsumo[]
+  ingresos    IngresoInsumo[]
+}
+
+model IngresoInsumo {
+  id_ingreso String @id @default(uuid())
+  id_insumo  String
+  id_almacen String
+
+  cantidad      Int
+  precio_compra Float?
+  fecha_ingreso DateTime @default(now())
+  id_user       String?
+
+  insumo  Insumo  @relation(fields: [id_insumo], references: [id_insumo])
+  almacen Almacen @relation(fields: [id_almacen], references: [id_almacen])
+  user    User?   @relation(fields: [id_user], references: [id_user])
 }
 
 model CategoriaInsumo {
@@ -412,9 +434,11 @@ model IngresoProducto {
   cantidad      Int
   precio_compra Float
   fecha_ingreso DateTime @default(now())
+  id_user       String?
 
   producto Producto @relation(fields: [id_producto], references: [id_producto])
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+  user     User?    @relation(fields: [id_user], references: [id_user])
 }
 
 model InventarioProducto {
@@ -558,16 +582,16 @@ enum HistorialAccion {
 }
 
 model Historial {
-  id_historial   String           @id @default(uuid())
+  id_historial   String            @id @default(uuid())
   id_entidad     String
   id_user        String
   id_pedido      String?
-  entidad        HistorialEntidad
-  accion         HistorialAccion
+  entidad        HistorialEntidad?
+  accion         HistorialAccion?
   comentario     String?
   objeto_antes   Json?
   objeto_despues Json?
-  fecha_registro DateTime         @default(now())
+  fecha_registro DateTime          @default(now())
 
   user   User    @relation(fields: [id_user], references: [id_user])
   pedido Pedido? @relation(fields: [id_pedido], references: [id_pedido])

@@ -1,7 +1,6 @@
 export class CreateIngresoProductoDto {
   private constructor(
     public readonly id_producto: string,
-    public readonly id_variante: string | null,
     public readonly id_almacen: string,
     public readonly cantidad: number,
     public readonly precio_compra: number,
@@ -9,10 +8,11 @@ export class CreateIngresoProductoDto {
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateIngresoProductoDto?] {
-    const { id_producto, id_variante, id_almacen, cantidad, precio_compra, id_user } = props;
+    const { id_producto, id_almacen, cantidad, precio_compra, id_user } = props;
 
     if (!id_producto) return ['id_producto es requerido', undefined];
     if (!id_almacen) return ['id_almacen es requerido', undefined];
+    if (!id_user) return ['id_user es requerido', undefined];
 
     const nCantidad = typeof cantidad === 'string' ? Number(cantidad) : cantidad;
     if (!Number.isInteger(nCantidad) || nCantidad <= 0)
@@ -26,7 +26,6 @@ export class CreateIngresoProductoDto {
       undefined,
       new CreateIngresoProductoDto(
         String(id_producto),
-        id_variante ? String(id_variante) : null,
         String(id_almacen),
         nCantidad,
         nPrecio,

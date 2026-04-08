@@ -12,12 +12,7 @@ export class IngresoProductoDataSourceImpl
   ): Promise<IngresoProductoEntity> {
 
     const ingreso = await prisma.ingresoProducto.create({
-      data: {
-        id_producto: dto.id_producto,
-        id_almacen: dto.id_almacen,
-        cantidad: dto.cantidad,
-        precio_compra: dto.precio_compra,
-      },
+      data: dto,
     });
 
     return IngresoProductoEntity.fromObject(ingreso);

@@ -20,7 +20,6 @@ export class CreateIngresoProducto {
   ) {}
 
   async execute(dto: CreateIngresoProductoDto): Promise<IngresoProductoEntity> {
-    
 
     // 1) Validar almacén
     const almacen = await this.almacenRepository.getAlmacenById(dto.id_almacen);
@@ -49,20 +48,19 @@ export class CreateIngresoProducto {
       });
       await this.inventarioProductoRepository.createInventario(newInventario!);
     }
+    
 
      // 4) Registrar movimiento de almacén
     const [errorMovimiento, movimiento] = CreateMovimientoAlmacenDto.create({
       tipo: TipoMovimiento.INGRESO,
       entidad: 'PRODUCTO',
-      id_entidad: dto.id_producto,
+      id_entidad_primario: dto.id_producto,
       cantidad: dto.cantidad,
       id_almacen_destino: dto.id_almacen,
       id_user: dto.id_user
     });    
     await this.movimientoAlmacenRepository.createMovimiento(movimiento!);
    
-    console.log('IngresoProducto creado:', ingreso);
-
     return ingreso;
   }
 }

@@ -485,22 +485,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             comentario: `Consumo de ${pedido.cantidad} kg por orden de tueste ${pedido.id_pedido}`,
         });
 
-        await this.registrarHistorial({
-            entidad: HistorialEntidad.LOTE,
-            accion: HistorialAccion.UPDATE,
-            id_entidad: loteOrigen.id_lote,
-            id_user: id_completado_por,
-            id_pedido: pedido.id_pedido,
-            comentario: `Actualización de pesos por orden de tueste ${pedido.id_pedido}`,
-            objeto_antes: {
-                cantidad_kg: inventarioLote.cantidad_kg,
-                cantidad_tostado_kg: inventarioLote.cantidad_tostado_kg ?? null,
-            },
-            objeto_despues: {
-                cantidad_kg: inventarioPayload.cantidad_kg,
-                cantidad_tostado_kg: inventarioPayload.cantidad_tostado_kg ?? inventarioLote.cantidad_tostado_kg ?? null,
-            },
-        });
+
 
         if (nuevoPesoLote === 0) {
             await this.loteRepository.deleteLote(loteOrigen.id_lote);
@@ -541,19 +526,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             id_entidad: loteTostado.id_lote_tostado,
             id_user: id_completado_por,
             id_pedido: pedido.id_pedido,
-            comentario: `Creación de lote tostado por orden de tueste ${pedido.id_pedido}`,
+            comentario: `Creación de lote tostado por orden de tueste`,
         });
 
-        await this.registrarMovimiento({
-            tipo: TipoMovimiento.INGRESO,
-            entidad: EntidadInventario.LOTE_TOSTADO,
-            id_entidad_primario: loteTostado.id_lote_tostado,
-            cantidad: pesoTotalTostado,
-            id_user: id_completado_por,
-            id_almacen_destino: pedido.id_almacen,
-            id_pedido: pedido.id_pedido,
-            comentario: `Ingreso de lote tostado por orden de tueste ${pedido.id_pedido}`,
-        });
 
         const [updateTuesteError, updateTuesteDto] = UpdateTuesteDto.update({
             id_lote_tostado: loteTostado.id_lote_tostado,

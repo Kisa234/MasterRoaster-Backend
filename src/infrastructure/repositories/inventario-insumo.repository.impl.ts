@@ -4,12 +4,13 @@ import { UpdateInventarioInsumoDto } from "../../domain/dtos/inventarios/inventa
 import { InventarioInsumoEntity } from "../../domain/entities/inventario-insumo.entity";
 import { InventarioInsumoRepository } from "../../domain/repository/inventario-insumo.repository";
 
-export class InventarioInsumoRepositoryImpl
-  implements InventarioInsumoRepository {
+export class InventarioInsumoRepositoryImpl implements InventarioInsumoRepository {
 
   constructor(
     private readonly datasource: InventarioInsumoDataSource
   ) { }
+
+ 
 
   createInventario(
     dto: CreateInventarioInsumoDto
@@ -39,5 +40,9 @@ export class InventarioInsumoRepositoryImpl
 
   getAllInventarios(): Promise<InventarioInsumoEntity[]> {
     return this.datasource.getAllInventarios();
+  }
+
+   getInventariosByInsumo(id_insumo: string): Promise<InventarioInsumoEntity[]> {
+    return this.datasource.getInventariosByInsumo(id_insumo);
   }
 }

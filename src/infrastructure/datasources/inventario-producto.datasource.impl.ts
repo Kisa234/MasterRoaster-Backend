@@ -47,26 +47,20 @@ export class InventarioProductoDataSourceImpl implements InventarioProductoDataS
     return InventarioProductoEntity.fromObject(deleted);
   }
 
-  async getByProductoAndAlmacen(
-    id_producto: string,
-    id_almacen: string,
-    gramaje: number,
-    molienda?: Molienda | null
-  ): Promise<InventarioProductoEntity | null> {
-    const inventario = await prisma.inventarioProducto.findUnique({
-      where: {
-        id_producto_id_almacen_gramaje_molienda: {
+    async getByProductoAndAlmacen(
+      id_producto: string,
+      id_almacen: string,
+    ): Promise<InventarioProductoEntity | null> {
+      const inventario = await prisma.inventarioProducto.findFirst({
+        where: {
           id_producto,
           id_almacen,
-          gramaje: gramaje,
-          molienda: molienda ?? 'NINGUNO',
         }
-      }
-    });
+      });
 
-    if (!inventario) return null;
+      if (!inventario) return null;
 
-    return InventarioProductoEntity.fromObject(inventario);
-  }
+      return InventarioProductoEntity.fromObject(inventario);
+    }
 
 }

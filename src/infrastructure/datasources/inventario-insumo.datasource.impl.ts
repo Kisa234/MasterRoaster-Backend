@@ -67,4 +67,12 @@ export class InventarioInsumoDataSourceImpl
     const inventarios = await prisma.inventarioInsumo.findMany({});
     return inventarios.map(InventarioInsumoEntity.fromObject);
   }
+
+  async getInventariosByInsumo(id_insumo: string): Promise<InventarioInsumoEntity[]> {
+    const inventarios = await prisma.inventarioInsumo.findMany({
+      where: { id_insumo },
+      orderBy: { fecha_registro: "asc" },
+    });
+    return inventarios.map(InventarioInsumoEntity.fromObject);
+  }
 }
