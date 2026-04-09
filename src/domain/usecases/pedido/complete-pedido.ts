@@ -1,3 +1,5 @@
+import { CreateInventarioLoteDto } from './../../dtos/inventarios/inventario-lote/create';
+import { create } from 'domain';
 import { CreateLoteTostado } from './../lote/lote-tostado/create-lote-tostado';
 import { UpdateLoteDto } from "../../dtos/lotes/lote/update";
 import { PedidoEntity } from "../../entities/pedido.entity";
@@ -22,6 +24,7 @@ import { CreateHistorialDto } from "../../dtos/historial/create";
 import { TuesteRepository } from '../../repository/tueste.repository';
 import { CreateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/create";
 import { UpdateTuesteDto } from "../../dtos/tueste/update";
+import { Console } from 'console';
 
 export interface CompletarPedidoUseCase {
     execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity>;
@@ -85,7 +88,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         if (!loteOrigen) throw new Error("Lote origen no válido");
 
 
-        // verificar que el lote tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
+        // verificar que el lote origen tenga suficiente peso para la cantidad solicitada en su almacen correspondiente
         const inventarioLote = await this.inventarioLoteRepository.getByLoteAndAlmacen(loteOrigen.id_lote, pedido.id_almacen!);
         if (!inventarioLote || inventarioLote.cantidad_kg < pedido.cantidad) {
             throw new Error("Stock insuficiente en el almacén");
@@ -142,13 +145,23 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             // actualizar lote existente
             // actualizar stock del lote existente en su inventario correspondiente
             const inventarioLoteExistente = await this.inventarioLoteRepository.getByLoteAndAlmacen(hasLote, pedido.id_almacen!);
-            if (!inventarioLoteExistente) throw new Error("Inventario del lote existente no encontrado");
-            const nuevoPesoInventario = inventarioLoteExistente.cantidad_kg + pedido.cantidad;
-            const [error, updateInventarioLoteExistenteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoInventario });
-            if (error) {
-                throw new Error(error);
+            // si no tiene inventario, crear uno con la cantidad del pedido, caso contrario actualizar sumando la cantidad del pedido al inventario existente
+            if (!inventarioLoteExistente) {
+                // crear un inventario para el nuevo lote 
+                const nuevoInventarioLote = await this.inventarioLoteRepository.createInventario({
+                    id_lote: hasLote,
+                    id_almacen: pedido.id_almacen!,
+                    cantidad_kg: pedido.cantidad,
+                });
+            } else {
+                // actualizar inventario sumando la cantidad del pedido al inventario existente
+                const nuevoPesoInventario = inventarioLoteExistente.cantidad_kg + pedido.cantidad;
+                const [error, updateInventarioLoteExistenteDto] = UpdateInventarioLoteDto.update({ cantidad_kg: nuevoPesoInventario });
+                if (error) {
+                    throw new Error(error);
+                }
+                await this.inventarioLoteRepository.updateInventario(inventarioLoteExistente.id_inventario, updateInventarioLoteExistenteDto!);
             }
-            await this.inventarioLoteRepository.updateInventario(inventarioLoteExistente.id_inventario, updateInventarioLoteExistenteDto!);
             //crear movimiento almacen, derivacion ya que el lote se parte 
             await this.registrarMovimiento({
                 tipo: TipoMovimiento.DERIVACION,
