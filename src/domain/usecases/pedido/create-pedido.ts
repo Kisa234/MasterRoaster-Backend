@@ -128,10 +128,19 @@ export class CreatePedido implements CreatePedidoUseCase {
         const factor = 1.1765;
 
         // validar verde
-        const verdeNecesario = dto.cantidad * factor;
+        if (inventarioLote.cantidad_kg < dto.cantidad) {
+            throw new Error('No hay suficiente café verde disponible');
+        }
 
-        if (inventarioLote.cantidad_kg < verdeNecesario) {
-            throw new Error('No hay suficiente café verde para cubrir el tueste');
+        // calcular tostado equivalente
+        const cantidadTostado = dto.cantidad / factor;
+
+        // validar tostado
+        if (lote.tipo_lote === 'Lote Tostado') {
+
+            if (inventarioLote.cantidad_tostado_kg == null ||inventarioLote.cantidad_tostado_kg < cantidadTostado) {
+                throw new Error('No hay suficiente café tostado disponible');
+            }
         }
 
         // validar tostado (solo si aplica)
@@ -143,13 +152,6 @@ export class CreatePedido implements CreatePedidoUseCase {
             }
         }
 
-        if (lote.tipo_lote === 'Lote Tostado') {
-            const tostadoDisponible = inventarioLote.cantidad_tostado_kg ?? 0;
-
-            if (tostadoDisponible < dto.cantidad) {
-                throw new Error('No hay suficiente cantidad tostada disponible en el lote');
-            }
-        }
 
         // 4. Obtener análisis físico si existe
         let analisisFisico: AnalisisFisicoEntity | null = null;
