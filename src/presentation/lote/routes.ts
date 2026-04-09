@@ -100,11 +100,11 @@ export class LoteRoutes {
             movimientoAlmacenRepository
         );
 
-        router.post('/', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLote);
-        router.post('/rapido', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLoteRapido);
-        router.post('/muestra/:id', authMiddleware, checkPermission('inventario.lotes_verdes.create'), loteController.createLoteFromMuestra);
-        router.put('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.update'), loteController.updateLote);
-        router.delete('/:id', authMiddleware, checkPermission('inventario.lotes_verdes.delete'), loteController.deleteLote);
+        router.post('/', authMiddleware,  loteController.createLote);
+        router.post('/rapido', authMiddleware,  loteController.createLoteRapido);
+        router.post('/muestra/:id', authMiddleware,  loteController.createLoteFromMuestra);
+        router.put('/:id', authMiddleware, loteController.updateLote);
+        router.delete('/:id', authMiddleware,  loteController.deleteLote);
 
         router.post('/fusionar', authMiddleware, loteController.FusionarLotes);
         router.post('/blend', authMiddleware,loteController.blendLotes);
