@@ -9,7 +9,7 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
   
   async createTueste(createTuesteDto:CreateTuesteDto): Promise<TuesteEntity> {
     const newTueste =  await prisma.tueste.create({
-      data: createTuesteDto!
+      data: { ...createTuesteDto }
     });
     return TuesteEntity.fromObject(newTueste);
   }
