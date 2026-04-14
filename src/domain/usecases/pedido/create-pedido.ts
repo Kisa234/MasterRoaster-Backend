@@ -140,23 +140,23 @@ export class CreatePedido implements CreatePedidoUseCase {
         }
 
 
-        // calcular tostado equivalente
-        const cantidadTostado = dto.cantidad / factor;
+        // // calcular tostado equivalente
+        // const cantidadTostado = dto.cantidad / factor;
 
 
-        // validar tostado
-        if (lote.tipo_lote === 'Lote Tostado') {
+        // // // validar tostado
+        // // if (lote.tipo_lote === 'Lote Tostado') {
 
-            if (inventarioLote.cantidad_tostado_kg == null || inventarioLote.cantidad_tostado_kg < cantidadTostado) {
-                throw new Error('No hay suficiente café tostado disponible');
-            }
+        // //     if (inventarioLote.cantidad_tostado_kg == null || inventarioLote.cantidad_tostado_kg < cantidadTostado) {
+        // //         throw new Error('No hay suficiente café tostado disponible');
+        // //     }
 
-            const tostadoDisponible = inventarioLote.cantidad_tostado_kg ?? 0;
+        // //     const tostadoDisponible = inventarioLote.cantidad_tostado_kg ?? 0;
 
-            if (tostadoDisponible < dto.cantidad) {
-                throw new Error('No hay suficiente cantidad tostada en el lote');
-            }
-        }
+        // //     if (tostadoDisponible < dto.cantidad) {
+        // //         throw new Error('No hay suficiente cantidad tostada en el lote');
+        // //     }
+        // // }
 
 
 

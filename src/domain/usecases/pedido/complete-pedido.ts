@@ -461,21 +461,21 @@ export class CompletarPedido implements CompletarPedidoUseCase {
 
         const inventarioPayload: {
             cantidad_kg: number;
-            cantidad_tostado_kg?: number;
+            // cantidad_tostado_kg?: number;
         } = {
             cantidad_kg: nuevoPesoLote
         };
 
-        if (loteOrigen.tipo_lote === 'Lote Tostado') {
-            const tostadoActual = inventarioLote.cantidad_tostado_kg ?? 0;
-            const nuevoPesoLoteTostado = tostadoActual - pesoTotalTostado;
+        // if (loteOrigen.tipo_lote === 'Lote Tostado') {
+        //     const tostadoActual = inventarioLote.cantidad_tostado_kg ?? 0;
+        //     const nuevoPesoLoteTostado = tostadoActual - pesoTotalTostado;
 
-            if (nuevoPesoLoteTostado < 0) {
-                throw new Error("Inconsistencia: el peso tostado quedó negativo al completar la orden de tueste");
-            }
+        //     if (nuevoPesoLoteTostado < 0) {
+        //         throw new Error("Inconsistencia: el peso tostado quedó negativo al completar la orden de tueste");
+        //     }
 
-            inventarioPayload.cantidad_tostado_kg = nuevoPesoLoteTostado;
-        }
+        //     inventarioPayload.cantidad_tostado_kg = nuevoPesoLoteTostado;
+        // }
 
         const [invError, updateInventarioLoteDto] = UpdateInventarioLoteDto.update(inventarioPayload);
         if (invError || !updateInventarioLoteDto) {
