@@ -115,12 +115,12 @@ export class UpdatePedido implements UpdatePedidoUseCase {
       throw new Error('No hay suficiente café verde disponible en el lote original');
     }
 
-    if (lote.tipo_lote === 'Lote Tostado') {
-      const tostadoDisponible = inventario.cantidad_tostado_kg ?? 0;
-      if (tostadoDisponible < nuevaCantidad) {
-        throw new Error('No hay suficiente cantidad tostada disponible en el lote');
-      }
-    }
+    // if (lote.tipo_lote === 'Lote Tostado') {
+    //   const tostadoDisponible = inventario.cantidad_tostado_kg ?? 0;
+    //   if (tostadoDisponible < nuevaCantidad) {
+    //     throw new Error('No hay suficiente cantidad tostada disponible en el lote');
+    //   }
+    // }
 
     const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
 
