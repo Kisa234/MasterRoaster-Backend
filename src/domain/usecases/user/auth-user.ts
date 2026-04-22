@@ -41,6 +41,7 @@ export class AuthUser implements AuthUserUseCase {
         id: user.id_user,
         email: user.email,
         rolId: user.id_rol, // UUID
+        rol: user.rol,
       },
       envs.JWT_SECRET,
       { expiresIn: '1d' }

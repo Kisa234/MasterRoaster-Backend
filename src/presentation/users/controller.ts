@@ -89,6 +89,12 @@ export class UserController {
       .catch(error => res.status(400).json({ error }));
   }
 
+  public getUsersInternal = async (req: Request, res: Response) => {
+    this.userRepository.getUsersInternal()
+      .then(users => res.json(users))
+      .catch(error => res.status(400).json({ error }));
+  }
+
 
   public login = async (req: Request, res: Response) => {
     const { email, password } = req.body;

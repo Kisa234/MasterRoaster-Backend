@@ -37,4 +37,7 @@ export class UserRepositoryImpl implements UserRepository {
   assignRoleToUser(id_user: string, id_rol: string): Promise<UserEntity> {
     return this.datasource.assignRoleToUser(id_user, id_rol);
   }
+  getUsersInternal(): Promise<UserEntity[]> {
+    return this.datasource.getUsersInternal();
+  }
 }

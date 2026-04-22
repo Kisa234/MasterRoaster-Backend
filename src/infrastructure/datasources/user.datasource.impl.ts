@@ -99,4 +99,17 @@ export class UserDataSourceImpl implements UserDataSource {
   }
 
 
+  async getUsersInternal(): Promise<UserEntity[]> {
+    const users = await prisma.user.findMany({
+      where: {
+        eliminado: false,
+        rol: {
+          not: 'cliente'
+        }
+      }
+    });
+
+    return users.map(UserEntity.fromObject);
+  }
+
 }
