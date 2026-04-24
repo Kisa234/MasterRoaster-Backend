@@ -6,10 +6,13 @@ import { CreateEnvioDto } from '../../domain/dtos/envio/envio/create';
 
 export class EnvioDataSourceImpl implements EnvioDataSource {
     async createEnvio(dto: CreateEnvioDto): Promise<EnvioEntity> {
+        console.log('DTO Create Envio:', dto);
         const newEnvio = await prisma.envio.create({
             data: dto
-        })
+        });
+        console.log('Nuevo Envio creado en DB:', newEnvio);
         return EnvioEntity.fromObject(newEnvio);
+
     }
     async getEnvioById(id_envio: string): Promise<EnvioEntity | null> {
         const envio = await prisma.envio.findFirst({

@@ -3,13 +3,16 @@ import { CreateEnvio } from '../../domain/usecases/envio/create-envio';
 import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { Request, Response } from "express";
 import { CreateEnvioDto } from '../../domain/dtos/envio/envio/create';
+import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
 
 
 export class EnvioController {
 
     constructor(
         private readonly envioRepository: EnvioRepository,
-        private readonly loteTostadoRepository: LoteTostadoRepository
+        private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository
+
     ) { }
 
 
@@ -20,7 +23,8 @@ export class EnvioController {
         }
         new CreateEnvio(
             this.envioRepository,
-            this.loteTostadoRepository
+            this.loteTostadoRepository,
+            this.inventarioLoteTostadoRepository
         )
             .execute(dto!)
             .then(envio => res.json(envio))

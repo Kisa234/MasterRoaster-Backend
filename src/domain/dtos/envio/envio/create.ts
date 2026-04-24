@@ -10,11 +10,13 @@ export class CreateEnvioDto {
     public readonly id_lote_tostado: string,
     public readonly id_cliente: string,
     public readonly cantidad: number,
+    public readonly id_almacen?: string,
     public readonly comentario?: string,
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateEnvioDto?] {
-    let { origen, clasificacion, id_lote_tostado, id_cliente, cantidad, comentario } = props;
+    let { origen, clasificacion, id_lote_tostado, id_cliente, cantidad, id_almacen, comentario } = props;
+
 
     // origen
     if (!origen) return ['Origen es requerido', undefined];
@@ -22,6 +24,7 @@ export class CreateEnvioDto {
     if (!ORIGEN_ENVIO_VALUES.includes(origenValue)) {
       return [`Origen inválido. Valores permitidos: ${ORIGEN_ENVIO_VALUES.join(', ')}`, undefined];
     }
+
 
     // FKs
     if (!id_lote_tostado) return ['id_lote_tostado es requerido', undefined];
@@ -41,6 +44,7 @@ export class CreateEnvioDto {
       id_lote_tostado,
       id_cliente,
       nCantidad,
+      id_almacen,
       comentario
     )];
   }
