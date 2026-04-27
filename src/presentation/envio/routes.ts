@@ -32,9 +32,10 @@ export class EnvioRoutes {
 
     // ---- CRUD ----
     router.post("/", controller.createEnvio);
-    router.get("/:id_envio", controller.getEnvioById);
     router.put("/:id_envio", controller.updateEnvio);
     router.delete("/:id_envio", controller.deleteEnvio);
+    router.get("/", controller.getAllEnvios);
+    router.get("/:id_envio", controller.getEnvioById);
     
     
     return router;

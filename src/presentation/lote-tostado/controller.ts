@@ -15,6 +15,7 @@ import { PedidoRepository } from "../../domain/repository/pedido.repository";
 import { HistorialRepository } from "../../domain/repository/historial.repository";
 import { GetLotesTostadoConLote } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-con-lote";
 import { GetLotesTostadosConInventario } from "../../domain/usecases/lote/lote-tostado/lote-inventario";
+import { GetLoteTostadoConInventario } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-inventario";
 
 export class LoteTostadoController {
     constructor(
@@ -102,6 +103,16 @@ export class LoteTostadoController {
     public getLotesTostadosConInventario = (req: Request, res: Response) => {
         new GetLotesTostadosConInventario(this.loteTostadoRepository)
             .execute()
+            .then(data => {
+                res.json(data)
+            })
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getLoteTostadoConInventario = (req: Request, res: Response) => {
+        const id_lote_tostado = req.params.id;
+        new GetLoteTostadoConInventario(this.loteTostadoRepository)
+            .execute(id_lote_tostado)
             .then(data => {
                 res.json(data)
             })

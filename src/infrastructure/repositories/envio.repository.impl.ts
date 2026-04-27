@@ -33,4 +33,8 @@ export class EnvioRepositoryImpl implements EnvioRepository{
     getEnviosByClasificacion(clasificacion: ClasificacionEnvio, from?: Date, to?: Date): Promise<EnvioEntity[]> {
         return this.envioDatasource.getEnviosByClasificacion(clasificacion,from,to);
     }
+
+    getAllenvios(): Promise<EnvioEntity[]> {
+      return this.envioDatasource.getAllenvios();
+    }
 }

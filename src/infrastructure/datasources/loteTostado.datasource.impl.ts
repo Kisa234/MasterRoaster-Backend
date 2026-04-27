@@ -101,5 +101,22 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
             LoteTostadoConInventarioEntity.fromObject(l)
         );
     }
+    async GetLoteTostadoConInventario(id: string): Promise<LoteTostadoConInventarioEntity> {
+        const loteTostado = await prisma.loteTostado.findUnique({
+            where: {
+                id_lote_tostado: id
+            },
+            include: {
+                lote: true,
+                inventarioLoteTostados: {
+                    include: {
+                        almacen: true
+                    }
+                }
+            }
+        });
+        if (!loteTostado) throw new Error("LoteTostado not found");
+        return LoteTostadoConInventarioEntity.fromObject(loteTostado);
+    }
 
 }

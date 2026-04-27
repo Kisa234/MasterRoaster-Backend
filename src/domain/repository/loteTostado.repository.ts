@@ -11,6 +11,7 @@ export abstract class LoteTostadoRepository {
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
     abstract GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]>;
     abstract getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]>
+    abstract GetLoteTostadoConInventario(id: string): Promise<LoteTostadoConInventarioEntity>;
     
     
 }

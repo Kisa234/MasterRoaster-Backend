@@ -88,4 +88,18 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
         return envios.map(EnvioEntity.fromObject);
     }
 
+    async getAllenvios(): Promise<EnvioEntity[]> {
+      const envios = await prisma.envio.findMany({
+        where: {
+          eliminado: false
+        },
+        orderBy: {
+          fecha: 'desc'
+        }
+      });
+    
+      return envios.map(EnvioEntity.fromObject);
+    }
+    
+
 }

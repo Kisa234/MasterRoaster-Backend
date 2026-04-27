@@ -1,3 +1,5 @@
+import { HistorialRepositoryImpl } from './../../../../infrastructure/repositories/historial.repository.impl';
+import { Historial } from '@prisma/client';
 import { EntidadInventario } from "../../../../enums/entidad-inventario.enum";
 import { HistorialAccion } from "../../../../enums/historial-accion.enum";
 import { HistorialEntidad } from "../../../../enums/historial-entidad.enum";

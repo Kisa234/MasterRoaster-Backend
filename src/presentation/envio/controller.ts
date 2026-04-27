@@ -140,6 +140,14 @@ export class EnvioController {
         }
     };
 
-
+    getAllEnvios = async (req: Request, res: Response) => {
+      try {
+        const envios = await this.envioRepository.getAllenvios();
+        return res.json(envios);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error al obtener envíos' });
+      }
+    };
 
 }

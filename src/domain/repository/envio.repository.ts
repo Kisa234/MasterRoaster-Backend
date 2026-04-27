@@ -14,5 +14,7 @@ export abstract class EnvioRepository {
   abstract getEnviosByCliente(id_cliente: string): Promise<EnvioEntity[]>;
   abstract getEnviosByFechaRange(from: Date, to: Date): Promise<EnvioEntity[]>;
   abstract getEnviosByClasificacion(clasificacion: ClasificacionEnvio, from?: Date, to?: Date): Promise<EnvioEntity[]>;
+  abstract getAllenvios(): Promise<EnvioEntity[]>;
+
 
 }

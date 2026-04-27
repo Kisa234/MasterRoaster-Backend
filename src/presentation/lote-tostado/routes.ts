@@ -34,16 +34,21 @@ export class LoteTostadoRoutes {
             historialRepository
         );
 
+        // CREATE / UPDATE / DELETE
         router.post('/', authMiddleware, loteController.createLoteTostado);
         router.put('/:id', authMiddleware, loteController.updateLoteTostado);
         router.delete('/:id', authMiddleware, loteController.deleteLoteTostado);
+
+        // GET específicos
         router.get('/lote-con-lote', loteController.getLotesTostadoandLote);
         router.get('/inventario', loteController.getLotesTostadosConInventario);
+        router.get('/inventario/:id', loteController.getLoteTostadoConInventario);
         router.get('/ficha/:id', loteController.getFichaTueste);
-        router.get('/', loteController.getLotesTostados);
-        router.get('/:id', loteController.getLoteTostadoById);
         router.get('/lote/:id', loteController.getLotesTostadoByLoteId);
 
+        // GET general
+        router.get('/', loteController.getLotesTostados);
+        router.get('/:id', loteController.getLoteTostadoById);
 
 
         return router;
