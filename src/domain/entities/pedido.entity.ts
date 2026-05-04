@@ -1,4 +1,5 @@
 import { Molienda } from "@prisma/client";
+import { LoteEntity } from "./lote.entity";
 
 export class PedidoEntity {
   constructor(
@@ -103,3 +104,73 @@ export class PedidoEntity {
     );
   }
 }
+
+
+
+export class PedidoConLoteEntity {
+  constructor(
+    public id_pedido: string,
+    public fecha_registro: Date,
+    public tipo_pedido: string,
+    public cantidad: number,
+    public estado_pedido: string,
+    public id_user: string,
+    public eliminado: boolean,
+    public facturado?: boolean,
+    public id_lote?: string,
+    public id_nuevoLote?: string,
+    public id_nuevoLote_tostado?: string,
+    public id_almacen?: string,
+    public comentario?: string,
+    public pesos?: number[],
+    public fecha_tueste?: Date,
+    public tostadora?: string,
+    public id_lote_tostado?: string,
+    public gramaje?: number,
+    public molienda?: Molienda,
+    public id_producto?: string,
+    public creado_por_id?: string,
+    public completado_por_id?: string,
+    public fecha_completado?: Date,
+    public id_lote_destino?: string | null,
+    public usuario_nombre?: string | null,
+
+    // extra
+    public lote?: LoteEntity | null,
+  ) { }
+
+  static fromObject(obj: { [key: string]: any }): PedidoConLoteEntity {
+    return new PedidoConLoteEntity(
+      obj.id_pedido,
+      obj.fecha_registro,
+      obj.tipo_pedido,
+      obj.cantidad,
+      obj.estado_pedido,
+      obj.id_user,
+      obj.eliminado,
+      obj.facturado,
+      obj.id_lote,
+      obj.id_nuevoLote,
+      obj.id_nuevoLote_tostado,
+      obj.id_almacen,
+      obj.comentario,
+      obj.pesos,
+      obj.fecha_tueste,
+      obj.tostadora,
+      obj.id_lote_tostado,
+      obj.gramaje,
+      obj.molienda,
+      obj.id_producto,
+      obj.creado_por_id,
+      obj.completado_por_id,
+      obj.fecha_completado,
+      obj.id_lote_destino,
+
+      // aquí se llena con el nombre que venga de Prisma
+      obj.usuario_nombre ?? obj.user?.nombre ?? null,
+
+      obj.lote ? LoteEntity.fromObject(obj.lote) : null,
+    );
+  }
+}
+

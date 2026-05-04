@@ -29,35 +29,39 @@ model User {
   cant_suscripcion    Int?      @default(0)
 
   // Relacion con el Rol
-  Rol                Rol?                @relation(fields: [id_rol], references: [id_rol])
+  Rol                   Rol?                @relation(fields: [id_rol], references: [id_rol])
   // Relación con lote
-  lotes              Lote[]
+  lotes                 Lote[]
   // Relación con muestra
-  muestras           Muestra[]
+  muestras              Muestra[]
   // Relación con pedidos de cliente
-  pedidos            Pedido[]            @relation("Cliente")
+  pedidos               Pedido[]            @relation("Cliente")
   // Relación con pedidos creados
-  pedidosCreados     Pedido[]            @relation("PedidoCreadoPor")
+  pedidosCreados        Pedido[]            @relation("PedidoCreadoPor")
   // Relación con pedidos completados
-  pedidosCompletados Pedido[]            @relation("PedidoCompletadoPor")
+  pedidosCompletados    Pedido[]            @relation("PedidoCompletadoPor")
   // Relación con Historial
-  historial          Historial[]
+  historial             Historial[]
   // Relacion con lotes Tostados
-  lotesTostados      LoteTostado[]
+  lotesTostados         LoteTostado[]
   // Relacion con las Entregas
-  envio              Envio[]
+  envio                 Envio[]
   // Relacion con BoxRespuestas
-  boxRespuestas      BoxRespuesta[]
+  boxRespuestas         BoxRespuesta[]
   // Relacion con Ingresos de Cafe
-  ingresosCafe       IngresoCafe[]
+  ingresosCafe          IngresoCafe[]
   // Relacion con el Historial de Cambios
-  cambios            Cambios[]
+  cambios               Cambios[]
   // Relacion con los Movimientos de Almacen
-  movimientoAlmacens MovimientoAlmacen[]
+  movimientoAlmacens    MovimientoAlmacen[]
   // Relacion con los Ingresos de Insumos
-  ingresosInsumos    IngresoInsumo[]
+  ingresosInsumos       IngresoInsumo[]
   // Relacion con los Ingresos de Productos
-  ingresosProductos  IngresoProducto[]
+  ingresosProductos     IngresoProducto[]
+  // Relacion con los Balones de Gas
+  balonesGasIngresados  BalonGas[]          @relation("BalonGasUserIngreso")
+  balonesGasIniciados   BalonGas[]          @relation("BalonGasUserInicioUso")
+  balonesGasFinalizados BalonGas[]          @relation("BalonGasUserFinUso")
 }
 
 // ROLES Y PERMISOS
@@ -696,6 +700,43 @@ model Tueste {
   // Relación con Analisis Rapido
   loteTostado LoteTostado? @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
   pedido      Pedido       @relation(fields: [id_pedido], references: [id_pedido])
+
+  balonGasInicio BalonGas[] @relation("BalonGasTuesteInicio")
+  balonGasFin    BalonGas[] @relation("BalonGasTuesteFin")
+}
+
+model BalonGas {
+  id_balon_gas String @id @default(uuid())
+
+  fecha_ingreso    DateTime
+  fecha_inicio_uso DateTime?
+  fecha_fin_uso    DateTime?
+
+  id_tueste_inicio String?
+  id_tueste_fin    String?
+
+  estado EstadoBalonGas @default(DISPONIBLE)
+
+  precio Float
+
+  id_user_ingreso    String
+  id_user_inicio_uso String?
+  id_user_fin_uso    String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tueste_inicio   Tueste? @relation("BalonGasTuesteInicio", fields: [id_tueste_inicio], references: [id_tueste])
+  tueste_fin      Tueste? @relation("BalonGasTuesteFin", fields: [id_tueste_fin], references: [id_tueste])
+  user_ingreso    User    @relation("BalonGasUserIngreso", fields: [id_user_ingreso], references: [id_user])
+  user_inicio_uso User?   @relation("BalonGasUserInicioUso", fields: [id_user_inicio_uso], references: [id_user])
+  user_fin_uso    User?   @relation("BalonGasUserFinUso", fields: [id_user_fin_uso], references: [id_user])
+}
+
+enum EstadoBalonGas {
+  DISPONIBLE
+  EN_USO
+  FINALIZADO
 }
 
 // ENVIOS

@@ -39,6 +39,7 @@ import { InventarioMuestraRoutes } from "./inventarios/inventario-muestra/routes
 import { categoriaInsumoRoutes } from "./categoria-insumo.ts/routes";
 import { MarcaRoutes } from "./marca/route";
 import { IngresoInsumoRoutes } from "./ingreso-insumo/routes";
+import { BalonGasRoutes } from "./balon-gas/routes";
 
 
 export class AppRoutes {
@@ -80,6 +81,7 @@ export class AppRoutes {
 
         router.use('/pedido', PedidoRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
+        router.use('/balon-gas', BalonGasRoutes.routes);
 
         router.use('/envio', EnvioRoutes.routes);
         router.use('/fichaEnvio', FichaEnvioRoutes.routes);

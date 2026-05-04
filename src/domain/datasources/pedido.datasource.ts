@@ -1,7 +1,7 @@
 import { GetPedidosOrdenTueste } from './../usecases/pedido/get-pedidos-tueste';
 import { CreatePedidoDto } from "../dtos/pedido/create";
 import { UpdatePedidoDto } from "../dtos/pedido/update";
-import { PedidoEntity } from "../entities/pedido.entity";
+import { PedidoConLoteEntity, PedidoEntity } from "../entities/pedido.entity";
 
 export abstract class PedidoDatasource {
     abstract createPedido(createPedidoDto:CreatePedidoDto): Promise<PedidoEntity>;
@@ -19,4 +19,8 @@ export abstract class PedidoDatasource {
     abstract getLotesCreados(): Promise<string[]>;
     abstract getLotesTostadoCreados(): Promise<string[]>;
     abstract setFacturado(state:boolean, id_pedido: string): Promise<PedidoEntity>;
+
+    abstract getPedidosConLote(): Promise<PedidoConLoteEntity[]>;
+    abstract getPedidoConLote(id: string): Promise<PedidoConLoteEntity>;
+    abstract getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]>;
 }

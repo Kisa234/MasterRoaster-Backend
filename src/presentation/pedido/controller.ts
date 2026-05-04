@@ -27,6 +27,9 @@ import { InventarioLoteTostadoRepository } from '../../domain/repository/inventa
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
 import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/create-lote-tostado';
+import { GetPedidosConLoteByEstadoYTipo } from '../../domain/usecases/pedido/get-pedidos-con-lote-by-estado-y-tipo';
+import { GetPedidosConLote } from '../../domain/usecases/pedido/get-pedidos-con-lote';
+import { GetPedidoConLote } from '../../domain/usecases/pedido/get-pedido-con-lote';
 
 export class PedidoController {
 
@@ -45,7 +48,7 @@ export class PedidoController {
         private readonly historialRepository: HistorialRepository,
         private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
         private readonly createLoteTostado: CreateLoteTostado
-        
+
 
     ) {
     }
@@ -208,5 +211,31 @@ export class PedidoController {
         }
     }
 
+    public getPedidosConLote = (req: Request, res: Response) => {
+        new GetPedidosConLote(this.pedidoRepository)
+            .execute()
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
+    }
 
+    public getPedidoConLote = (req: Request, res: Response) => {
+        const { id } = req.params;
+
+        new GetPedidoConLote(this.pedidoRepository)
+            .execute(id)
+            .then(pedido => res.json(pedido))
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
+    }
+
+    public getPedidosConLoteByEstadoYTipo = (req: Request, res: Response) => {
+        const { estado, tipo } = req.params;
+        console.log(`Recibiendo solicitud para obtener pedidos con lote por estado "${estado}" y tipo "${tipo}"`);
+
+        new GetPedidosConLoteByEstadoYTipo(this.pedidoRepository)
+            .execute(estado, tipo)
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
+    }
+
+    
 }

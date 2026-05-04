@@ -10,7 +10,7 @@ import { InventarioLoteRepository } from "../../../repository/inventario-lote.re
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
@@ -24,8 +24,8 @@ export class CreateLote implements CreateLoteUseCase {
         private readonly inventarioLoteRepository: InventarioLoteRepository
     ) { }
 
-    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<LoteEntity> {
-        const id = await this.generarId(createLoteDto, tueste, id_c,);
+    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string): Promise<LoteEntity> {
+        const id = await this.generarId(createLoteDto, tueste, id_c);
         const [error, dto] = CreateLoteDto.create({
             ...createLoteDto,
             id_lote: id,
@@ -33,7 +33,15 @@ export class CreateLote implements CreateLoteUseCase {
         if (error) {
             console.log('Error DTO:', error);
         }
-        const lote = this.loteRepository.createLote(dto!);
+        const lote = await this.loteRepository.createLote(dto!);
+        
+        if (id_almacen) {
+            await this.inventarioLoteRepository.createInventario({
+                id_lote: lote.id_lote,
+                id_almacen: id_almacen,
+                cantidad_kg: lote.peso,
+            });
+        }
         return lote;
     }
 
@@ -86,7 +94,7 @@ export class CreateLote implements CreateLoteUseCase {
         const user = await this.userRepository.getUserById(dto.id_user!);
         if (user) {
             if (user?.rol === 'cliente') {
-                
+
                 const partesNombre = user.nombre.trim().split(' ');
                 const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
                 const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';

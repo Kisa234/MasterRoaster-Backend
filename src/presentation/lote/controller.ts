@@ -51,7 +51,7 @@ export class LoteController {
         private readonly historialRepository: HistorialRepository,
         private readonly inventarioLoteRepository: InventarioLoteRepository,
         private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository
-        
+
     ) { }
 
     public createLote = (req: Request, res: Response) => {
@@ -60,12 +60,7 @@ export class LoteController {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
 
-
-        // 2. Decide de dónde viene el id_user:
-        //    - Si el DTO entrante trae un id_user válido lo usamos.
-        //    - Si no lo trae, lo tomamos del token (req.user.id).
-        // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
-        // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
+        // 2. Decide de dónde viene el id_user
         const idUserFromBody = req.body.id_user as string | undefined;
         const effectiveUserId = idUserFromBody ?? req.user.id_user;
 
@@ -75,7 +70,10 @@ export class LoteController {
             id_user: effectiveUserId,
         };
 
-        // 4. Crea el DTO y valida
+        // 4. Obtener el almacén en caso se quiera crear el lote con inventario directamente
+        const idAlmacen = req.body.almacen as string | undefined;
+
+        // 5. Crea el DTO y valida
         const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
         if (error) {
             return res.status(400).json({ error });
@@ -88,13 +86,12 @@ export class LoteController {
             this.historialRepository,
             this.movimientoAlmacenRepository,
             this.inventarioLoteRepository
-
         )
-            .execute(createLoteDto!)
+            .execute(createLoteDto!, undefined, undefined, idAlmacen)
             .then(lote => {
-                res.json(lote)
+                res.json(lote);
             })
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
     }
 
     public createLoteRapido = (req: Request, res: Response) => {
@@ -123,10 +120,9 @@ export class LoteController {
         const lote_before = await this.loteRepository.getLoteById(id_lote);
         new UpdateLote(this.loteRepository)
             .execute(req.params.id, updateLoteDto!)
-            .then(lote => 
-                {
-                    res.json(lote)
-                })
+            .then(lote => {
+                res.json(lote)
+            })
             .catch(error => res.status(400).json({ error }));
     }
 
@@ -179,9 +175,9 @@ export class LoteController {
             .execute(id_muestra, createLoteDto)
             .then(lote => {
                 this.inventarioLoteRepository.createInventario({
-                    id_lote:lote.id_lote,
-                    id_almacen:req.body.almacen,
-                    cantidad_kg:lote.peso
+                    id_lote: lote.id_lote,
+                    id_almacen: req.body.almacen,
+                    cantidad_kg: lote.peso
                 })
                 res.json(lote)
             })
@@ -279,7 +275,7 @@ export class LoteController {
         new GetLoteInventarioById(this.loteRepository)
             .execute(id)
             .then(lote => {
-                
+
                 res.json(lote);
             })
             .catch(error => res.status(400).json({ error })

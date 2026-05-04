@@ -92,7 +92,7 @@ export class PedidoRoutes {
         // Inventario
         const InventarioDatasource = new InventarioProductoDataSourceImpl();
         const InventarioRepository = new InventarioProductoRepositoryImpl(InventarioDatasource);
-        
+
         //Historial
         const historialDataSource = new HistorialDataSourceImpl();
         const historialRepository = new HistorialRepositoryImpl(historialDataSource);
@@ -101,10 +101,10 @@ export class PedidoRoutes {
         const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
         const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
 
-         
+
         const createLoteUseCase = new CreateLote(
-            LoteRepository, 
-            UserRepository, 
+            LoteRepository,
+            UserRepository,
             PedidoRepository,
             historialRepository,
             movimientoAlmacenRepository,
@@ -143,7 +143,9 @@ export class PedidoRoutes {
         router.get('/lote/:id_lote', authMiddleware, controller.GetPedidosByLote);
         router.put('/completar/:id', authMiddleware, controller.completarPedido);
         router.put('/facturar/:id_pedido', authMiddleware, controller.SetPedidoFacturado);
-
+        router.get('/con-lote/estado/:estado/tipo/:tipo', controller.getPedidosConLoteByEstadoYTipo);
+        router.get('/con-lote', controller.getPedidosConLote);
+        router.get('/con-lote/:id', controller.getPedidoConLote);
 
         router.post('/', authMiddleware, controller.createPedido);
         router.get('/', authMiddleware, controller.getAllPedidos);

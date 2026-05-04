@@ -1,5 +1,5 @@
 
-import { PedidoEntity } from "../../domain/entities/pedido.entity";
+import { PedidoConLoteEntity, PedidoEntity } from "../../domain/entities/pedido.entity";
 import { CreatePedidoDto } from '../../domain/dtos/pedido/create';
 import { prisma } from "../../data/postgres";
 import { UpdatePedidoDto } from '../../domain/dtos/pedido/update';
@@ -77,14 +77,14 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
     }
 
 
-    async completarPedido(id: string, id_completado_por:string): Promise<PedidoEntity> {
+    async completarPedido(id: string, id_completado_por: string): Promise<PedidoEntity> {
         const pedido = await this.getPedidoById(id);
         const pedidoCompletado = await prisma.pedido.update({
             where: { id_pedido: id },
-            data: { 
+            data: {
                 estado_pedido: 'Completado',
                 completado_por_id: id_completado_por,
-                fecha_completado: new Date()    
+                fecha_completado: new Date()
             }
         });
         return PedidoEntity.fromObject(pedidoCompletado);
@@ -207,5 +207,78 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
             }
         })
         return PedidoEntity.fromObject(pedido);
+    }
+
+    async getPedidosConLote(): Promise<PedidoConLoteEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false,
+            },
+            include: {
+                lote: true,
+                cliente: {
+                    select: {
+                        id_user: true,
+                        nombre: true,
+                    },
+                },
+            },
+            orderBy: {
+                fecha_registro: 'desc',
+            },
+        });
+
+        return pedidos.map(pedido => PedidoConLoteEntity.fromObject(pedido));
+    }
+
+    async getPedidoConLote(id: string): Promise<PedidoConLoteEntity> {
+        const pedido = await prisma.pedido.findFirst({
+            where: {
+                id_pedido: id,
+                eliminado: false,
+            },
+            include: {
+                lote: true,
+                cliente: {
+                    select: {
+                        id_user: true,
+                        nombre: true,
+                    },
+                },
+            },
+        });
+
+        if (!pedido) {
+            throw new Error("No existe el pedido");
+        }
+
+        return PedidoConLoteEntity.fromObject(pedido);
+    }
+
+    async getPedidosConLoteByEstadoYTipo(
+        estado: string,
+        tipo: string
+    ): Promise<PedidoConLoteEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false,
+                estado_pedido: estado,
+                tipo_pedido: tipo,
+            },
+            include: {
+                lote: true,
+                cliente: {
+                    select: {
+                        id_user: true,
+                        nombre: true,
+                    },
+                },
+            },
+            orderBy: {
+                fecha_registro: 'desc',
+            },
+        });
+        console.log(`Pedidos encontrados para estado "${estado}" y tipo "${tipo}":`, pedidos.length);
+        return pedidos.map(pedido => PedidoConLoteEntity.fromObject(pedido));
     }
 }

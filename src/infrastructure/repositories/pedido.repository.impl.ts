@@ -1,7 +1,7 @@
 import { PedidoDatasource } from '../../domain/datasources/pedido.datasource';
 import { CreatePedidoDto } from '../../domain/dtos/pedido/create';
 import { UpdatePedidoDto } from '../../domain/dtos/pedido/update';
-import { PedidoEntity } from '../../domain/entities/pedido.entity';
+import { PedidoConLoteEntity, PedidoEntity } from '../../domain/entities/pedido.entity';
 import { PedidoRepository } from '../../domain/repository/pedido.repository';
 
 
@@ -9,11 +9,11 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
 
     constructor(
         private readonly pedidoDataSource: PedidoDatasource
-        
+
     ) { }
-   
-    createPedido( dto:CreatePedidoDto): Promise<PedidoEntity> {
-        return this.pedidoDataSource.createPedido( dto);
+
+    createPedido(dto: CreatePedidoDto): Promise<PedidoEntity> {
+        return this.pedidoDataSource.createPedido(dto);
     }
     getPedidoById(id: string): Promise<PedidoEntity | null> {
         return this.pedidoDataSource.getPedidoById(id);
@@ -24,7 +24,7 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     getHistoricoPedidos(): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getHistoricoPedidos();
     }
-    updatePedido(id: string,updatePedidoDto:UpdatePedidoDto ): Promise<PedidoEntity> {
+    updatePedido(id: string, updatePedidoDto: UpdatePedidoDto): Promise<PedidoEntity> {
         return this.pedidoDataSource.updatePedido(id, updatePedidoDto);
     }
     deletePedido(id: string): Promise<PedidoEntity> {
@@ -36,13 +36,13 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosByCliente(cliente_id);
     }
-    completarPedido(id_pedido: string, id_completado_por:string): Promise<PedidoEntity> {
+    completarPedido(id_pedido: string, id_completado_por: string): Promise<PedidoEntity> {
         return this.pedidoDataSource.completarPedido(id_pedido, id_completado_por);
     }
     getPedidosOrdenTueste(): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosOrdenTueste();
     }
-     GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
+    GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.GetPedidosOrdenTuesteByFecha(fecha);
     }
     getPedidosByLote(id_lote: string): Promise<PedidoEntity[]> {
@@ -55,7 +55,17 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
         return this.pedidoDataSource.getLotesTostadoCreados();
     }
     setFacturado(state: boolean, id_pedido: string): Promise<PedidoEntity> {
-        return this.pedidoDataSource.setFacturado(state,id_pedido);
+        return this.pedidoDataSource.setFacturado(state, id_pedido);
+    }
+    async getPedidosConLote(): Promise<PedidoConLoteEntity[]> {
+        return this.pedidoDataSource.getPedidosConLote();
     }
 
+    async getPedidoConLote(id: string): Promise<PedidoConLoteEntity> {
+        return this.pedidoDataSource.getPedidoConLote(id);
+    }
+
+    async getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]> {
+        return this.pedidoDataSource.getPedidosConLoteByEstadoYTipo(estado, tipo);
+    }
 }
