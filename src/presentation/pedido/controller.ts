@@ -229,7 +229,6 @@ export class PedidoController {
 
     public getPedidosConLoteByEstadoYTipo = (req: Request, res: Response) => {
         const { estado, tipo } = req.params;
-        console.log(`Recibiendo solicitud para obtener pedidos con lote por estado "${estado}" y tipo "${tipo}"`);
 
         new GetPedidosConLoteByEstadoYTipo(this.pedidoRepository)
             .execute(estado, tipo)

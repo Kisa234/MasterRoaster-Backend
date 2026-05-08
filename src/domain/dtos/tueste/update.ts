@@ -1,26 +1,26 @@
-import { AnalisisRapidoEntity } from "../../entities/analisisRapido.entity";
-
 export class UpdateTuesteDto {
     private constructor(
-        public readonly id_tueste                :string,
-        public readonly fecha_tueste             :Date,
-        public readonly tostadora                :string,
-        public readonly densidad                 :number,
-        public readonly humedad                  :number,
-        public readonly peso_entrada             :number,
-        public readonly temperatura_entrada      :number,
-        public readonly llama_inicial            :number,
-        public readonly aire_inicial             :number,
-        public readonly punto_no_retorno         :number,
-        public readonly tiempo_despues_crack     :number,
-        public readonly temperatura_crack        :number,
-        public readonly temperatura_salida       :number,
-        public readonly tiempo_total             :number,
-        public readonly porcentaje_caramelizacion:number,
-        public readonly desarrollo               :number,
-        public readonly grados_desarrollo        :number,
-        public readonly id_lote_tostado          :string
-    ) {}
+        public readonly id_tueste: string,
+        public readonly fecha_tueste: Date,
+        public readonly tostadora: string,
+        public readonly densidad: number,
+        public readonly humedad: number,
+        public readonly peso_entrada: number,
+        public readonly temperatura_entrada: number,
+        public readonly llama_inicial: number,
+        public readonly aire_inicial: number,
+        public readonly punto_no_retorno: number,
+        public readonly tiempo_despues_crack: number,
+        public readonly temperatura_crack: number,
+        public readonly temperatura_salida: number,
+        public readonly tiempo_total: number,
+        public readonly porcentaje_caramelizacion: number,
+        public readonly desarrollo: number,
+        public readonly grados_desarrollo: number,
+        public readonly id_lote_tostado: string,
+        public readonly agtrom_comercial: number,  
+        public readonly agtrom_gourmet: number,    
+    ) { }
 
     get values() {
         const returnObj: { [key: string]: any } = {};
@@ -41,11 +41,13 @@ export class UpdateTuesteDto {
         if (this.desarrollo !== undefined) returnObj.desarrollo = this.desarrollo;
         if (this.grados_desarrollo !== undefined) returnObj.grados_desarrollo = this.grados_desarrollo;
         if (this.id_lote_tostado) returnObj.id_lote_tostado = this.id_lote_tostado;
+        if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;  
+        if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;        
         return returnObj;
     }
 
     static update(props: { [key: string]: any }): [string?, UpdateTuesteDto?] {
-        const { 
+        const {
             id_tueste,
             fecha_tueste,
             tostadora,
@@ -63,7 +65,9 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
-            id_lote_tostado
+            id_lote_tostado,
+            agtrom_comercial,  
+            agtrom_gourmet,    
         } = props;
 
         return [undefined, new UpdateTuesteDto(
@@ -84,7 +88,9 @@ export class UpdateTuesteDto {
             porcentaje_caramelizacion,
             desarrollo,
             grados_desarrollo,
-            id_lote_tostado
+            id_lote_tostado,
+            agtrom_comercial,  
+            agtrom_gourmet,    
         )];
     }
 }

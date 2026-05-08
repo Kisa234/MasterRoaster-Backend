@@ -278,7 +278,7 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
                 fecha_registro: 'desc',
             },
         });
-        console.log(`Pedidos encontrados para estado "${estado}" y tipo "${tipo}":`, pedidos.length);
+
         return pedidos.map(pedido => PedidoConLoteEntity.fromObject(pedido));
     }
 }
