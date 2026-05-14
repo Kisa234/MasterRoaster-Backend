@@ -7,26 +7,20 @@ export class FichaTueste {
         public desarrollo: number,
         public temp_desarrollo: number,
         public agtrom: number,
+        public agtrom_gourmet: number,
         public tiempo: number,
         public tueste: string,
         public id_lote_tostado: string,
         public peso_total: number,
-       
+        public merma: number,
+        public merma_gr: number
     ) {}
   
     static fromObject(obj: { [key: string]: any }): FichaTueste {
         const {
-            id_lote,
-            humedad,
-            densidad,
-            caramelizacion,
-            desarrollo,
-            temp_desarrollo,
-            agtrom,
-            tiempo,
-            tueste,
-            id_lote_tostado,
-            peso_total
+            id_lote, humedad, densidad, caramelizacion, desarrollo,
+            temp_desarrollo, agtrom, agtrom_gourmet, tiempo, tueste,
+            id_lote_tostado, peso_total, merma, merma_gr
         } = obj;
 
         if (!id_lote) throw new Error('id_lote property is required');
@@ -40,21 +34,11 @@ export class FichaTueste {
         if (!tueste) throw new Error('tueste property is required');
         if (!id_lote_tostado) throw new Error('id_lote_tostado property is required');
         if (!peso_total) throw new Error('peso_total property is required');
-        
 
         return new FichaTueste(
-            id_lote,
-            humedad,
-            densidad,
-            caramelizacion,
-            desarrollo,
-            temp_desarrollo,
-            agtrom,
-            tiempo,
-            tueste,
-            id_lote_tostado,
-            peso_total
+            id_lote, humedad, densidad, caramelizacion, desarrollo,
+            temp_desarrollo, agtrom, agtrom_gourmet ?? 0, tiempo, tueste,
+            id_lote_tostado, peso_total, merma ?? 0, merma_gr ?? 0
         );
     }
-  }
-  
+}

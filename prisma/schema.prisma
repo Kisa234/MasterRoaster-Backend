@@ -571,6 +571,7 @@ enum HistorialEntidad {
   INSUMO
   PRODUCTO
   INVENTARIO
+  TUESTE
 }
 
 enum HistorialAccion {

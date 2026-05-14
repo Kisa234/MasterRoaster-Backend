@@ -15,14 +15,16 @@ import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
 import { GetTostadosByPedido } from "../../domain/usecases/tueste/get-by-pedido";
 import { GetReferenceTueste } from "../../domain/usecases/tueste/reference-tueste";
+import { HistorialRepository } from '../../domain/repository/historial.repository';
 
 export class TuesteController {
 
     constructor(
         private readonly tuesteRepository: TuesteRepository,
+        private readonly historialRepository: HistorialRepository,
         private readonly pedidoRepository: PedidoRepository,
         private readonly completarPedidoUseCase: CompletarPedidoUseCase
-    ){}
+    ) { }
 
     public createTueste = async (req: Request, res: Response) => {
         const [error, createTuesteDto] = CreateTuesteDto.create(req.body);
@@ -31,21 +33,26 @@ export class TuesteController {
         }
         new CreateTueste(this.tuesteRepository)
             .execute(createTuesteDto!)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error }));
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     };
 
     public updateTueste = async (req: Request, res: Response) => {
+        if (!req.user?.id_user) {
+            return res.status(401).json({ error: 'Usuario no autenticado' });
+        }
+
         const id_tueste = req.params.id;
+        const id_user = req.user.id_user;
         const [error, updateTuesteDto] = UpdateTuesteDto.update(req.body);
         if (error) {
             return res.status(400).json({ error });
         }
-        new UpdateTueste(this.tuesteRepository)
-            .execute(id_tueste,updateTuesteDto!)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error }
-            ));
+
+        new UpdateTueste(this.tuesteRepository, this.historialRepository)
+            .execute(id_tueste, updateTuesteDto!, id_user)
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     };
 
     public completarTostados = async (req: Request, res: Response) => {
@@ -63,40 +70,40 @@ export class TuesteController {
         new CompleteTueste(
             this.tuesteRepository,
             this.completarPedidoUseCase
-            )
+        )
             .execute(id_tueste, completeTuesteDto!, id_completado_por)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error}));
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     }
 
     public deleteTueste = async (req: Request, res: Response) => {
         new DeleteTueste(this.tuesteRepository)
             .execute(req.params.id)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error })) ;
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     }
 
     public getTuesteById = async (req: Request, res: Response) => {
         new GetTueste(this.tuesteRepository)
             .execute(req.params.id)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error}));
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     }
 
     public getTuesteByFecha = async (req: Request, res: Response) => {
         new GetTueste(this.tuesteRepository)
             .execute(req.params.fecha)
-            .then( tueste => res.json(tueste))
-            .catch( error => res.status(400).json({ error}));
+            .then(tueste => res.json(tueste))
+            .catch(error => res.status(400).json({ error }));
     }
 
     public getAllTuestes = async (req: Request, res: Response) => {
         new GetAllTueste(this.tuesteRepository)
             .execute()
-            .then( tuestes => res.json(tuestes))
-            .catch( error => res.status(400).json({ error}));
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
     }
-   
+
     public getTostadosByPedido = async (req: Request, res: Response) => {
         const id_pedido = req.params.id;
         new GetTostadosByPedido(this.tuesteRepository)
@@ -113,7 +120,7 @@ export class TuesteController {
         ).execute(id_lote)
             .then(avgTueste => res.json(avgTueste))
             .catch(error => res.status(400).json({ error }));
-    
+
     }
 
     public getTuestesByLoteTostado = async (req: Request, res: Response) => {
@@ -122,6 +129,6 @@ export class TuesteController {
             .then(tuestes => res.json(tuestes))
             .catch(error => res.status(400).json({ error }));
     }
-    
+
 
 }

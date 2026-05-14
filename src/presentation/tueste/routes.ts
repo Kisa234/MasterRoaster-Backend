@@ -111,6 +111,8 @@ export class TuesteRoutes {
         const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
         const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
 
+        
+
         const createLoteTostado = new CreateLoteTostado(
             loteTostadoRepository
         )
@@ -147,7 +149,7 @@ export class TuesteRoutes {
         );
 
 
-        const tuesteController = new TuesteController(tuesteRepository, pedidoRepository, completarPedidoUseCase);
+        const tuesteController = new TuesteController(tuesteRepository, historialRepository, pedidoRepository, completarPedidoUseCase);
 
         router.post('/', authMiddleware, tuesteController.createTueste);
         router.put('/c/:id', authMiddleware, tuesteController.completarTostados);
