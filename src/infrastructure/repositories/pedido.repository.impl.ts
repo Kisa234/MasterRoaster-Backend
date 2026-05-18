@@ -68,4 +68,8 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     async getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]> {
         return this.pedidoDataSource.getPedidosConLoteByEstadoYTipo(estado, tipo);
     }
+
+    async getPedidosByRango(desde: Date, hasta: Date): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getPedidosByRango(desde, hasta);
+    }
 }

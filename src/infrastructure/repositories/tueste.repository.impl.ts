@@ -42,7 +42,9 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTuestesCantByLote(id_lote: string): Promise<number> {
         return this.tuesteDataSource.getTuestesCantByLote(id_lote);
     }
-    
+    getTuestesByRango(desde: Date, hasta: Date): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getTuestesByRango(desde, hasta);
+    }
     
     
 }

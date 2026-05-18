@@ -30,6 +30,8 @@ import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/creat
 import { GetPedidosConLoteByEstadoYTipo } from '../../domain/usecases/pedido/get-pedidos-con-lote-by-estado-y-tipo';
 import { GetPedidosConLote } from '../../domain/usecases/pedido/get-pedidos-con-lote';
 import { GetPedidoConLote } from '../../domain/usecases/pedido/get-pedido-con-lote';
+import { GetPedidosByRango } from '../../domain/usecases/pedido/get-pedidos-rango';
+import { GetEstadisticasTueste } from '../../domain/usecases/pedido/get-estadisticas-tueste';
 
 export class PedidoController {
 
@@ -236,5 +238,28 @@ export class PedidoController {
             .catch(error => res.status(400).json({ error: error.message ?? error }));
     }
 
-    
+    public getPedidosByRango = async (req: Request, res: Response) => {
+        const { desde, hasta } = req.query;
+        if (!desde || !hasta) {
+            return res.status(400).json({ error: 'Se requieren los parámetros desde y hasta' });
+        }
+        new GetPedidosByRango(this.pedidoRepository)
+            .execute(new Date(desde as string), new Date(hasta as string))
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getEstadisticasTueste = async (req: Request, res: Response) => {
+        const { desde, hasta } = req.query;
+        if (!desde || !hasta) {
+            return res.status(400).json({ error: 'Se requieren los parámetros desde y hasta' });
+        }
+        new GetEstadisticasTueste(
+            this.tuesteRepository,
+            this.pedidoRepository
+        )
+            .execute(new Date(desde as string), new Date(hasta as string))
+            .then(estadisticas => res.json(estadisticas))
+            .catch(error => res.status(400).json({ error }));
+    }
 }

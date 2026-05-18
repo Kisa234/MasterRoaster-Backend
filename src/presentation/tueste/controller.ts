@@ -16,6 +16,7 @@ import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/creat
 import { GetTostadosByPedido } from "../../domain/usecases/tueste/get-by-pedido";
 import { GetReferenceTueste } from "../../domain/usecases/tueste/reference-tueste";
 import { HistorialRepository } from '../../domain/repository/historial.repository';
+import { GetTuestesByRango } from '../../domain/usecases/tueste/get-by-rango';
 
 export class TuesteController {
 
@@ -130,5 +131,15 @@ export class TuesteController {
             .catch(error => res.status(400).json({ error }));
     }
 
+    public getTuestesByRango = async (req: Request, res: Response) => {
+        const { desde, hasta } = req.query;
+        if (!desde || !hasta) {
+            return res.status(400).json({ error: 'Se requieren los parámetros desde y hasta' });
+        }
+        new GetTuestesByRango(this.tuesteRepository)
+            .execute(new Date(desde as string), new Date(hasta as string))
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
+    }
 
 }

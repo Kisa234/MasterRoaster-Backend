@@ -18,6 +18,7 @@ export abstract class PedidoRepository {
     abstract getLotesCreados(): Promise<string[]>;
     abstract getLotesTostadoCreados(): Promise<string[]>;
     abstract setFacturado(state: boolean, id_pedido: string): Promise<PedidoEntity>;
+    abstract getPedidosByRango(desde: Date, hasta: Date): Promise<PedidoEntity[]>
     abstract getPedidosConLote(): Promise<PedidoConLoteEntity[]>;
     abstract getPedidoConLote(id: string): Promise<PedidoConLoteEntity>;
     abstract getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]>;

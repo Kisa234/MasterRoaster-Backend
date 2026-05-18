@@ -6,9 +6,9 @@ import { UpdateTuesteDto } from '../../domain/dtos/tueste/update';
 import { CompleteTuesteDto } from '../../domain/dtos/tueste/complete';
 
 export class TuesteDataSourceImpl implements TuesteDataSource {
-  
-  async createTueste(createTuesteDto:CreateTuesteDto): Promise<TuesteEntity> {
-    const newTueste =  await prisma.tueste.create({
+
+  async createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity> {
+    const newTueste = await prisma.tueste.create({
       data: { ...createTuesteDto }
     });
     return TuesteEntity.fromObject(newTueste);
@@ -23,7 +23,7 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     if (!tueste) return null;
     return TuesteEntity.fromObject(tueste);
   }
-  async updateTueste(id: string, updateTuesteDto:UpdateTuesteDto): Promise<TuesteEntity> {
+  async updateTueste(id: string, updateTuesteDto: UpdateTuesteDto): Promise<TuesteEntity> {
     const tueste = this.getTuesteById(id);
     const updatedTueste = await prisma.tueste.update({
       where: { id_tueste: id },
@@ -31,12 +31,12 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     });
     return TuesteEntity.fromObject(updatedTueste);
   }
-  async completarTueste(id: string, completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
+  async completarTueste(id: string, completeTuesteDto: CompleteTuesteDto): Promise<TuesteEntity> {
     const tueste = await this.getTuesteById(id);
 
     const tuesteCompletado = await prisma.tueste.update({
       where: { id_tueste: id },
-      data:  completeTuesteDto.values
+      data: completeTuesteDto.values
     });
     return TuesteEntity.fromObject(tuesteCompletado);
   }
@@ -95,5 +95,24 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
     return tuestesCount;
   }
 
-  
+  async getTuestesByRango(desde: Date, hasta: Date): Promise<TuesteEntity[]> {
+    const inicio = new Date(desde);
+    inicio.setHours(0, 0, 0, 0);
+
+    const fin = new Date(hasta);
+    fin.setHours(23, 59, 59, 999);
+
+    const tuestes = await prisma.tueste.findMany({
+      where: {
+        eliminado: false,
+        estado_tueste: { not: 'Pendiente' },
+        fecha_tueste: {
+          gte: inicio,
+          lte: fin,
+        }
+      }
+    });
+
+    return tuestes.map(TuesteEntity.fromObject);
+  }
 }

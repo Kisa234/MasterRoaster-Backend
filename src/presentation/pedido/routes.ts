@@ -136,16 +136,19 @@ export class PedidoRoutes {
 
         // Definición de rutas
 
+        router.get('/estadisticas/tueste', authMiddleware, controller.getEstadisticasTueste);
         router.get('/orden/tueste', authMiddleware, controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', authMiddleware, controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', authMiddleware, controller.getPedidosByEstado);
         router.get('/cliente/:cliente_id', authMiddleware, controller.getPedidosByCliente);
         router.get('/lote/:id_lote', authMiddleware, controller.GetPedidosByLote);
-        router.put('/completar/:id', authMiddleware, controller.completarPedido);
-        router.put('/facturar/:id_pedido', authMiddleware, controller.SetPedidoFacturado);
+        router.get('/rango', authMiddleware, controller.getPedidosByRango);
         router.get('/con-lote/estado/:estado/tipo/:tipo', controller.getPedidosConLoteByEstadoYTipo);
         router.get('/con-lote', controller.getPedidosConLote);
         router.get('/con-lote/:id', controller.getPedidoConLote);
+
+        router.put('/completar/:id', authMiddleware, controller.completarPedido);
+        router.put('/facturar/:id_pedido', authMiddleware, controller.SetPedidoFacturado);
 
         router.post('/', authMiddleware, controller.createPedido);
         router.get('/', authMiddleware, controller.getAllPedidos);

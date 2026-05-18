@@ -14,4 +14,5 @@ export abstract class TuesteRepository {
     abstract completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;  
     abstract getTostadosByLoteTostado(id_lote_tostado: string): Promise<TuesteEntity[]>;
     abstract getTuestesCantByLote(id_lote: string): Promise<number>;
+    abstract getTuestesByRango(desde: Date, hasta: Date): Promise<TuesteEntity[]>;
 }

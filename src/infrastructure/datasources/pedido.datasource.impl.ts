@@ -281,4 +281,24 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
 
         return pedidos.map(pedido => PedidoConLoteEntity.fromObject(pedido));
     }
+
+    async getPedidosByRango(desde: Date, hasta: Date): Promise<PedidoEntity[]> {
+        const inicio = new Date(desde);
+        inicio.setHours(0, 0, 0, 0);
+
+        const fin = new Date(hasta);
+        fin.setHours(23, 59, 59, 999);
+
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                eliminado: false,
+                fecha_registro: {
+                    gte: inicio,
+                    lte: fin,
+                }
+            }
+        });
+
+        return pedidos.map(PedidoEntity.fromObject);
+    }
 }
