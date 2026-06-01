@@ -16,7 +16,7 @@ export class UpdateUserDto {
         public readonly tuestes?: number,
         public readonly suscripcion?: boolean,
         public readonly cant_suscripcion?: number,
-
+        public readonly fecha_primera_compra?: Date | null,  
     ) { }
 
     get values() {
@@ -38,6 +38,7 @@ export class UpdateUserDto {
         if (this.tuestes) returnObj.tuestes = this.tuestes;
         if (this.suscripcion) returnObj.suscripcion = this.suscripcion;
         if (this.cant_suscripcion) returnObj.cant_suscripcion = this.cant_suscripcion;
+        if (this.fecha_primera_compra !== undefined) returnObj.fecha_primera_compra = this.fecha_primera_compra; 
 
         return returnObj;
     }
@@ -59,8 +60,13 @@ export class UpdateUserDto {
             password,
             tuestes,
             suscripcion,
-            cant_suscripcion
+            cant_suscripcion,
+            fecha_primera_compra,  
         } = props;
+
+        const parsedFechaPrimeraCompra = fecha_primera_compra
+            ? new Date(fecha_primera_compra)
+            : fecha_primera_compra === null ? null : undefined;
 
         return [undefined, new UpdateUserDto(
             new Date(),
@@ -78,7 +84,8 @@ export class UpdateUserDto {
             password,
             tuestes,
             suscripcion,
-            cant_suscripcion
+            cant_suscripcion,
+            parsedFechaPrimeraCompra,  
         )];
     }
 }

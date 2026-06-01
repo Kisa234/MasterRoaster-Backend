@@ -1,5 +1,3 @@
-
-
 export class UserEntity {
     constructor(
         public id_user: string,
@@ -21,6 +19,7 @@ export class UserEntity {
         public cant_suscripcion: number | null,
         public fecha_registro: Date,
         public fecha_editado?: Date,
+        public fecha_primera_compra?: Date | null, 
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): UserEntity {
@@ -43,7 +42,8 @@ export class UserEntity {
             suscripcion,
             cant_suscripcion,
             fecha_registro,
-            fecha_editado
+            fecha_editado,
+            fecha_primera_compra, 
         } = obj;
 
         if (!id_user) throw new Error('id_user property is required');
@@ -68,7 +68,6 @@ export class UserEntity {
             }
         }
 
-
         return new UserEntity(
             id_user,
             nombre,
@@ -88,7 +87,8 @@ export class UserEntity {
             suscripcion,
             cant_suscripcion,
             fecha_registro,
-            fecha_editado
+            fecha_editado,
+            fecha_primera_compra ?? null, 
         );
     }
 }

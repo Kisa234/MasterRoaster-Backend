@@ -18,8 +18,10 @@ export class UpdateTuesteDto {
         public readonly desarrollo: number,
         public readonly grados_desarrollo: number,
         public readonly id_lote_tostado: string,
-        public readonly agtrom_comercial: number,  
-        public readonly agtrom_gourmet: number,    
+        public readonly agtrom_comercial: number,
+        public readonly agtrom_gourmet: number,
+        public readonly peso_salida: number,   
+        public readonly merma: number,         
     ) { }
 
     get values() {
@@ -41,8 +43,10 @@ export class UpdateTuesteDto {
         if (this.desarrollo !== undefined) returnObj.desarrollo = this.desarrollo;
         if (this.grados_desarrollo !== undefined) returnObj.grados_desarrollo = this.grados_desarrollo;
         if (this.id_lote_tostado) returnObj.id_lote_tostado = this.id_lote_tostado;
-        if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;  
-        if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;        
+        if (this.agtrom_comercial !== undefined) returnObj.agtrom_comercial = this.agtrom_comercial;
+        if (this.agtrom_gourmet !== undefined) returnObj.agtrom_gourmet = this.agtrom_gourmet;
+        if (this.peso_salida !== undefined) returnObj.peso_salida = this.peso_salida;   
+        if (this.merma !== undefined) returnObj.merma = this.merma;                     
         return returnObj;
     }
 
@@ -66,8 +70,10 @@ export class UpdateTuesteDto {
             desarrollo,
             grados_desarrollo,
             id_lote_tostado,
-            agtrom_comercial,  
-            agtrom_gourmet,    
+            agtrom_comercial,
+            agtrom_gourmet,
+            peso_salida,   
+            merma,         
         } = props;
 
         return [undefined, new UpdateTuesteDto(
@@ -89,8 +95,10 @@ export class UpdateTuesteDto {
             desarrollo,
             grados_desarrollo,
             id_lote_tostado,
-            agtrom_comercial,  
-            agtrom_gourmet,    
+            agtrom_comercial,
+            agtrom_gourmet,
+            peso_salida,   
+            merma,         
         )];
     }
 }

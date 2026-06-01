@@ -8,25 +8,26 @@ datasource db {
 }
 
 model User {
-  id_user             String    @id @default(uuid())
-  nombre              String
-  nombre_comercial    String?
-  email               String    @unique
-  documento_tipo      String?
-  documento_identidad String?   @unique
-  fecha_nacimiento    DateTime?
-  departamento        String?
-  direccion           String?
-  numero_telefono     String
-  rol                 String
-  id_rol              String?
-  password            String
-  eliminado           Boolean   @default(false)
-  fecha_registro      DateTime  @default(now())
-  fecha_editado       DateTime?
-  tuestes             Int?      @default(0)
-  suscripcion         Boolean   @default(false)
-  cant_suscripcion    Int?      @default(0)
+  id_user              String    @id @default(uuid())
+  nombre               String
+  nombre_comercial     String?
+  email                String    @unique
+  documento_tipo       String?
+  documento_identidad  String?   @unique
+  fecha_nacimiento     DateTime?
+  fecha_primera_compra DateTime?
+  departamento         String?
+  direccion            String?
+  numero_telefono      String
+  rol                  String
+  id_rol               String?
+  password             String
+  eliminado            Boolean   @default(false)
+  fecha_registro       DateTime  @default(now())
+  fecha_editado        DateTime?
+  tuestes              Int?      @default(0)
+  suscripcion          Boolean   @default(false)
+  cant_suscripcion     Int?      @default(0)
 
   // Relacion con el Rol
   Rol                   Rol?                @relation(fields: [id_rol], references: [id_rol])

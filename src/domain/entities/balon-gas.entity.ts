@@ -58,3 +58,10 @@ export class BalonGasEntity {
     );
   }
 }
+
+
+export interface EstadisticasBalonGas {
+  ultimoPrecio: number | null;
+  promedioTuestesPorBalon: number | null;
+  totalBalonesFinalizados: number;
+}
