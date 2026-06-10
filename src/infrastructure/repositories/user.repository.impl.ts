@@ -40,4 +40,9 @@ export class UserRepositoryImpl implements UserRepository {
   getUsersInternal(): Promise<UserEntity[]> {
     return this.datasource.getUsersInternal();
   }
+
+  findByDocumento(documento_identidad: string): Promise<UserEntity | null> {
+    return this.datasource.findByDocumento(documento_identidad);
+  }
+
 }

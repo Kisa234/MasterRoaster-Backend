@@ -112,4 +112,16 @@ export class UserDataSourceImpl implements UserDataSource {
     return users.map(UserEntity.fromObject);
   }
 
+
+  async findByDocumento(documento_identidad: string): Promise<UserEntity | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        documento_identidad,
+        eliminado: false,
+      }
+    });
+    if (!user) return null;
+    return UserEntity.fromObject(user);
+  }
+
 }

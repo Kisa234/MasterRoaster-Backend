@@ -6,7 +6,6 @@ import { BalonGasController } from "./controller";
 import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
 
 export class BalonGasRoutes {
-
   static get routes(): Router {
     const router = Router();
 
@@ -14,9 +13,10 @@ export class BalonGasRoutes {
     const repository = new BalonGasRepositoryImpl(datasource);
     const controller = new BalonGasController(repository);
 
-    router.post('/',          authMiddleware, controller.createBalonGas);
-    router.post('/start',     authMiddleware, controller.startBalonGas);
-    router.post('/finalize',  authMiddleware, controller.finalizeBalonGas);
+    router.post('/',           authMiddleware, controller.createBalonGas);
+    router.post('/historico',  authMiddleware, controller.createBalonGasHistorico);
+    router.post('/start',      authMiddleware, controller.startBalonGas);
+    router.post('/finalize',   authMiddleware, controller.finalizeBalonGas);
 
     router.get('/estadisticas', authMiddleware, controller.getEstadisticasBalonGas);
     router.get('/',             authMiddleware, controller.getBalonesGas);

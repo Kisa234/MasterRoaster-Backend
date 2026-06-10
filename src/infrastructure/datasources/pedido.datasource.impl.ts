@@ -142,6 +142,12 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
     }
 
     async GetPedidosOrdenTuesteByFecha(fecha: Date): Promise<PedidoEntity[]> {
+        const inicio = new Date(fecha);
+        inicio.setHours(0, 0, 0, 0);
+
+        const fin = new Date(fecha);
+        fin.setHours(23, 59, 59, 999);
+
         const pedidos = await prisma.pedido.findMany({
             where: {
                 eliminado: false,
@@ -149,9 +155,13 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
                     equals: 'Orden Tueste',
                     mode: 'insensitive'
                 },
-                fecha_tueste: fecha,
+                fecha_tueste: {
+                    gte: inicio,
+                    lte: fin,
+                }
             }
         });
+
         return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
     }
 

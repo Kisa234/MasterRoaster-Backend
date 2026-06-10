@@ -13,4 +13,7 @@ export abstract class UserDataSource {
     abstract getAllUsers(): Promise<UserEntity[]>;
     abstract getRole(id:string): Promise<string>;
     abstract assignRoleToUser(id_user: string, id_rol: string): Promise<UserEntity>;
+    abstract findByDocumento(documento_identidad: string): Promise<UserEntity | null>;
+    
+
   }

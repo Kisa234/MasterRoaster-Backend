@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 
 import { BalonGasRepository } from "../../domain/repository/balon-gas.repository";
-import { CreateBalonGasDto } from "../../domain/dtos/balon-gas/create-balon-gas";
+import { CreateBalonGasHistoricoDto } from "../../domain/dtos/balon-gas/create-balon-gas-historico";
 import { FinalizeBalonGasDto } from "../../domain/dtos/balon-gas/finalize-balon-gas";
 import { StartBalonGasDto } from "../../domain/dtos/balon-gas/start-balon-gas";
 
 import { GetBalonesGas } from "../../domain/usecases/balon-gas/get-balones-gas";
 import { StartBalonGas } from "../../domain/usecases/balon-gas/start-balon-gas";
-import { CreateBalonGas } from "../../domain/usecases/balon-gas/create-balon-gas";
 import { GetBalonGasActual } from "../../domain/usecases/balon-gas/get-balon-gas-actual";
 import { FinalizeBalonGas } from "../../domain/usecases/balon-gas/finalize-balon-gas";
 import { GetBalonGasById } from "../../domain/usecases/balon-gas/get-balon-gas-by-id";
+import { CreateBalonGasHistorico } from "../../domain/usecases/balon-gas/create-balon-gas-historico";
+import { CreateBalonGasDto } from "../../domain/dtos/balon-gas/create-balon-gas copy";
+import { CreateBalonGas } from "../../domain/usecases/balon-gas/create-balon-gas copy";
 import { GetEstadisticasBalonGas } from "../../domain/usecases/balon-gas/get-estadistica-balon-gas";
 
 export class BalonGasController {
@@ -22,6 +24,16 @@ export class BalonGasController {
     const [error, dto] = CreateBalonGasDto.create({ ...req.body, id_user_ingreso: user.id_user });
     if (error) return res.status(400).json({ error });
     new CreateBalonGas(this.balonGasRepository)
+      .execute(dto!)
+      .then(balon => res.status(201).json(balon))
+      .catch(error => res.status(400).json({ error }));
+  };
+
+  public createBalonGasHistorico = async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const [error, dto] = CreateBalonGasHistoricoDto.create({ ...req.body, id_user_ingreso: user.id_user });
+    if (error) return res.status(400).json({ error });
+    new CreateBalonGasHistorico(this.balonGasRepository)
       .execute(dto!)
       .then(balon => res.status(201).json(balon))
       .catch(error => res.status(400).json({ error }));
@@ -69,7 +81,6 @@ export class BalonGasController {
       .catch(error => res.status(400).json({ error }));
   };
 
-  // ← nuevo
   public getEstadisticasBalonGas = async (req: Request, res: Response) => {
     new GetEstadisticasBalonGas(this.balonGasRepository)
       .execute()

@@ -18,6 +18,8 @@ export class UserRoutes {
         router.post('/refresh', userController.refresh);
         router.post('/logout', authMiddleware, userController.logout);
         router.get('/me', authMiddleware, userController.getSessionInfo);
+        router.post('/login-pin', userController.loginPin);
+
 
         // 👥 Users (rutas específicas primero)
         router.get('/internal', authMiddleware, userController.getUsersInternal);

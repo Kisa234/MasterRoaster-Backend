@@ -14,6 +14,7 @@ import { UpdateUserDto } from '../../domain/dtos/user/update';
 import { envs } from '../../config/envs';
 import jwt from "jsonwebtoken";
 import { RefreshAccessToken } from '../../domain/usecases/user/refresh-token';
+import { AuthUserByPin } from '../../domain/usecases/user/auth-user-pin';
 
 
 
@@ -184,7 +185,32 @@ export class UserController {
     }
   };
 
+  public loginPin = async (req: Request, res: Response) => {
+    const { documento_identidad, pin } = req.body;
 
+    if (!documento_identidad || !pin) {
+      return res.status(400).json({ error: 'DNI y PIN son requeridos' });
+    }
+
+    try {
+      const { accessToken, refreshToken, user } =
+        await new AuthUserByPin(this.userRepository).execute(documento_identidad, pin);
+
+      return res.json({
+        accessToken,
+        refreshToken,
+        user: {
+          id_user: user.id_user,
+          email: user.email,
+          rol: user.rol,
+          id_rol: user.id_rol
+        }
+      });
+
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
 
 
 }
