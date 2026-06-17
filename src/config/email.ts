@@ -7,8 +7,12 @@ export class EmailService {
     auth: {
       user: envs.EMAIL_USER,
       pass: envs.EMAIL_APP_PASSWORD
-    }
-  });
+    },
+    family: 4,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
+  } as any);
 
   async sendPasswordResetEmail(to: string, nombre: string, resetLink: string): Promise<void> {
     await this.transporter.sendMail({
