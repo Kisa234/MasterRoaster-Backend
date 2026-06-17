@@ -1,3 +1,5 @@
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 
 import { envs } from './config/envs';
 import { AppRoutes } from './presentation/routes';
