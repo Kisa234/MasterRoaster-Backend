@@ -21,4 +21,8 @@ export abstract class InventarioLoteTostadoRepository {
   abstract getByAlmacen(
     id_almacen: string
   ): Promise<InventarioLoteTostadoEntity[]>;
+
+  abstract getByLote(
+    id_lote: string
+  ): Promise<InventarioLoteTostadoEntity[]>;
 }

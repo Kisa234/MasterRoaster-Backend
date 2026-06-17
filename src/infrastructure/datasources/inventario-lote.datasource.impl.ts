@@ -57,4 +57,12 @@ export class InventarioLoteDataSourceImpl implements InventarioLoteDataSource {
 
     return inventarios.map(InventarioLoteEntity.fromObject);
   }
+
+  async getByLote(id_lote: string): Promise<InventarioLoteEntity[]> {
+    const inventarios = await prisma.inventarioLote.findMany({
+      where: { id_lote },
+      orderBy: { fecha_registro: 'asc' },
+    });
+    return inventarios.map(InventarioLoteEntity.fromObject);
+  }
 }

@@ -3,6 +3,9 @@ import { UserController } from "./controller";
 import { UserDataSourceImpl } from "../../infrastructure/datasources/user.datasource.impl";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository.impl";
 import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
+import { PasswordResetTokenDataSourceImpl } from "../../infrastructure/datasources/passwordResetToken.datasource.impl";
+import { PasswordResetTokenRepositoryImpl } from "../../infrastructure/repositories/passwordResetToken.repository.impl";
+import { EmailService } from "../../config/email";
 
 export class UserRoutes {
 
@@ -11,7 +14,13 @@ export class UserRoutes {
 
         const datasource = new UserDataSourceImpl();
         const userRepository = new UserRepositoryImpl(datasource);
-        const userController = new UserController(userRepository);
+
+        const passwordResetDatasource = new PasswordResetTokenDataSourceImpl();
+        const passwordResetTokenRepository = new PasswordResetTokenRepositoryImpl(passwordResetDatasource);
+
+        const emailService = new EmailService();
+
+        const userController = new UserController(userRepository, passwordResetTokenRepository, emailService);
 
         // 🔐 Auth
         router.post('/login', userController.login);
@@ -19,7 +28,11 @@ export class UserRoutes {
         router.post('/logout', authMiddleware, userController.logout);
         router.get('/me', authMiddleware, userController.getSessionInfo);
         router.post('/login-pin', userController.loginPin);
+        router.put('/:id/password', authMiddleware, userController.changePassword);
 
+        // 🔑 Recuperación de contraseña (público, sin auth)
+        router.post('/forgot-password', userController.forgotPassword);
+        router.post('/reset-password', userController.resetPassword);
 
         // 👥 Users (rutas específicas primero)
         router.get('/internal', authMiddleware, userController.getUsersInternal);

@@ -26,6 +26,10 @@ import { InventarioMuestraDataSourceImpl } from "../../../infrastructure/datasou
 import { InventarioProductoDataSourceImpl } from "../../../infrastructure/datasources/inventario-producto.datasource.impl";
 import { InventarioInsumoDataSourceImpl } from "../../../infrastructure/datasources/inventario-insumo.datasource.impl";
 import { authMiddleware } from "../../../infrastructure/middlewares/auth.middleware";
+import { LoteTostadoRepositoryImpl } from "../../../infrastructure/repositories/loteTostado.repository.impl";
+import { LoteTostadoDataSourceImpl } from "../../../infrastructure/datasources/loteTostado.datasource.impl";
+import { LoteRepositoryImpl } from "../../../infrastructure/repositories/lote.repository.impl";
+import { LoteDataSourceImpl } from "../../../infrastructure/datasources/lote.datasource.impl";
 
 export class AlmacenRoutes {
 
@@ -60,6 +64,12 @@ export class AlmacenRoutes {
     const inventarioInsumoDatasource = new InventarioInsumoDataSourceImpl();
     const inventarioInsumoRepository = new InventarioInsumoRepositoryImpl(inventarioInsumoDatasource);
 
+    const loteTostadoDatasource = new LoteTostadoDataSourceImpl();
+    const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteTostadoDatasource);
+
+    const loteDatasource = new LoteDataSourceImpl();
+    const loteRepository = new LoteRepositoryImpl(loteDatasource);
+    
     // --- Controller ---
     const controller = new AlmacenController(
       almacenRepository,
@@ -69,7 +79,9 @@ export class AlmacenRoutes {
       inventarioLoteTostadoRepository,
       inventarioMuestraRepository,
       inventarioProductoRepository,
-      inventarioInsumoRepository
+      inventarioInsumoRepository,
+      loteTostadoRepository,
+      loteRepository
     );
 
     // ---- Query routes (específicas primero) ----

@@ -21,6 +21,8 @@ import { AjustarStockAlmacenDto } from "../../../domain/dtos/almacen/almacen/aju
 import { TrasladarStockAlmacenDto } from "../../../domain/dtos/almacen/almacen/trasladar-stock";
 import { AjustarStockAlmacen } from "../../../domain/usecases/almacen/almacen/ajustar-stock";
 import { TrasladarStockAlmacen } from "../../../domain/usecases/almacen/almacen/trasladar-stock";
+import { LoteTostadoRepository } from "../../../domain/repository/loteTostado.repository";
+import { LoteRepository } from "../../../domain/repository/lote.repository";
 
 export class AlmacenController {
 
@@ -33,6 +35,8 @@ export class AlmacenController {
     private readonly inventarioMuestraRepository: InventarioMuestraRepository,
     private readonly inventarioProductoRepository: InventarioProductoRepository,
     private readonly inventarioInsumoRepository: InventarioInsumoRepository,
+    private readonly loteTostadoRepository: LoteTostadoRepository,
+    private readonly loteRepository: LoteRepository,
   ) { }
 
   public createAlmacen = (req: Request, res: Response) => {
@@ -127,7 +131,9 @@ export class AlmacenController {
       this.inventarioLoteTostadoRepository,
       this.inventarioMuestraRepository,
       this.inventarioProductoRepository,
-      this.inventarioInsumoRepository
+      this.inventarioInsumoRepository,
+      this.loteRepository,
+      this.loteTostadoRepository,
     )
       .execute(ajustarStockDto!)
       .then(() => res.json({ message: "Stock ajustado correctamente" }))

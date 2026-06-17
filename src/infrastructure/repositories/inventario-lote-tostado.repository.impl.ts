@@ -39,4 +39,10 @@ export class InventarioLoteTostadoRepositoryImpl
   ): Promise<InventarioLoteTostadoEntity[]> {
     return this.inventarioDatasource.getByAlmacen(id_almacen);
   }
+
+  getByLote(
+    id_lote_tostado: string
+  ): Promise<InventarioLoteTostadoEntity[]> {
+    return this.inventarioDatasource.getByLote(id_lote_tostado);
+  }
 }

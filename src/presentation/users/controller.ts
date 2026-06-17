@@ -15,6 +15,11 @@ import { envs } from '../../config/envs';
 import jwt from "jsonwebtoken";
 import { RefreshAccessToken } from '../../domain/usecases/user/refresh-token';
 import { AuthUserByPin } from '../../domain/usecases/user/auth-user-pin';
+import { ChangePassword } from '../../domain/usecases/user/change-password';
+import { PasswordResetTokenRepository } from '../../domain/repository/passwordResetToken.repository';
+import { EmailService } from '../../config/email';
+import { ForgotPassword } from '../../domain/usecases/passwordResetToken/forgotPassword';
+import { ResetPassword } from '../../domain/usecases/passwordResetToken/resetPassword';
 
 
 
@@ -24,7 +29,9 @@ export class UserController {
 
   // DI
   constructor(
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly passwordResetTokenRepository: PasswordResetTokenRepository,
+    private readonly emailService: EmailService
   ) { }
 
   public createUser = async (req: Request, res: Response) => {
@@ -212,5 +219,49 @@ export class UserController {
     }
   };
 
+  public changePassword = async (req: Request, res: Response) => {
+    const id_user = req.params.id;
+    const requester = req.user as { id_user: string };
 
+    if (requester?.id_user !== id_user) {
+      return res.status(403).json({ error: 'No tienes permiso para cambiar esta contraseña' });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+      await new ChangePassword(this.userRepository)
+        .execute(id_user, currentPassword, newPassword);
+
+      return res.json({ message: 'Contraseña actualizada correctamente' });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
+
+  public forgotPassword = async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    try {
+      await new ForgotPassword(this.userRepository, this.passwordResetTokenRepository, this.emailService)
+        .execute(email, req.ip);
+
+      return res.json({ message: 'Si el correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña' });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
+
+  public resetPassword = async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+
+    try {
+      await new ResetPassword(this.userRepository, this.passwordResetTokenRepository)
+        .execute(token, newPassword);
+
+      return res.json({ message: 'Contraseña actualizada correctamente' });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  };
 }

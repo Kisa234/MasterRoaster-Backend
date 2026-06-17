@@ -7,6 +7,7 @@ import { CreateInventarioLoteTostado } from "../../../domain/usecases/inventario
 import { GetInventarioLoteTostadoByAlmacen } from "../../../domain/usecases/inventarios/inventario-lote-tostado/get-by-almacen";
 import { GetInventarioLoteTostadoByLote } from "../../../domain/usecases/inventarios/inventario-lote-tostado/get-by-lote-tostado";
 import { UpdateInventarioLoteTostado } from "../../../domain/usecases/inventarios/inventario-lote-tostado/update";
+import { GetAllInventarioLoteTostadoByLoteTostado } from "../../../domain/usecases/inventarios/inventario-lote-tostado/get-by-lote-all";
 
 export class InventarioLoteTostadoController {
 
@@ -70,4 +71,15 @@ export class InventarioLoteTostadoController {
       return res.status(400).json({ error: error?.message ?? String(error) });
     }
   };
+
+  public getByLoteTostado = async (req: Request, res: Response) => {
+  try {
+    const { id_lote_tostado } = req.params;
+    const inventarios = await new GetAllInventarioLoteTostadoByLoteTostado(this.inventarioRepository)
+      .execute(id_lote_tostado);
+    return res.json(inventarios);
+  } catch (error: any) {
+    return res.status(400).json({ error: error?.message ?? String(error) });
+  }
+};
 }

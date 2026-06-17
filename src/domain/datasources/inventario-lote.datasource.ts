@@ -21,4 +21,8 @@ export abstract class InventarioLoteDataSource {
   abstract getByAlmacen(
     id_almacen: string
   ): Promise<InventarioLoteEntity[]>;
+
+  abstract getByLote(
+    id_lote: string
+  ): Promise<InventarioLoteEntity[]>;
 }

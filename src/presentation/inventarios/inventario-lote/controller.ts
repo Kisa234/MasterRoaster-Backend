@@ -7,12 +7,13 @@ import { CreateInventarioLote } from "../../../domain/usecases/inventarios/inven
 import { GetInventarioLoteByAlmacen } from "../../../domain/usecases/inventarios/inventario-lote/get-by-almacen";
 import { GetInventarioLoteByLote } from "../../../domain/usecases/inventarios/inventario-lote/get-by-lote";
 import { UpdateInventarioLote } from "../../../domain/usecases/inventarios/inventario-lote/update";
+import { GetAllInventarioLoteByLote } from "../../../domain/usecases/inventarios/inventario-lote/get-by-lote-all";
 
 export class InventarioLoteController {
 
   constructor(
     private readonly inventarioRepository: InventarioLoteRepository
-  ) {}
+  ) { }
 
   public createInventario = (req: Request, res: Response) => {
     const [error, dto] = CreateInventarioLoteDto.create(req.body);
@@ -66,6 +67,17 @@ export class InventarioLoteController {
         .execute(id_inventario, dto!);
 
       return res.json(inventario);
+    } catch (error: any) {
+      return res.status(400).json({ error: error?.message ?? String(error) });
+    }
+  };
+
+  public getByLote = async (req: Request, res: Response) => {
+    try {
+      const { id_lote } = req.params;
+      const inventarios = await new GetAllInventarioLoteByLote(this.inventarioRepository)
+        .execute(id_lote);
+      return res.json(inventarios);
     } catch (error: any) {
       return res.status(400).json({ error: error?.message ?? String(error) });
     }

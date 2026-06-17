@@ -62,4 +62,12 @@ export class InventarioLoteTostadoDataSourceImpl
 
     return inventarios.map(InventarioLoteTostadoEntity.fromObject);
   }
+
+  async getByLote(id_lote_tostado: string): Promise<InventarioLoteTostadoEntity[]> {
+    const inventarios = await prisma.inventarioLoteTostado.findMany({
+      where: { id_lote_tostado },
+      orderBy: { fecha_registro: 'asc' },
+    });
+    return inventarios.map(InventarioLoteTostadoEntity.fromObject);
+  }
 }

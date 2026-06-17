@@ -63,6 +63,22 @@ model User {
   balonesGasIngresados  BalonGas[]          @relation("BalonGasUserIngreso")
   balonesGasIniciados   BalonGas[]          @relation("BalonGasUserInicioUso")
   balonesGasFinalizados BalonGas[]          @relation("BalonGasUserFinUso")
+
+  // Relacion con cambios de contrasena
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id_token     String    @id @default(uuid())
+  id_user      String
+  token        String    @unique
+  fecha_creado DateTime  @default(now())
+  fecha_expira DateTime
+  usado        Boolean   @default(false)
+  fecha_usado  DateTime?
+  ip_solicitud String?
+
+  user User @relation(fields: [id_user], references: [id_user])
 }
 
 // ROLES Y PERMISOS

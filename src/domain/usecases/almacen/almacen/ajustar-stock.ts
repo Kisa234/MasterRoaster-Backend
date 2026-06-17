@@ -21,6 +21,8 @@ import { InventarioLoteRepository } from "../../../repository/inventario-lote.re
 import { InventarioMuestraRepository } from "../../../repository/inventario-muestra.repository";
 import { InventarioProductoRepository } from "../../../repository/inventario-producto.repository";
 import { MovimientoAlmacenRepository } from "../../../repository/movimiento-almacen.repository";
+import { LoteRepository } from '../../../repository/lote.repository';
+import { LoteTostadoRepository } from '../../../repository/loteTostado.repository';
 
 export interface AjustarStockAlmacenUseCase {
   execute(dto: AjustarStockAlmacenDto): Promise<void>;
@@ -36,21 +38,15 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
     private readonly inventarioMuestraRepository: InventarioMuestraRepository,
     private readonly inventarioProductoRepository: InventarioProductoRepository,
     private readonly inventarioInsumoRepository: InventarioInsumoRepository,
+    private readonly loteRepository: LoteRepository,
+    private readonly loteTostadoRepository: LoteTostadoRepository
   ) {}
 
   async execute(dto: AjustarStockAlmacenDto): Promise<void> {
     const almacen = await this.almacenRepository.getAlmacenById(dto.id_almacen);
-    if (!almacen) {
-      throw new Error("El almacén no existe");
-    }
-
-    if (!dto.id_user) {
-      throw new Error("El id_user es requerido");
-    }
-
-    if (dto.nueva_cantidad < 0) {
-      throw new Error("La nueva cantidad no puede ser negativa");
-    }
+    if (!almacen) throw new Error("El almacén no existe");
+    if (!dto.id_user) throw new Error("El id_user es requerido");
+    if (dto.nueva_cantidad < 0) throw new Error("La nueva cantidad no puede ser negativa");
 
     let inventarioActual: Record<string, any> | null = null;
     let objetoDespues: Record<string, any> | null = null;
@@ -86,6 +82,34 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
           updateDto
         );
 
+        if (dto.nueva_cantidad === 0) {
+          const todosInventarios = await this.inventarioLoteRepository.getByLote(dto.id_entidad);
+          const stockTotal = todosInventarios.reduce(
+            (sum, inv) => sum + Number(inv.cantidad_kg), 0
+          );
+
+          if (stockTotal === 0) {
+            const loteAntes = await this.loteRepository.getLoteById(dto.id_entidad);
+            await this.loteRepository.deleteLote(dto.id_entidad);
+
+            const [histDeleteError, histDeleteDto] = CreateHistorialDto.create({
+              id_entidad: dto.id_entidad,
+              id_user: dto.id_user,
+              entidad: HistorialEntidad.LOTE,
+              accion: HistorialAccion.DELETE,
+              comentario: `Lote eliminado automáticamente por stock agotado en todos los almacenes.${dto.motivo ? ' Motivo: ' + dto.motivo : ''}`,
+              objeto_antes: loteAntes,
+              objeto_despues: null,
+            });
+
+            if (histDeleteError || !histDeleteDto) {
+              throw new Error(histDeleteError ?? "No se pudo construir el historial de eliminación del lote");
+            }
+
+            await this.historialRepository.createHistorial(histDeleteDto);
+          }
+        }
+
         break;
       }
 
@@ -117,6 +141,34 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
           inventarioActual.id_inventario,
           updateDto
         );
+
+        if (dto.nueva_cantidad === 0) {
+          const todosInventarios = await this.inventarioLoteTostadoRepository.getByLote(dto.id_entidad);
+          const stockTotal = todosInventarios.reduce(
+            (sum, inv) => sum + Number(inv.cantidad_kg), 0
+          );
+
+          if (stockTotal === 0) {
+            const loteTostadoAntes = await this.loteTostadoRepository.getLoteTostadoById(dto.id_entidad);
+            await this.loteTostadoRepository.deleteLoteTostado(dto.id_entidad);
+
+            const [histDeleteError, histDeleteDto] = CreateHistorialDto.create({
+              id_entidad: dto.id_entidad,
+              id_user: dto.id_user,
+              entidad: HistorialEntidad.LOTE_TOSTADO,
+              accion: HistorialAccion.DELETE,
+              comentario: `Lote tostado eliminado automáticamente por stock agotado en todos los almacenes.${dto.motivo ? ' Motivo: ' + dto.motivo : ''}`,
+              objeto_antes: loteTostadoAntes,
+              objeto_despues: null,
+            });
+
+            if (histDeleteError || !histDeleteDto) {
+              throw new Error(histDeleteError ?? "No se pudo construir el historial de eliminación del lote tostado");
+            }
+
+            await this.historialRepository.createHistorial(histDeleteDto);
+          }
+        }
 
         break;
       }
@@ -261,35 +313,23 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
 
   private mapEntidadInventario(entidad: AjustarStockAlmacenDto["entidad"]): EntidadInventario {
     switch (entidad) {
-      case "LOTE":
-        return EntidadInventario.LOTE;
-      case "LOTE_TOSTADO":
-        return EntidadInventario.LOTE_TOSTADO;
-      case "PRODUCTO":
-        return EntidadInventario.PRODUCTO;
-      case "MUESTRA":
-        return EntidadInventario.MUESTRA;
-      case "INSUMO":
-        return EntidadInventario.INSUMO;
-      default:
-        throw new Error("Entidad de inventario no soportada");
+      case "LOTE": return EntidadInventario.LOTE;
+      case "LOTE_TOSTADO": return EntidadInventario.LOTE_TOSTADO;
+      case "PRODUCTO": return EntidadInventario.PRODUCTO;
+      case "MUESTRA": return EntidadInventario.MUESTRA;
+      case "INSUMO": return EntidadInventario.INSUMO;
+      default: throw new Error("Entidad de inventario no soportada");
     }
   }
 
   private mapHistorialEntidad(entidad: AjustarStockAlmacenDto["entidad"]): HistorialEntidad {
     switch (entidad) {
-      case "LOTE":
-        return HistorialEntidad.LOTE;
-      case "LOTE_TOSTADO":
-        return HistorialEntidad.LOTE_TOSTADO;
-      case "PRODUCTO":
-        return HistorialEntidad.PRODUCTO;
-      case "MUESTRA":
-        return HistorialEntidad.MUESTRA;
-      case "INSUMO":
-        return HistorialEntidad.INSUMO;
-      default:
-        throw new Error("Entidad de historial no soportada");
+      case "LOTE": return HistorialEntidad.LOTE;
+      case "LOTE_TOSTADO": return HistorialEntidad.LOTE_TOSTADO;
+      case "PRODUCTO": return HistorialEntidad.PRODUCTO;
+      case "MUESTRA": return HistorialEntidad.MUESTRA;
+      case "INSUMO": return HistorialEntidad.INSUMO;
+      default: throw new Error("Entidad de historial no soportada");
     }
   }
 }

@@ -31,4 +31,8 @@ export class InventarioLoteRepositoryImpl implements InventarioLoteRepository {
   getByAlmacen(id_almacen: string): Promise<InventarioLoteEntity[]> {
     return this.inventarioDatasource.getByAlmacen(id_almacen);
   }
+
+  getByLote(id_lote: string): Promise<InventarioLoteEntity[]> {
+    return this.inventarioDatasource.getByLote(id_lote);
+  }
 }
