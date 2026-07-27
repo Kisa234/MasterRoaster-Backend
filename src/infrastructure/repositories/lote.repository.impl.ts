@@ -43,8 +43,8 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getUserByLote(id: string): Promise<string> {
         return this.datasource.getUserByLote(id);
     }
-    getLotesConInventario(): Promise<LoteConInventarioEntity[]> {
-        return this.datasource.getLotesConInventario(); 
+    getLotesConInventario(incluirEliminados: boolean = false): Promise<LoteConInventarioEntity[]> {
+        return this.datasource.getLotesConInventario(incluirEliminados);
     }
     getLoteConInventarioById(id: string): Promise<LoteConInventarioEntity | null> {
         return this.datasource.getLoteConInventarioById(id);

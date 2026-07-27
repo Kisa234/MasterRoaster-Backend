@@ -135,11 +135,11 @@ export class LoteDataSourceImpl implements LoteDataSource {
   }
 
 
-  async getLotesConInventario(): Promise<LoteConInventarioEntity[]> {
+  async getLotesConInventario(incluirEliminados: boolean = false): Promise<LoteConInventarioEntity[]> {
     const lotes = await prisma.lote.findMany({
-      where: {
-        eliminado: false,
-      },
+      where: incluirEliminados
+        ? {} // trae activos e inactivos
+        : { eliminado: false },
       include: {
         inventarioLotes: {
           include: { almacen: true },
@@ -151,24 +151,24 @@ export class LoteDataSourceImpl implements LoteDataSource {
   }
 
   async getLoteConInventarioById(id: string): Promise<LoteConInventarioEntity | null> {
-  const lote = await prisma.lote.findFirst({
-    where: {
-      id_lote: id,
-      eliminado: false,
-    },
-    include: {
-      inventarioLotes: {
-        include: {
-          almacen: true,
+    const lote = await prisma.lote.findFirst({
+      where: {
+        id_lote: id,
+        eliminado: false,
+      },
+      include: {
+        inventarioLotes: {
+          include: {
+            almacen: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!lote) return null;
+    if (!lote) return null;
 
-  return LoteConInventarioEntity.fromObject(lote);
-}
+    return LoteConInventarioEntity.fromObject(lote);
+  }
 
 
 

@@ -263,8 +263,9 @@ export class LoteController {
             )
     }
     public getLoteInventario = async (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
         new GetLoteInventario(this.loteRepository)
-            .execute()
+            .execute(incluirEliminados)
             .then(lotes => res.json(lotes))
             .catch(error => res.status(400).json({ error })
             )

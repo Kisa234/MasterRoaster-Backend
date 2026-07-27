@@ -3,7 +3,7 @@ import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteConInventarioEntity, LoteEntity } from "../../../entities/lote.entity";
 
 export interface GetLoteInventarioUseCase {
-    execute(): Promise<LoteConInventarioEntity[]>;
+    execute(incluirEliminados: boolean): Promise<LoteConInventarioEntity[]>;
 }
 
 export class GetLoteInventario implements GetLoteInventarioUseCase {
@@ -11,7 +11,7 @@ export class GetLoteInventario implements GetLoteInventarioUseCase {
         private readonly loteRepository: LoteRepository
     ){}
 
-    async execute( ): Promise<LoteConInventarioEntity[]> {
-        return await this.loteRepository.getLotesConInventario();
+    async execute( incluirEliminados: boolean ): Promise<LoteConInventarioEntity[]> {
+        return await this.loteRepository.getLotesConInventario(incluirEliminados);
     }
 }
