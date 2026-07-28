@@ -154,7 +154,6 @@ export class LoteDataSourceImpl implements LoteDataSource {
     const lote = await prisma.lote.findFirst({
       where: {
         id_lote: id,
-        eliminado: false,
       },
       include: {
         inventarioLotes: {
