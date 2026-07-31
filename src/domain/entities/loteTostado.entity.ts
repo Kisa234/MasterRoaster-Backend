@@ -11,7 +11,8 @@ export class LoteTostadoEntity {
         public fecha_registro: Date,
         public id_user:string,
         public id_analisis_rapido?: string,
-        public entregado?: Date
+        public entregado?: Date,
+        public eliminado?: boolean
     ) {}
   
     static fromObject(obj: { [key: string]: any }): LoteTostadoEntity {
@@ -24,7 +25,8 @@ export class LoteTostadoEntity {
             fecha_registro,
             id_user,
             id_analisis_rapido,
-            entregado
+            entregado,
+            eliminado
         } = obj;
 
         if(!id_lote_tostado) throw new Error('id_lote_tostado property is required');
@@ -48,7 +50,8 @@ export class LoteTostadoEntity {
             newFechaRegistro,
             id_user,
             id_analisis_rapido,
-            entregado
+            entregado,
+            eliminado
         );
     }
   }
@@ -68,7 +71,8 @@ export class LoteTostadoConLoteEntity {
     public lote: LoteEntity,
 
     public id_analisis_rapido?: string,
-    public entregado?: Date
+    public entregado?: Date,
+    public eliminado?: boolean
   ) {}
 
   static fromObject(obj: { [key: string]: any }): LoteTostadoConLoteEntity {
@@ -82,7 +86,8 @@ export class LoteTostadoConLoteEntity {
       id_user,
       id_analisis_rapido,
       entregado,
-      lote
+      lote,
+      eliminado
     } = obj;
 
     if (!id_lote_tostado) throw new Error('id_lote_tostado property is required');
@@ -115,7 +120,8 @@ export class LoteTostadoConLoteEntity {
       id_user,
       LoteEntity.fromObject(lote),
       id_analisis_rapido,
-      newEntregado
+      newEntregado,
+      eliminado
     );
   }
 }
@@ -132,7 +138,8 @@ export class LoteTostadoConInventarioEntity {
     public lote: LoteEntity,
     public inventarioLotesTostados: InventarioLoteTostadoEntity[],
     public id_analisis_rapido?: string,
-    public entregado?: Date
+    public entregado?: Date,
+    public eliminado?: boolean
   ) {}
 
   static fromObject(obj: { [key: string]: any }): LoteTostadoConInventarioEntity {
@@ -147,7 +154,8 @@ export class LoteTostadoConInventarioEntity {
       id_analisis_rapido,
       entregado,
       lote,
-      inventarioLoteTostados = []
+      inventarioLoteTostados = [],
+      eliminado
     } = obj;
 
     if (!id_lote_tostado) throw new Error('id_lote_tostado property is required');
@@ -183,7 +191,8 @@ export class LoteTostadoConInventarioEntity {
         InventarioLoteTostadoEntity.fromObject(inv)
       ),
       id_analisis_rapido,
-      newEntregado
+      newEntregado,
+      eliminado
     );
   }
 }

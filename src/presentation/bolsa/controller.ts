@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { BolsaRepository } from "../../domain/repository/bolsa.repository";
-import { InventarioBolsaRepository } from "../../domain/repository/inventarioBolsa.repository";
 import { CreateBolsaDto } from "../../domain/dtos/bolsa/create";
 import { UpdateBolsaDto } from "../../domain/dtos/bolsa/update";
 import { CreateBolsa } from "../../domain/usecases/bolsa/create-bolsa";
@@ -12,6 +11,7 @@ import { GetBolsaInventario } from "../../domain/usecases/bolsa/get-bolsa-invent
 import { GetBolsaInventarioById } from "../../domain/usecases/bolsa/get-bolsa-inventario-id";
 import { UpdateBolsa } from "../../domain/usecases/bolsa/update-bolsa";
 import { DeleteBolsa } from "../../domain/usecases/bolsa/delete-bolsa";
+import { InventarioBolsaRepository } from "../../domain/repository/inventario-bolsa.repository";
 
 export class BolsaController {
 
@@ -31,7 +31,7 @@ export class BolsaController {
         });
         if (error) return res.status(400).json({ error });
 
-        new CreateBolsa(this.bolsaRepository, this.inventarioBolsaRepository)
+        new CreateBolsa(this.bolsaRepository)
             .execute(createBolsaDto!)
             .then(bolsa => res.json(bolsa))
             .catch(error => res.status(400).json({ error: error.message ?? error }));

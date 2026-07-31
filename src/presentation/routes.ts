@@ -42,6 +42,7 @@ import { IngresoInsumoRoutes } from "./ingreso-insumo/routes";
 import { BalonGasRoutes } from "./balon-gas/routes";
 import { BolsaRoutes } from "./bolsa/routes";
 import { InventarioBolsaRoutes } from "./inventarios/inventario-bolsa/routes";
+import { PedidoBolsaRoutes } from "./pedido-bolsa/routes";
 
 
 export class AppRoutes {
@@ -84,6 +85,7 @@ export class AppRoutes {
         router.use('/notas', NotasRoutes.routes);
 
         router.use('/pedido', PedidoRoutes.routes);
+        router.use('/pedido-bolsa', PedidoBolsaRoutes.routes);
         router.use('/tueste', TuesteRoutes.routes);
         router.use('/balon-gas', BalonGasRoutes.routes);
 

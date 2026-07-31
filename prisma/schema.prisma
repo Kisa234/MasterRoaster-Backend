@@ -38,7 +38,6 @@ model User {
   ingresosCafe          IngresoCafe[]
   ingresosInsumos       IngresoInsumo[]
   ingresosProductos     IngresoProducto[]
-<<<<<<< Updated upstream
   lotes                 Lote[]
   lotesTostados         LoteTostado[]
   movimientoAlmacens    MovimientoAlmacen[]
@@ -49,16 +48,6 @@ model User {
   pedidos               Pedido[]             @relation("Cliente")
   Rol                   Rol?                 @relation(fields: [id_rol], references: [id_rol])
   bolsas                Bolsa[]
-=======
-  // Relacion con los Balones de Gas
-  balonesGasIngresados  BalonGas[]          @relation("BalonGasUserIngreso")
-  balonesGasIniciados   BalonGas[]          @relation("BalonGasUserInicioUso")
-  balonesGasFinalizados BalonGas[]          @relation("BalonGasUserFinUso")
-
-  // Relacion con cambios de contrasena
-  passwordResetTokens PasswordResetToken[]
-  bolsas              Bolsa[]
->>>>>>> Stashed changes
 }
 
 model PasswordResetToken {
@@ -110,7 +99,6 @@ model Almacen {
   ingresoInsumos      IngresoInsumo[]
   ingresoProductos    IngresoProducto[]
   inventarioInsumos   InventarioInsumo[]
-<<<<<<< Updated upstream
   inventarioLotes     InventarioLote[]
   inventarioTostados  InventarioLoteTostado[]
   inventarioMuestras  InventarioMuestra[]
@@ -119,32 +107,6 @@ model Almacen {
   movimientosOrigen   MovimientoAlmacen[]     @relation("MovimientoOrigen")
   pedidos             Pedido[]                @relation("almacen")
   inventarioBolsas    InventarioBolsa[]
-=======
-
-  ingresoProductos   IngresoProducto[]
-  ingresoInsumos     IngresoInsumo[]
-  movimientosOrigen  MovimientoAlmacen[] @relation("MovimientoOrigen")
-  movimientosDestino MovimientoAlmacen[] @relation("MovimientoDestino")
-  pedidos            Pedido[]            @relation("almacen")
-  inventarioBolsas   InventarioBolsa[]
-}
-
-enum TipoMovimiento {
-  INGRESO // compra, producción
-  SALIDA // venta, merma, consumo
-  TRASLADO // entre almacenes
-  AJUSTE // corrección manual
-  DERIVACION
-}
-
-enum EntidadInventario {
-  LOTE
-  LOTE_TOSTADO
-  PRODUCTO
-  MUESTRA
-  INSUMO
-  BOLSA
->>>>>>> Stashed changes
 }
 
 model MovimientoAlmacen {
@@ -263,7 +225,6 @@ model LoteTostado {
   id_user                String?
   envio                  Envio[]
   inventarioLoteTostados InventarioLoteTostado[]
-<<<<<<< Updated upstream
   inventarios            InventarioProducto[]
   analisisRapido         AnalisisRapido?         @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
   lote                   Lote                    @relation(fields: [id_lote], references: [id_lote])
@@ -271,8 +232,6 @@ model LoteTostado {
   PedidoEmbolsado        Pedido[]                @relation("PedidoLoteTostadoOrigen")
   PedidoOrigen           Pedido?                 @relation("PedidoLoteTostado")
   tuestes                Tueste[]
-=======
->>>>>>> Stashed changes
   bolsas                 Bolsa[]
 }
 
@@ -289,23 +248,15 @@ model InventarioLoteTostado {
   @@unique([id_lote_tostado, id_almacen])
 }
 
-<<<<<<< Updated upstream
-model Bolsa {
-  id_bolsa        String   @id @default(uuid())
-  id_lote_tostado String
-  id_pedido       String
-  gramaje         Int
-  molienda        Molienda @default(NINGUNO)
-=======
 //BOLSA
 
 model Bolsa {
-  id_bolsa        String   @id
+  id_bolsa        String @id
   id_lote_tostado String
   id_pedido       String
   gramaje         Int
   molienda        String
->>>>>>> Stashed changes
+
   cantidad        Int
   fecha_embolsado DateTime @default(now())
   id_user         String?
@@ -332,11 +283,8 @@ model InventarioBolsa {
 
   @@unique([id_bolsa, id_almacen])
 }
-<<<<<<< Updated upstream
-=======
 
 // INSUMOS 
->>>>>>> Stashed changes
 
 model Insumo {
   id_insumo     String             @id @default(uuid())
@@ -539,10 +487,6 @@ model IngresoCafe {
   fecha_ingreso  DateTime @default(now())
   proveedor      String?
   id_user        String?
-<<<<<<< Updated upstream
-  lote           Lote     @relation(fields: [id_lote], references: [id_lote])
-  user           User?    @relation(fields: [id_user], references: [id_user])
-=======
 
   lote Lote  @relation(fields: [id_lote], references: [id_lote])
   user User? @relation(fields: [id_user], references: [id_user])
@@ -572,7 +516,6 @@ enum HistorialAccion {
   INGRESO
   SALIDA
   TRASLADO
->>>>>>> Stashed changes
 }
 
 model Historial {
@@ -602,50 +545,35 @@ model Cambios {
 }
 
 model Pedido {
-  id_pedido            String              @id @default(uuid())
-  fecha_registro       DateTime            @default(now())
+  id_pedido            String    @id @default(uuid())
+  fecha_registro       DateTime  @default(now())
   tipo_pedido          String
   cantidad             Float
-  estado_pedido        String              @default("Pendiente")
+  estado_pedido        String    @default("Pendiente")
   id_user              String
   id_lote              String?
   id_nuevoLote         String?
-  id_nuevoLote_tostado String?             @unique
+  id_nuevoLote_tostado String?   @unique
+  id_lote_tostado      String?
+  id_lote_destino      String?
+  id_almacen           String?
+  id_producto          String?
   comentario           String?
   pesos                Float[]
   fecha_tueste         DateTime?
   tostadora            String?
-  eliminado            Boolean             @default(false)
-  completado_por_id    String?
-  creado_por_id        String?
-  fecha_completado     DateTime?
-<<<<<<< Updated upstream
-  gramaje              Int?
-  id_lote_tostado      String?
-  id_producto          String?
-  molienda             Molienda?
   facturado            Boolean?
-  id_almacen           String?
-  id_lote_destino      String?
-  historials           Historial[]
-  movimientoAlmacens   MovimientoAlmacen[]
-  completadoPor        User?               @relation("PedidoCompletadoPor", fields: [completado_por_id], references: [id_user])
-  creadoPor            User?               @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
-  Almacen              Almacen?            @relation("almacen", fields: [id_almacen], references: [id_almacen])
-  loteDestino          Lote?               @relation("LoteDestino", fields: [id_lote_destino], references: [id_lote])
-  lote                 Lote?               @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
-  loteTostadoOrigen    LoteTostado?        @relation("PedidoLoteTostadoOrigen", fields: [id_lote_tostado], references: [id_lote_tostado])
-  loteCreado           Lote?               @relation("LoteCreado", fields: [id_nuevoLote], references: [id_lote])
-  loteTostado          LoteTostado?        @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
-  producto             Producto?           @relation(fields: [id_producto], references: [id_producto])
-  cliente              User                @relation("Cliente", fields: [id_user], references: [id_user])
-  tueste               Tueste[]
-  bolsas               Bolsa[]
-=======
+  creado_por_id        String?
+  completado_por_id    String?
+  fecha_completado     DateTime?
   eliminado            Boolean   @default(false)
 
   // Relación con Usuario como Cliente
   cliente            User                @relation("Cliente", fields: [id_user], references: [id_user])
+  // Relación con Usuario como quien lo creó
+  creadoPor          User?               @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
+  // Relación con Usuario como quien lo completó
+  completadoPor      User?               @relation("PedidoCompletadoPor", fields: [completado_por_id], references: [id_user])
   // Relación con lote original
   lote               Lote?               @relation("LoteOrigen", fields: [id_lote], references: [id_lote])
   // Relación con lote creado
@@ -654,22 +582,29 @@ model Pedido {
   loteDestino        Lote?               @relation("LoteDestino", fields: [id_lote_destino], references: [id_lote])
   // Relación con lote tostado creado
   loteTostado        LoteTostado?        @relation("PedidoLoteTostado", fields: [id_nuevoLote_tostado], references: [id_lote_tostado])
-  // Relación con lote tostado de origen 
+  // Relación con lote tostado de origen
   loteTostadoOrigen  LoteTostado?        @relation("PedidoLoteTostadoOrigen", fields: [id_lote_tostado], references: [id_lote_tostado])
-  //  Relacion con el almacen del lote 
+  // Relación con almacén
   Almacen            Almacen?            @relation("almacen", fields: [id_almacen], references: [id_almacen])
-  // Relación con Usuario como quien lo creó
-  creadoPor          User?               @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
-  // Relación con Usuario como quien lo completóq
-  completadoPor      User?               @relation("PedidoCompletadoPor", fields: [completado_por_id], references: [id_user])
-  // Relación con los tuestes realizados para este pedido
-  tueste             Tueste[]
-  // Relacion con los productos en caso de maquila
+  // Relación con producto (maquila futura, empaquetado)
   producto           Producto?           @relation(fields: [id_producto], references: [id_producto])
+  // Relaciones de auditoría y operación
+  tueste             Tueste[]
+  bolsas             Bolsa[]
   historials         Historial[]
   movimientoAlmacens MovimientoAlmacen[]
-  bolsas             Bolsa[]
->>>>>>> Stashed changes
+  // relaciones con pedido de bolsas 
+  pedidoBolsas       PedidoBolsa[]
+}
+
+model PedidoBolsa {
+  id_pedido_bolsa String @id @default(uuid())
+  id_pedido       String
+  gramaje         Int
+  molienda        String
+  cantidad        Int
+
+  pedido Pedido @relation(fields: [id_pedido], references: [id_pedido])
 }
 
 model Tueste {
@@ -729,29 +664,21 @@ model BalonGas {
 }
 
 model Envio {
-  id_envio        String             @id @default(uuid())
+  id_envio        String   @id @default(uuid())
   id_lote_tostado String
   id_cliente      String
   cantidad        Int
   comentario      String?
-  fecha           DateTime           @default(now())
-  eliminado       Boolean            @default(false)
-<<<<<<< Updated upstream
-  origen          OrigenEnvio
-  clasificacion   ClasificacionEnvio
-  cliente         User               @relation(fields: [id_cliente], references: [id_user])
-  loteTostado     LoteTostado        @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
-  ficha           FichaEnvio?
-  bolsa           Bolsa?             @relation(fields: [bolsaId_bolsa], references: [id_bolsa])
-  bolsaId_bolsa   String?
-=======
+  fecha           DateTime @default(now())
+  eliminado       Boolean  @default(false)
 
-  loteTostado   LoteTostado @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
-  cliente       User        @relation(fields: [id_cliente], references: [id_user])
+  origen        OrigenEnvio
+  clasificacion ClasificacionEnvio
+  cliente       User               @relation(fields: [id_cliente], references: [id_user])
+  loteTostado   LoteTostado        @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
   ficha         FichaEnvio?
-  bolsa         Bolsa?      @relation(fields: [bolsaId_bolsa], references: [id_bolsa])
+  bolsa         Bolsa?             @relation(fields: [bolsaId_bolsa], references: [id_bolsa])
   bolsaId_bolsa String?
->>>>>>> Stashed changes
 }
 
 model FichaEnvio {
@@ -925,6 +852,7 @@ enum EntidadInventario {
   PRODUCTO
   MUESTRA
   INSUMO
+  BOLSA
 }
 
 enum Molienda {
@@ -933,29 +861,6 @@ enum Molienda {
   MOLIENDA_MEDIA
   MOLIENDA_GRUESA
   NINGUNO
-}
-
-enum HistorialEntidad {
-  PEDIDO
-  LOTE
-  LOTE_TOSTADO
-  MUESTRA
-  INSUMO
-  PRODUCTO
-  INVENTARIO
-  TUESTE
-}
-
-enum HistorialAccion {
-  CREATE
-  UPDATE
-  DELETE
-  COMPLETE
-  CANCEL
-  AJUSTE
-  INGRESO
-  SALIDA
-  TRASLADO
 }
 
 enum EstadoBalonGas {

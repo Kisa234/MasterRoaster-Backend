@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { CreateInventarioBolsaDto } from "../../../domain/dtos/inventarios/inventario-bolsa/create";
 import { UpdateInventarioBolsaDto } from "../../../domain/dtos/inventarios/inventario-bolsa/update";
-import { InventarioBolsaRepository } from "../../../domain/repository/inventario-bolsa";
 import { CreateInventarioBolsa } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/create-inventario-bolsa";
 import { UpdateInventarioBolsa } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/update-inventario-bolsa";
 import { GetAllInventarioBolsas } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/get-all-inventario-bolsas";
 import { GetInventarioBolsaByBolsa } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/get-inventario-bolsa-by-bolsa";
 import { GetInventarioBolsaByAlmacen } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/get-inventario-bolsa-by-almacen";
 import { GetInventarioBolsaByBolsaAndAlmacen } from "../../../domain/usecases/inventarios/inventarios-bolsa.ts/get-inventario-bolsa-by-bolsa-almacen";
+import { InventarioBolsaRepository } from "../../../domain/repository/inventario-bolsa.repository";
 
 export class InventarioBolsaController {
 

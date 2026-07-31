@@ -4,6 +4,7 @@ export enum HistorialEntidad {
   LOTE_TOSTADO = "LOTE_TOSTADO",
   MUESTRA = "MUESTRA",
   INSUMO = "INSUMO",
+  BOLSA = 'BOLSA',
   PRODUCTO = "PRODUCTO",
   INVENTARIO = "INVENTARIO",
   TUESTE = "TUESTE",

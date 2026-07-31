@@ -25,6 +25,11 @@ import { TuesteRepository } from '../../repository/tueste.repository';
 import { CreateLoteTostadoDto } from "../../dtos/lotes/lote-tostado/create";
 import { UpdateTuesteDto } from "../../dtos/tueste/update";
 import { Console } from 'console';
+import { PedidoBolsaRepository } from '../../repository/pedido-bolsa.repository';
+import { BolsaRepository } from '../../repository/bolsa.repository';
+import { InventarioBolsaRepository } from '../../repository/inventario-bolsa.repository';
+import { CreateInventarioBolsaDto } from '../../dtos/inventarios/inventario-bolsa/create';
+import { CreateBolsaDto } from '../../dtos/bolsa/create';
 
 export interface CompletarPedidoUseCase {
     execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity>;
@@ -38,11 +43,13 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         private readonly inventarioLoteRepository: InventarioLoteRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
-        private readonly inventarioRepository: InventarioProductoRepository,
         private readonly historialRepository: HistorialRepository,
         private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
         private readonly tuesteRepository: TuesteRepository,
-        private readonly createLoteTostado: CreateLoteTostado
+        private readonly createLoteTostado: CreateLoteTostado,
+        private readonly pedidoBolsaRepository: PedidoBolsaRepository,
+        private readonly bolsaRepository: BolsaRepository,
+        private readonly inventarioBolsaRepository: InventarioBolsaRepository,
     ) { }
 
     async execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity> {
@@ -567,52 +574,131 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     }
 
     async maquilaCompletion(pedidoId: string, id_completado_por: string) {
+
+        // 1. Validar que el pedido existe y está Pendiente
         const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
-        // 1. Validar que el pedido exista, esté pendiente y tenga los datos necesarios para maquila
         if (!pedido || pedido.estado_pedido !== "Pendiente")
             throw new Error("Pedido no válido o ya completado");
 
-        // 2. Verificar que el lote tostado exista
+        // 2. Leer las PedidoBolsas guardadas al crear el pedido
+        //    Estas contienen las combinaciones de gramaje/molienda/cantidad definidas por el cliente
+        const pedidoBolsas = await this.pedidoBolsaRepository.getByPedido(pedidoId);
+        if (!pedidoBolsas || pedidoBolsas.length === 0)
+            throw new Error('El pedido no tiene combinaciones de bolsas definidas');
+
+        // 3. Re-validar que la suma de unidades sigue coincidiendo con Pedido.cantidad
+        //    Por si alguien editó las PedidoBolsas después de crear el pedido
+        const totalUnidades = pedidoBolsas.reduce((acc, b) => acc + b.cantidad, 0);
+        if (totalUnidades !== pedido.cantidad) {
+            throw new Error(`La suma de bolsas (${totalUnidades}) no coincide con la cantidad del pedido (${pedido.cantidad})`);
+        }
+
+        // 4. Calcular total en gramos que se necesita del inventario
+        //    gramaje viene en gramos, cantidad_kg en inventario también está en gramos
+        //    → multiplicar directamente, sin conversión
+        const totalSolicitadoGr = pedidoBolsas.reduce(
+            (acc, b) => acc + b.gramaje * b.cantidad, 0
+        );
+
+        // 5. Validar que el lote tostado sigue existiendo
         const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(pedido.id_lote_tostado!);
-        if (!loteTostado || loteTostado.peso < 0) {
-            throw new Error("Lote tostado no válido o eliminado");
+        if (!loteTostado || loteTostado.eliminado) throw new Error('Lote tostado no válido');
+
+        // 6. Re-validar stock en el inventario del lote tostado
+        //    Puede haber bajado desde que se creó el pedido
+        const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(
+            loteTostado.id_lote_tostado,
+            pedido.id_almacen!
+        );
+        if (!inventarioLoteTostado)
+            throw new Error('No se encontró inventario del lote tostado en el almacén');
+        if (inventarioLoteTostado.cantidad_kg < totalSolicitadoGr) {
+            throw new Error(`Stock insuficiente. Se necesitan ${totalSolicitadoGr}gr, solo hay ${inventarioLoteTostado.cantidad_kg}gr`);
         }
 
-        // 3 Calcular total solicitado en kg
-        if (!pedido.cantidad || !pedido.gramaje)
-            throw new Error("Cantidad y gramaje requeridos para maquila");
-        const totalSolicitadoKg = (pedido.cantidad * pedido.gramaje);
+        // 7. Descontar los gramos consumidos del inventario del lote tostado
+        const nuevoPesoLoteTostado = inventarioLoteTostado.cantidad_kg - totalSolicitadoGr;
+        const [, updateInvDto] = UpdateInventarioLoteTostadoDto.update({ cantidad_kg: nuevoPesoLoteTostado });
+        await this.inventarioLoteTostadoRepository.updateInventario(
+            inventarioLoteTostado.id_inventario,
+            updateInvDto!
+        );
 
-        //4. calcular el total en gramos y verificar que el lote tostado tenga suficiente peso para la cantidad solicitada
-        const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(loteTostado.id_lote_tostado, pedido.id_almacen!);
-        if (!inventarioLoteTostado) {
-            throw new Error('No se encontró el inventario para el lote tostado y almacén especificados');
-        }
-        if (inventarioLoteTostado.cantidad_kg < totalSolicitadoKg) {
-            throw new Error(`Stock insuficiente. Solo hay ${inventarioLoteTostado.cantidad_kg} kg disponibles`);
-        }
-
-        // 4 Restar stock en lote origen
-        const nuevoPesoLote = inventarioLoteTostado.cantidad_kg - totalSolicitadoKg;
-        const [, updateInventarioLoteTostadoDto] = UpdateInventarioLoteTostadoDto.update({ cantidad_kg: nuevoPesoLote });
-        await this.inventarioLoteTostadoRepository.updateInventario(inventarioLoteTostado.id_inventario, updateInventarioLoteTostadoDto!);
-        //eliminar lote si el nuevo peso es  0 
-        if (nuevoPesoLote == 0) {
+        // 8. Si quedó en 0, eliminar el lote tostado (sin stock ya no tiene sentido mantenerlo)
+        if (nuevoPesoLoteTostado === 0) {
             await this.loteTostadoRepository.deleteLoteTostado(loteTostado.id_lote_tostado);
         }
 
-        // 5. Crear registro en inventario del producto resultante
-        await this.inventarioRepository.createInventario({
-            id_producto: pedido.id_producto!,
-            id_almacen: pedido.id_almacen!,
-            id_lote_tostado: loteTostado.id_lote_tostado,
-            cantidad: pedido.cantidad,
-            gramaje: pedido.gramaje,
-            molienda: pedido.molienda!,
-            unidad_medida: "BOLSAS"
+        // 9. Registrar la salida del lote tostado en MovimientoAlmacen
+        await this.registrarMovimiento({
+            tipo: TipoMovimiento.SALIDA,
+            entidad: EntidadInventario.LOTE_TOSTADO,
+            id_entidad_primario: loteTostado.id_lote_tostado,
+            id_almacen_origen: pedido.id_almacen,
+            cantidad: totalSolicitadoGr,
+            id_user: id_completado_por,
+            id_pedido: pedido.id_pedido,
+            comentario: `Consumo de ${totalSolicitadoGr}gr por maquila — ${pedidoBolsas.length} combinación(es) de bolsas`,
         });
 
-        // 🔹 6. Marcar pedido como completado
+        // 10. Por cada combinación crear Bolsa + InventarioBolsa
+        for (const item of pedidoBolsas) {
+
+            // 10a. Generar id correlativo al lote tostado: {id_lote_tostado}-BO-{n}
+            //      Contar cuántas bolsas existen ya de este lote tostado para el siguiente número
+            const count = await this.bolsaRepository.countBolsasByLoteTostadoId(loteTostado.id_lote_tostado);
+            const siguiente = (count + 1).toString().padStart(2, '0');
+            const id_bolsa = `${loteTostado.id_lote_tostado}-BO-${siguiente}`;
+
+            // 10b. Crear la Bolsa — hecho histórico de producción (inmutable una vez creado)
+            const [errBolsa, createBolsaDto] = CreateBolsaDto.create({
+                id_lote_tostado: loteTostado.id_lote_tostado,
+                id_pedido: pedido.id_pedido,
+                gramaje: item.gramaje,
+                molienda: item.molienda,
+                cantidad: item.cantidad,
+                id_user: id_completado_por,
+                id_almacen: pedido.id_almacen,
+            });
+            if (errBolsa || !createBolsaDto) throw new Error(errBolsa ?? 'Error al crear DTO de bolsa');
+
+            const bolsa = await this.bolsaRepository.createBolsa(id_bolsa, createBolsaDto);
+
+            // 10c. Crear InventarioBolsa — stock inicial igual a la cantidad producida
+            //      Nada se ha vendido ni enviado aún, entra todo al almacén del pedido
+            const [errInv, createInvDto] = CreateInventarioBolsaDto.create({
+                id_bolsa: bolsa.id_bolsa,
+                id_almacen: pedido.id_almacen!,
+                cantidad: item.cantidad,
+            });
+            if (errInv || !createInvDto) throw new Error(errInv ?? 'Error al crear DTO de inventario bolsa');
+
+            await this.inventarioBolsaRepository.createInventario(createInvDto);
+
+            // 10d. Registrar ingreso de esta bolsa en MovimientoAlmacen
+            await this.registrarMovimiento({
+                tipo: TipoMovimiento.INGRESO,
+                entidad: EntidadInventario.BOLSA,
+                id_entidad_primario: bolsa.id_bolsa,
+                id_almacen_destino: pedido.id_almacen,
+                cantidad: item.cantidad,
+                id_user: id_completado_por,
+                id_pedido: pedido.id_pedido,
+                comentario: `Ingreso ${item.cantidad} bolsas de ${item.gramaje}gr (${item.molienda})`,
+            });
+
+            // 10e. Registrar en Historial la creación de esta bolsa
+            await this.registrarHistorial({
+                entidad: HistorialEntidad.BOLSA,
+                accion: HistorialAccion.CREATE,
+                id_entidad: bolsa.id_bolsa,
+                id_user: id_completado_por,
+                id_pedido: pedido.id_pedido,
+                comentario: `Bolsa creada por maquila: ${item.cantidad} uds x ${item.gramaje}gr (${item.molienda})`,
+            });
+        }
+
+        // 11. Marcar pedido como Completado
         return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
     }
 

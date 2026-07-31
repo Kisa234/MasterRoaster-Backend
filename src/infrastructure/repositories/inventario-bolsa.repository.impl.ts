@@ -2,7 +2,7 @@ import { InventarioBolsaDataSource } from "../../domain/datasources/inventario-b
 import { CreateInventarioBolsaDto } from "../../domain/dtos/inventarios/inventario-bolsa/create";
 import { UpdateInventarioBolsaDto } from "../../domain/dtos/inventarios/inventario-bolsa/update";
 import { InventarioBolsaEntity } from "../../domain/entities/inventarioBolsa.entity";
-import { InventarioBolsaRepository } from "../../domain/repository/inventario-bolsa";
+import { InventarioBolsaRepository } from "../../domain/repository/inventario-bolsa.repository";
 
 export class InventarioBolsaRepositoryImpl implements InventarioBolsaRepository {
 

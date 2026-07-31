@@ -10,6 +10,8 @@ import { AnalisisFisicoRepository } from "../../repository/analisisFisico.reposi
 import { AnalisisFisicoEntity } from "../../entities/analisisFisico.entity";
 import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { InventarioLoteRepository } from '../../repository/inventario-lote.repository';
+import { InventarioLoteTostadoRepository } from "../../repository/inventario-lote-tostado.repository";
+import { PedidoBolsaRepository } from "../../repository/pedido-bolsa.repository";
 
 export interface UpdatePedidoUseCase {
   execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity>;
@@ -24,7 +26,9 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     private readonly userRepository: UserRepository,
     private readonly analisisRepository: AnalisisRepository,
     private readonly analisisFisicoRepository: AnalisisFisicoRepository,
-    private readonly inventarioLoteRepository: InventarioLoteRepository
+    private readonly inventarioLoteRepository: InventarioLoteRepository,
+    private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
+    private readonly pedidoBolsaRepository: PedidoBolsaRepository,
 
   ) { }
 
@@ -190,32 +194,56 @@ export class UpdatePedido implements UpdatePedidoUseCase {
   }
 
   async editarMaquila(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
-    // 1) Validar lote tostado de origen
-    if (!pedido.id_lote_tostado) {
-      throw new Error('El pedido de maquila no tiene lote tostado de origen');
-    }
 
-    const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(pedido.id_lote_tostado);
-    if (!loteTostado) throw new Error('Lote tostado no válido o eliminado');
+    // 1. Validar lote tostado (puede venir uno nuevo en el DTO o usar el actual)
+    const idLoteTostado = pedido.id_lote_tostado;
+    if (!idLoteTostado) throw new Error('El pedido de maquila no tiene lote tostado de origen');
 
-    // 2) Determinar valores "finales" (si no vienen en el DTO, se usan los actuales)
+    const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(idLoteTostado);
+    if (!loteTostado || loteTostado.eliminado) throw new Error('Lote tostado no válido o eliminado');
+
+    // 2. Validar cantidad
     const nuevaCantidad = dto.cantidad ?? pedido.cantidad;
-    const nuevoGramaje = dto.gramaje ?? pedido.gramaje;
-
-    // 3) Validaciones de dominio
     if (nuevaCantidad <= 0) throw new Error('La cantidad de bolsas debe ser mayor a 0');
-    if (!nuevoGramaje || nuevoGramaje <= 0) throw new Error('El gramaje debe ser mayor a 0');
 
-    // 4) Calcular peso total solicitado en kg
-    const totalSolicitadoKg = (nuevaCantidad * nuevoGramaje); // gramaje viene en gramos
+    // 3. Leer PedidoBolsas actuales para calcular el stock real que se necesita
+    const pedidoBolsas = await this.pedidoBolsaRepository.getByPedido(pedido.id_pedido);
+    if (!pedidoBolsas || pedidoBolsas.length === 0)
+      throw new Error('El pedido no tiene combinaciones de bolsas definidas');
 
-    if (loteTostado.peso < totalSolicitadoKg) {
-      throw new Error(`Stock insuficiente. Solo hay ${loteTostado.peso} kg disponibles`);
+    // 4. Validar que la nueva cantidad coincida con la suma de PedidoBolsas
+    const totalUnidades = pedidoBolsas.reduce((acc, b) => acc + b.cantidad, 0);
+    if (nuevaCantidad !== totalUnidades) {
+      throw new Error(
+        `La cantidad del pedido (${nuevaCantidad}) no coincide con la suma de bolsas definidas (${totalUnidades}). ` +
+        `Edita primero las combinaciones de bolsas en /pedido-bolsa/pedido/${pedido.id_pedido}`
+      );
     }
 
-    // 5) Actualizar pedido (DTO ya limpio y sin undefined)
-    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+    // 5. Calcular total en gramos que se necesita del inventario
+    const totalSolicitadoGr = pedidoBolsas.reduce(
+      (acc, b) => acc + b.gramaje * b.cantidad, 0
+    );
 
+    // 6. Validar stock en el almacén (puede haber cambiado en el DTO)
+    const idAlmacen = dto.id_almacen ?? pedido.id_almacen;
+    if (!idAlmacen) throw new Error('El pedido no tiene almacén');
+
+    const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(
+      loteTostado.id_lote_tostado,
+      idAlmacen
+    );
+    if (!inventarioLoteTostado)
+      throw new Error('No se encontró inventario para el lote tostado en el almacén');
+    if (inventarioLoteTostado.cantidad_kg < totalSolicitadoGr) {
+      throw new Error(
+        `Stock insuficiente. Se necesitan ${totalSolicitadoGr}gr, ` +
+        `solo hay ${inventarioLoteTostado.cantidad_kg}gr disponibles`
+      );
+    }
+
+    // 7. Actualizar pedido
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 

@@ -13,10 +13,13 @@ import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { UpdateUserDto } from "../../dtos/user/update";
 import { InventarioLoteRepository } from "../../repository/inventario-lote.repository";
 import { InventarioLoteTostadoRepository } from "../../repository/inventario-lote-tostado.repository";
+import { CreatePedidoBolsaDto } from "../../dtos/pedido-bolsa/create";
+import { PedidoBolsaRepository } from "../../repository/pedido-bolsa.repository";
+import { BolsaItemDto, CreateMaquilaDto } from "../../dtos/pedido/create-maquila";
 
 
 export interface CreatePedidoUseCase {
-    execute(createPedidoDto: CreatePedidoDto, id_completado_por: string): Promise<PedidoEntity>;
+    execute(createPedidoDto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[]): Promise<PedidoEntity>;
 }
 
 export class CreatePedido implements CreatePedidoUseCase {
@@ -30,31 +33,28 @@ export class CreatePedido implements CreatePedidoUseCase {
         private readonly tuesteRepository: TuesteRepository,
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
+        private readonly pedidoBolsaRepository: PedidoBolsaRepository,
 
     ) { }
 
-    async execute(dto: CreatePedidoDto, id_completado_por: string): Promise<PedidoEntity> {
-        //dependiendo del tipo de pedido 
+    async execute(dto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[]): Promise<PedidoEntity> {
+
         switch (dto.tipo_pedido) {
             case 'Venta Verde':
                 return this.ventaVerdeValidations(dto);
-                break;
             case 'Tostado Verde':
                 return this.tostadoVerdeValidations(dto);
-                break;
             case 'Orden Tueste':
                 return this.ordenTueste(dto);
-                break
             case 'Maquila':
-                return this.maquilaValidations(dto);
-                break;
+                const [errMaquila, maquilaDto] = CreateMaquilaDto.create({ ...dto, bolsas });
+                if (errMaquila || !maquilaDto) throw new Error(errMaquila ?? 'Error al crear DTO de maquila');
+                return this.maquilaValidations(maquilaDto);
             case 'Suscripcion':
                 return this.suscripcionValidations(dto, id_completado_por);
-                break;
             default:
                 throw new Error('Tipo de pedido inválido');
         }
-
     }
 
     async ventaVerdeValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
@@ -228,38 +228,45 @@ export class CreatePedido implements CreatePedidoUseCase {
         return PedidoEntity.fromObject(pedido);
     }
 
-    async maquilaValidations(dto: CreatePedidoDto): Promise<PedidoEntity> {
+    async maquilaValidations(dto: CreateMaquilaDto): Promise<PedidoEntity> {
 
         // 1. Validar cliente
-        const cliente = await this.clienteRepository.getUserById(dto.id_user);
-        if (!cliente || cliente.eliminado) {
-            throw new Error("Cliente no válido");
+        const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user);
+        if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
+
+        // 2. Validar lote tostado
+        const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.pedido.id_lote_tostado!);
+        if (!loteTostado || loteTostado.eliminado) throw new Error("Lote tostado no válido o eliminado");
+
+        // 3. Validar cantidad total de bolsas
+        const totalSolicitadoGr = dto.bolsas.reduce(
+            (acc, b) => acc + b.gramaje * b.cantidad, 0
+        );
+
+        // 4. Verificar stock
+        const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(
+            loteTostado.id_lote_tostado,
+            dto.pedido.id_almacen!
+        );
+        if (!inventarioLoteTostado) throw new Error('No se encontró el inventario para el lote tostado y almacén especificados');
+        if (inventarioLoteTostado.cantidad_kg < totalSolicitadoGr) {
+            throw new Error(`Stock insuficiente. Se necesitan ${totalSolicitadoGr}gr, solo hay ${inventarioLoteTostado.cantidad_kg}gr`);
         }
 
-        // 2. Verificar que el lote tostado exista
-        const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.id_lote_tostado!);
-        if (!loteTostado || loteTostado.peso < 0) {
-            throw new Error("Lote tostado no válido o eliminado");
-        }
+        // 5. Crear pedido — ahora dto.pedido es el CreatePedidoDto limpio, sin bolsas
+        const pedido = await this.pedidoRepository.createPedido(dto.pedido);
 
-        // 3. Validar campos requeridos
-        if (!dto.gramaje) throw new Error('El gramaje es requerido para pedidos de maquila');
-        if (!dto.cantidad) throw new Error('La cantidad de bolsas es requerida para pedidos de maquila');
-        if (dto.cantidad <= 0) throw new Error('La cantidad de bolsas debe ser mayor a 0');
-        if (dto.gramaje <= 0) throw new Error('El gramaje debe ser mayor a 0');
-
-        //4. calcular el total en gramos y verificar que el lote tostado tenga suficiente peso para la cantidad solicitada
-        const totalSolicitadoKg = (dto.cantidad * dto.gramaje);
-        const inventarioLoteTostado = await this.inventarioLoteTostadoRepository.getByLoteTostadoAndAlmacen(loteTostado.id_lote_tostado, dto.id_almacen!);
-        if (!inventarioLoteTostado) {
-            throw new Error('No se encontró el inventario para el lote tostado y almacén especificados');
+        // 6. Guardar las combinaciones de bolsas
+        for (const item of dto.bolsas) {
+            const [errBolsa, createBolsaDto] = CreatePedidoBolsaDto.create({
+                id_pedido: pedido.id_pedido,
+                gramaje: item.gramaje,
+                molienda: item.molienda,
+                cantidad: item.cantidad,
+            });
+            if (errBolsa || !createBolsaDto) throw new Error(errBolsa ?? 'Error al crear DTO de pedido bolsa');
+            await this.pedidoBolsaRepository.createPedidoBolsa(createBolsaDto);
         }
-        if (inventarioLoteTostado.cantidad_kg < totalSolicitadoKg) {
-            throw new Error(`Stock insuficiente. Solo hay ${inventarioLoteTostado.cantidad_kg} kg disponibles`);
-        }
-
-        // 4. Crear pedido de maquila
-        const pedido = await this.pedidoRepository.createPedido(dto);
 
         return pedido;
     }

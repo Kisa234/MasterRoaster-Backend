@@ -1,7 +1,6 @@
 import { MovimientoAlmacenDataSourceImpl } from './../../infrastructure/datasources/movimiento-almacen.datasource.impl';
 import { HistorialRepositoryImpl } from './../../infrastructure/repositories/historial.repository.impl';
 import { HistorialDataSourceImpl } from './../../infrastructure/datasources/historial.datasource.impl';
-import { Historial } from '@prisma/client';
 import { Router } from 'express';
 import { PedidoController } from './controller';
 import { PedidoDataSourceImpl } from '../../infrastructure/datasources/pedido.datasource.impl';
@@ -24,7 +23,6 @@ import { AnalisisDefectosRespositoryImpl } from '../../infrastructure/repositori
 import { LoteAnalisisDataSourceImpl } from '../../infrastructure/datasources/lote-analisis.datasource.impl';
 import PedidoRepositoryImpl from '../../infrastructure/repositories/pedido.repository.impl';
 import { DuplicateLote } from '../../domain/usecases/lote/lote/duplicar-lote';
-import { InventarioProductoDataSourceImpl } from '../../infrastructure/datasources/inventario-producto.datasource.impl';
 import { authMiddleware } from '../../infrastructure/middlewares/auth.middleware';
 import { LoteTostadoDataSourceImpl } from '../../infrastructure/datasources/loteTostado.datasource.impl';
 import { LoteTostadoRepositoryImpl } from '../../infrastructure/repositories/loteTostado.repository.impl';
@@ -32,35 +30,40 @@ import { InventarioLoteRepositoryImpl } from '../../infrastructure/repositories/
 import { InventarioLoteDataSourceImpl } from '../../infrastructure/datasources/inventario-lote.datasource.impl';
 import { InventarioLoteTostadoRepositoryImpl } from '../../infrastructure/repositories/inventario-lote-tostado.repository.impl';
 import { InventarioLoteTostadoDataSourceImpl } from '../../infrastructure/datasources/inventario-lote-tostado.datasource.impl';
-import { InventarioProductoRepositoryImpl } from '../../infrastructure/repositories/inventario-producto.repository.impl';
 import { MovimientoAlmacenRepositoryImpl } from '../../infrastructure/repositories/movimiento-almacen.repository.impl';
 import { CreateLoteTostado } from '../../domain/usecases/lote/lote-tostado/create-lote-tostado';
-
+import { PedidoBolsaDataSourceImpl } from '../../infrastructure/datasources/pedido-bolsa.datasource.impl';
+import { PedidoBolsaRepositoryImpl } from '../../infrastructure/repositories/pedido-bolsa.repository.impl';
+import { BolsaDataSourceImpl } from '../../infrastructure/datasources/bolsa.datasource.impl';
+import { InventarioBolsaDataSourceImpl } from '../../infrastructure/datasources/inventario-bolsa.datasource.impl';
+import { InventarioBolsaRepositoryImpl } from '../../infrastructure/repositories/inventario-bolsa.repository.impl';
+import { BolsaRepositoryImpl } from '../../infrastructure/repositories/bolsa.repository';
 
 export class PedidoRoutes {
 
-
     static get routes(): Router {
-
         const router = Router();
 
-        // Inyección de dependencias
         // Pedido
         const PedidoDatasource = new PedidoDataSourceImpl();
         const PedidoRepository = new PedidoRepositoryImpl(PedidoDatasource);
+
         // Lote
         const LoteDatasource = new LoteDataSourceImpl();
         const LoteRepository = new LoteRepositoryImpl(LoteDatasource);
-        // LoteInventario
+
+        // InventarioLote
         const inventarioLoteDatasource = new InventarioLoteDataSourceImpl();
         const inventarioLoteRepository = new InventarioLoteRepositoryImpl(inventarioLoteDatasource);
+
         // Tueste
         const TuesteDatasource = new TuesteDataSourceImpl();
         const TuesteRepository = new TuesteRepositoryImpl(TuesteDatasource);
 
-        // TuesteInventario
+        // InventarioLoteTostado
         const inventarioTostadoDatasource = new InventarioLoteTostadoDataSourceImpl();
         const inventarioTostadoRepository = new InventarioLoteTostadoRepositoryImpl(inventarioTostadoDatasource);
+
         // User
         const Userdatasource = new UserDataSourceImpl();
         const UserRepository = new UserRepositoryImpl(Userdatasource);
@@ -89,19 +92,27 @@ export class PedidoRoutes {
         const LoteTostadoDatasource = new LoteTostadoDataSourceImpl();
         const LoteTostadoRepository = new LoteTostadoRepositoryImpl(LoteTostadoDatasource);
 
-        // Inventario
-        const InventarioDatasource = new InventarioProductoDataSourceImpl();
-        const InventarioRepository = new InventarioProductoRepositoryImpl(InventarioDatasource);
-
-        //Historial
+        // Historial
         const historialDataSource = new HistorialDataSourceImpl();
         const historialRepository = new HistorialRepositoryImpl(historialDataSource);
 
-        //MovimientoAlmacen 
+        // MovimientoAlmacen
         const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
         const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
 
+        // PedidoBolsa
+        const pedidoBolsaDatasource = new PedidoBolsaDataSourceImpl();
+        const pedidoBolsaRepository = new PedidoBolsaRepositoryImpl(pedidoBolsaDatasource);
 
+        // Bolsa
+        const bolsaDatasource = new BolsaDataSourceImpl();
+        const bolsaRepository = new BolsaRepositoryImpl(bolsaDatasource);
+
+        // InventarioBolsa
+        const inventarioBolsaDatasource = new InventarioBolsaDataSourceImpl();
+        const inventarioBolsaRepository = new InventarioBolsaRepositoryImpl(inventarioBolsaDatasource);
+
+        // Use cases
         const createLoteUseCase = new CreateLote(
             LoteRepository,
             UserRepository,
@@ -115,7 +126,15 @@ export class PedidoRoutes {
             LoteTostadoRepository,
         );
 
-        const duplicateLote = new DuplicateLote(LoteRepository, createLoteUseCase, AnalisisRepository, AnalisisFisicoRepository, AnalisisSensorialRepository, AnalisisDefectosRepository, LoteAnalisisRepository);
+        const duplicateLote = new DuplicateLote(
+            LoteRepository,
+            createLoteUseCase,
+            AnalisisRepository,
+            AnalisisFisicoRepository,
+            AnalisisSensorialRepository,
+            AnalisisDefectosRepository,
+            LoteAnalisisRepository
+        );
 
         const controller = new PedidoController(
             PedidoRepository,
@@ -126,16 +145,17 @@ export class PedidoRoutes {
             AnalisisRepository,
             AnalisisFisicoRepository,
             duplicateLote,
-            InventarioRepository,
             LoteTostadoRepository,
             inventarioTostadoRepository,
             historialRepository,
             movimientoAlmacenRepository,
-            CreateLoteTostadoUseCase
+            CreateLoteTostadoUseCase,
+            pedidoBolsaRepository,       
+            bolsaRepository,             
+            inventarioBolsaRepository,   
         );
 
-        // Definición de rutas
-
+        // Rutas — sin cambios
         router.get('/estadisticas/tueste', authMiddleware, controller.getEstadisticasTueste);
         router.get('/orden/tueste', authMiddleware, controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', authMiddleware, controller.getPedidosOrdenTuesteByFecha);
@@ -155,7 +175,7 @@ export class PedidoRoutes {
         router.get('/:id', authMiddleware, controller.getPedidoById);
         router.put('/:id', authMiddleware, controller.updatePedido);
         router.delete('/:id', authMiddleware, controller.deletePedido);
-        return router;
 
+        return router;
     }
 }

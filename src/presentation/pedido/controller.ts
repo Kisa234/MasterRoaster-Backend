@@ -32,6 +32,9 @@ import { GetPedidosConLote } from '../../domain/usecases/pedido/get-pedidos-con-
 import { GetPedidoConLote } from '../../domain/usecases/pedido/get-pedido-con-lote';
 import { GetPedidosByRango } from '../../domain/usecases/pedido/get-pedidos-rango';
 import { GetEstadisticasTueste } from '../../domain/usecases/pedido/get-estadisticas-tueste';
+import { PedidoBolsaRepository } from '../../domain/repository/pedido-bolsa.repository';
+import { BolsaRepository } from '../../domain/repository/bolsa.repository';
+import { InventarioBolsaRepository } from '../../domain/repository/inventario-bolsa.repository';
 
 export class PedidoController {
 
@@ -44,12 +47,14 @@ export class PedidoController {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly duplicateLoteUseCase: DuplicateLoteUseCase,
-        private readonly inventarioRepository: InventarioProductoRepository,
         private readonly loteTostadoRepository: LoteTostadoRepository,
         private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
         private readonly historialRepository: HistorialRepository,
         private readonly movimientoAlmacenRepository: MovimientoAlmacenRepository,
-        private readonly createLoteTostado: CreateLoteTostado
+        private readonly createLoteTostado: CreateLoteTostado,
+        private readonly pedidoBolsaRepository: PedidoBolsaRepository,
+        private readonly bolsaRepository: BolsaRepository,
+        private readonly inventarioBolsaRepository: InventarioBolsaRepository
 
 
     ) {
@@ -59,14 +64,14 @@ export class PedidoController {
         if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
-        // Inyectamos el usuario autenticado directamente aquí
         const body = { ...req.body, creado_por_id: req.user?.id_user as string };
         const id_completado_por = req.user?.id_user as string;
+
+
         const [error, createPedidoDto] = CreatePedidoDto.create(body);
         if (error) {
             return res.status(400).json({ error });
         }
-
 
         new CreatePedido(
             this.pedidoRepository,
@@ -77,11 +82,15 @@ export class PedidoController {
             this.userRepository,
             this.tuesteRepository,
             this.analisisRepository,
-            this.analisisFisicoRepository
+            this.analisisFisicoRepository,
+            this.pedidoBolsaRepository,
         )
-            .execute(createPedidoDto!, id_completado_por)
+            .execute(createPedidoDto!, id_completado_por, body.bolsas) 
             .then(pedido => res.json(pedido))
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => {
+                console.error('[createPedido] error en use case:', error); 
+                return res.status(400).json({ error: error?.message ?? String(error) }); 
+            });
     };
 
     public completarPedido = async (req: Request, res: Response) => {
@@ -98,11 +107,13 @@ export class PedidoController {
             this.inventarioLoteRepository,
             this.inventarioLoteTostadoRepository,
             this.duplicateLoteUseCase,
-            this.inventarioRepository,
             this.historialRepository,
             this.movimientoAlmacenRepository,
             this.tuesteRepository,
-            this.createLoteTostado
+            this.createLoteTostado,
+            this.pedidoBolsaRepository,
+            this.bolsaRepository,
+            this.inventarioBolsaRepository,
 
         )
             .execute(id_pedido, id_completado_por)
@@ -124,7 +135,9 @@ export class PedidoController {
             this.userRepository,
             this.analisisRepository,
             this.analisisFisicoRepository,
-            this.inventarioLoteRepository
+            this.inventarioLoteRepository,
+            this.inventarioLoteTostadoRepository,
+            this.pedidoBolsaRepository,
         )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))

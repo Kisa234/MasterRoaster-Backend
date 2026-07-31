@@ -35,6 +35,12 @@ import { MovimientoAlmacenDataSourceImpl } from '../../infrastructure/datasource
 import { MovimientoAlmacenRepositoryImpl } from '../../infrastructure/repositories/movimiento-almacen.repository.impl';
 import { DuplicateLote } from '../../domain/usecases/lote/lote/duplicar-lote';
 import { CreateLote } from '../../domain/usecases/lote/lote/create-lote';
+import { PedidoBolsaDataSourceImpl } from '../../infrastructure/datasources/pedido-bolsa.datasource.impl';
+import { PedidoBolsaRepositoryImpl } from '../../infrastructure/repositories/pedido-bolsa.repository.impl';
+import { BolsaDataSourceImpl } from '../../infrastructure/datasources/bolsa.datasource.impl';
+import { BolsaRepositoryImpl } from '../../infrastructure/repositories/bolsa.repository';
+import { InventarioBolsaRepositoryImpl } from '../../infrastructure/repositories/inventario-bolsa.repository.impl';
+import { InventarioBolsaDataSourceImpl } from '../../infrastructure/datasources/inventario-bolsa.datasource.impl';
 
 export class TuesteRoutes {
 
@@ -111,6 +117,17 @@ export class TuesteRoutes {
         const movimientoAlmacenDataSource = new MovimientoAlmacenDataSourceImpl();
         const movimientoAlmacenRepository = new MovimientoAlmacenRepositoryImpl(movimientoAlmacenDataSource);
 
+        // PedidoBolsa
+        const pedidoBolsaDatasource = new PedidoBolsaDataSourceImpl();
+        const pedidoBolsaRepository = new PedidoBolsaRepositoryImpl(pedidoBolsaDatasource);
+
+        // Bolsa
+        const bolsaDatasource = new BolsaDataSourceImpl();
+        const bolsaRepository = new BolsaRepositoryImpl(bolsaDatasource);
+
+        // InventarioBolsa
+        const inventarioBolsaDatasource = new InventarioBolsaDataSourceImpl();
+        const inventarioBolsaRepository = new InventarioBolsaRepositoryImpl(inventarioBolsaDatasource);
 
 
         const createLoteTostado = new CreateLoteTostado(
@@ -141,11 +158,13 @@ export class TuesteRoutes {
             inventarioLoteRepository,
             inventarioTostadoRepository,
             duplicateLote,
-            inventarioRepository,
             historialRepository,
             movimientoAlmacenRepository,
             tuesteRepository,
-            createLoteTostado
+            createLoteTostado,
+            pedidoBolsaRepository,
+            bolsaRepository,
+            inventarioBolsaRepository,
         );
 
 

@@ -4,4 +4,5 @@ export enum EntidadInventario {
   PRODUCTO = 'PRODUCTO',
   MUESTRA = 'MUESTRA',
   INSUMO = 'INSUMO',
+  BOLSA = 'BOLSA',
 }
