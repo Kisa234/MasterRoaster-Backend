@@ -92,4 +92,10 @@ export class BolsaDataSourceImpl implements BolsaDataSource {
         if (!bolsa) return null;
         return BolsaConInventarioEntity.fromObject(bolsa);
     }
+
+    async countBolsasByLoteTostadoGramajeMolienda(id_lote_tostado: string, gramaje: number, molienda: string): Promise<number> {
+        return prisma.bolsa.count({
+            where: { id_lote_tostado, gramaje, molienda }
+        });
+    }
 }

@@ -13,4 +13,5 @@ export abstract class BolsaDataSource {
     abstract countBolsasByLoteTostadoId(id_lote_tostado: string): Promise<number>;
     abstract getBolsasConInventario(incluirEliminados: boolean): Promise<BolsaConInventarioEntity[]>;
     abstract getBolsaConInventarioById(id: string): Promise<BolsaConInventarioEntity | null>;
+    abstract countBolsasByLoteTostadoGramajeMolienda(id_lote_tostado: string, gramaje: number, molienda: string): Promise<number>;
 }

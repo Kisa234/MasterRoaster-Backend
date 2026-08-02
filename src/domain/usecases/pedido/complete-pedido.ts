@@ -30,6 +30,7 @@ import { BolsaRepository } from '../../repository/bolsa.repository';
 import { InventarioBolsaRepository } from '../../repository/inventario-bolsa.repository';
 import { CreateInventarioBolsaDto } from '../../dtos/inventarios/inventario-bolsa/create';
 import { CreateBolsaDto } from '../../dtos/bolsa/create';
+import { getMoliendaAbrev } from '../../utils/molienda-abrev';
 
 export interface CompletarPedidoUseCase {
     execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity>;
@@ -644,11 +645,16 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         // 10. Por cada combinación crear Bolsa + InventarioBolsa
         for (const item of pedidoBolsas) {
 
-            // 10a. Generar id correlativo al lote tostado: {id_lote_tostado}-BO-{n}
-            //      Contar cuántas bolsas existen ya de este lote tostado para el siguiente número
-            const count = await this.bolsaRepository.countBolsasByLoteTostadoId(loteTostado.id_lote_tostado);
+            // 10a. Generar id correlativo por lote tostado + combinación gramaje/molienda
+            //      Formato: {id_lote_tostado}-BO-{gramaje}-{molienda_abrev}-{secuencial 2 dígitos}
+            const abrev = getMoliendaAbrev(item.molienda);
+            const count = await this.bolsaRepository.countBolsasByLoteTostadoGramajeMolienda(
+                loteTostado.id_lote_tostado,
+                item.gramaje,
+                item.molienda
+            );
             const siguiente = (count + 1).toString().padStart(2, '0');
-            const id_bolsa = `${loteTostado.id_lote_tostado}-BO-${siguiente}`;
+            const id_bolsa = `${loteTostado.id_lote_tostado}-BO-${item.gramaje}-${abrev}-${siguiente}`;
 
             // 10b. Crear la Bolsa — hecho histórico de producción (inmutable una vez creado)
             const [errBolsa, createBolsaDto] = CreateBolsaDto.create({
@@ -657,7 +663,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 gramaje: item.gramaje,
                 molienda: item.molienda,
                 cantidad: item.cantidad,
-                id_user: id_completado_por,
+                id_user: pedido.id_user,
                 id_almacen: pedido.id_almacen,
             });
             if (errBolsa || !createBolsaDto) throw new Error(errBolsa ?? 'Error al crear DTO de bolsa');

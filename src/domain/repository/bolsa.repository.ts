@@ -11,6 +11,7 @@ export abstract class BolsaRepository {
   abstract getBolsasByPedidoId(id_pedido: string): Promise<BolsaEntity[]>;
   abstract getBolsasByLoteTostadoId(id_lote_tostado: string): Promise<BolsaEntity[]>;
   abstract countBolsasByLoteTostadoId(id_lote_tostado: string): Promise<number>;
+  abstract countBolsasByLoteTostadoGramajeMolienda(id_lote_tostado: string, gramaje: number, molienda: string): Promise<number>;
   abstract getBolsasConInventario(incluirEliminados: boolean): Promise<BolsaConInventarioEntity[]>;
   abstract getBolsaConInventarioById(id: string): Promise<BolsaConInventarioEntity | null>;
 }

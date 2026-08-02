@@ -96,7 +96,7 @@ export class BolsaConInventarioEntity {
             id_user,
             comentario,
             fecha_embolsado,
-            inventarioBolsas,
+            inventarios, // 👈 fix: coincide con el nombre de la relación en el include de Prisma
         } = obj;
 
         if (!id_bolsa) throw new Error('id_bolsa property is required');
@@ -107,8 +107,8 @@ export class BolsaConInventarioEntity {
         const newFechaEmbolsado = new Date(fecha_embolsado);
         if (isNaN(newFechaEmbolsado.getTime())) throw new Error('fecha_embolsado no es válida');
 
-        const invMapped: InventarioBolsaMini[] = Array.isArray(inventarioBolsas)
-            ? inventarioBolsas.map((i: any) => ({
+        const invMapped: InventarioBolsaMini[] = Array.isArray(inventarios) // 👈 fix
+            ? inventarios.map((i: any) => ({ // 👈 fix
                 id_inventario: i.id_inventario,
                 id_bolsa: i.id_bolsa,
                 id_almacen: i.id_almacen,

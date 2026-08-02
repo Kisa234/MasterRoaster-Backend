@@ -39,4 +39,7 @@ export class BolsaRepositoryImpl implements BolsaRepository {
     getBolsaConInventarioById(id: string): Promise<BolsaConInventarioEntity | null> {
         return this.datasource.getBolsaConInventarioById(id);
     }
+    countBolsasByLoteTostadoGramajeMolienda(id_lote_tostado: string, gramaje: number, molienda: string): Promise<number> {
+        return this.datasource.countBolsasByLoteTostadoGramajeMolienda(id_lote_tostado, gramaje, molienda);
+    }
 }
