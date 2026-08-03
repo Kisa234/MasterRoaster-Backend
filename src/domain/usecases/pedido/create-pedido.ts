@@ -16,10 +16,13 @@ import { InventarioLoteTostadoRepository } from "../../repository/inventario-lot
 import { CreatePedidoBolsaDto } from "../../dtos/pedido-bolsa/create";
 import { PedidoBolsaRepository } from "../../repository/pedido-bolsa.repository";
 import { BolsaItemDto, CreateMaquilaDto } from "../../dtos/pedido/create-maquila";
-
+import { CreatePedidoItemDto } from "../../dtos/pedido-item/create";
+import { PedidoItemRepository } from "../../repository/pedido-item.repository";
+import { InventarioGenericoRepository } from "../../repository/inventario-generico.repository";
+import { CreateOrdenDespachoDto, PedidoItemInputDto } from "../../dtos/pedido/create-orden-despacho";
 
 export interface CreatePedidoUseCase {
-    execute(createPedidoDto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[]): Promise<PedidoEntity>;
+    execute(createPedidoDto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[], items?: PedidoItemInputDto[]): Promise<PedidoEntity>;
 }
 
 export class CreatePedido implements CreatePedidoUseCase {
@@ -34,10 +37,12 @@ export class CreatePedido implements CreatePedidoUseCase {
         private readonly analisisRepository: AnalisisRepository,
         private readonly analisisFisicoRepository: AnalisisFisicoRepository,
         private readonly pedidoBolsaRepository: PedidoBolsaRepository,
+        private readonly pedidoItemRepository: PedidoItemRepository,
+        private readonly inventarioGenericoRepository: InventarioGenericoRepository,
 
     ) { }
 
-    async execute(dto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[]): Promise<PedidoEntity> {
+    async execute(dto: CreatePedidoDto, id_completado_por: string, bolsas?: BolsaItemDto[], items?: PedidoItemInputDto[]): Promise<PedidoEntity> {
 
         switch (dto.tipo_pedido) {
             case 'Venta Verde':
@@ -52,6 +57,10 @@ export class CreatePedido implements CreatePedidoUseCase {
                 return this.maquilaValidations(maquilaDto);
             case 'Suscripcion':
                 return this.suscripcionValidations(dto, id_completado_por);
+            case 'OrdenDespacho':
+                const [errOD, ordenDespachoDto] = CreateOrdenDespachoDto.create({ ...dto, items });
+                if (errOD || !ordenDespachoDto) throw new Error(errOD ?? 'Error al crear DTO de orden de despacho');
+                return this.ordenDespachoValidations(ordenDespachoDto);
             default:
                 throw new Error('Tipo de pedido inválido');
         }
@@ -292,6 +301,36 @@ export class CreatePedido implements CreatePedidoUseCase {
 
         return pedido;
 
+    }
+
+    async ordenDespachoValidations(dto: CreateOrdenDespachoDto): Promise<PedidoEntity> {
+        const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user);
+        if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
+
+        if (!dto.pedido.id_almacen) throw new Error('El almacén es requerido para una Orden de Despacho');
+
+        const pedidoItemDtos: CreatePedidoItemDto[] = [];
+        for (const [i, item] of dto.items.entries()) {
+            const [errItem, itemDto] = CreatePedidoItemDto.create(item);
+            if (errItem || !itemDto) throw new Error(`items[${i}]: ${errItem}`);
+
+            const disponible = await this.inventarioGenericoRepository.obtenerStockDisponible({
+                entidad: itemDto.entidad,
+                id_entidad: itemDto.id_entidad,
+                id_almacen: dto.pedido.id_almacen,
+                cantidad: itemDto.cantidad,
+            });
+            if (disponible < itemDto.cantidad) {
+                throw new Error(`items[${i}]: stock insuficiente para ${itemDto.entidad} ${itemDto.id_entidad} (disponible ${disponible}, solicitado ${itemDto.cantidad})`);
+            }
+
+            pedidoItemDtos.push(itemDto);
+        }
+
+        const pedido = await this.pedidoRepository.createPedido(dto.pedido);
+        await this.pedidoItemRepository.createMany(pedido.id_pedido, pedidoItemDtos);
+
+        return pedido;
     }
 
 }

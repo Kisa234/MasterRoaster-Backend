@@ -1,153 +1,142 @@
-import { EnvioRepository } from '../../domain/repository/envio.repository';
-import { CreateEnvio } from '../../domain/usecases/envio/create-envio';
-import { LoteTostadoRepository } from '../../domain/repository/loteTostado.repository';
 import { Request, Response } from "express";
-import { CreateEnvioDto } from '../../domain/dtos/envio/envio/create';
-import { InventarioLoteTostadoRepository } from '../../domain/repository/inventario-lote-tostado.repository';
+import { EnvioRepository } from "../../domain/repository/envio.repository";
+import { DireccionEnvioRepository } from "../../domain/repository/direccion-envio.repository";
+import { PaqueteRepository } from "../../domain/repository/paquete.repository";
+import { PaqueteItemRepository } from "../../domain/repository/paquete-item.repository";
+import { InventarioGenericoRepository } from "../../domain/repository/inventario-generico.repository";
+import { MovimientoAlmacenRepository } from "../../domain/repository/movimiento-almacen.repository";
+import { HistorialRepository } from "../../domain/repository/historial.repository";
 
+import { CreateEnvioDto } from "../../domain/dtos/envio/create";
+import { ProgramarEnvioDto } from "../../domain/dtos/envio/programar";
+import { DespacharEnvioDto } from "../../domain/dtos/envio/despachar";
+import { ConfirmarEntregaEnvioDto } from "../../domain/dtos/envio/confirmar-entrega";
+import { CancelarEnvioDto } from "../../domain/dtos/envio/cancelar";
+import { RegistrarDevolucionEnvioDto } from "../../domain/dtos/envio/registrar-devolucion";
+
+import { CrearEnvio } from "../../domain/usecases/envio/crear-envio";
+import { ProgramarEnvio } from "../../domain/usecases/envio/programar-envio";
+import { DespacharEnvio } from "../../domain/usecases/envio/despachar-envio";
+import { ConfirmarEntregaEnvio } from "../../domain/usecases/envio/confirmar-entrega-envio";
+import { CancelarEnvio } from "../../domain/usecases/envio/cancelar-envio";
+import { RegistrarDevolucionEnvio } from "../../domain/usecases/envio/registrar-devolucion-envio";
+import { GetEnvio } from "../../domain/usecases/envio/get-envio";
+import { GetEnvios } from "../../domain/usecases/envio/get-envios";
 
 export class EnvioController {
-
     constructor(
-        private readonly envioRepository: EnvioRepository,
-        private readonly loteTostadoRepository: LoteTostadoRepository,
-        private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository
-
+        private readonly envioRepo: EnvioRepository,
+        private readonly direccionRepo: DireccionEnvioRepository,
+        private readonly paqueteRepo: PaqueteRepository,
+        private readonly paqueteItemRepo: PaqueteItemRepository,
+        private readonly inventarioRepo: InventarioGenericoRepository,
+        private readonly movimientoRepo: MovimientoAlmacenRepository,
+        private readonly historialRepo: HistorialRepository,
     ) { }
 
+    public create = (req: Request, res: Response) => {
+        if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
 
-    public createEnvio = (req: Request, res: Response) => {
-        const [error, dto] = CreateEnvioDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error }); ``
-        }
-        new CreateEnvio(
-            this.envioRepository,
-            this.loteTostadoRepository,
-            this.inventarioLoteTostadoRepository
-        )
+        const [error, dto] = CreateEnvioDto.create({
+            ...req.body,
+            registrado_por_id: req.body.registrado_por_id ?? req.user.id_user,
+        });
+        if (error) return res.status(400).json({ error });
+
+        new CrearEnvio(this.envioRepo, this.direccionRepo, this.paqueteRepo)
             .execute(dto!)
             .then(envio => res.json(envio))
-            .catch(error => res.status(400).json({ error }));
-    }
-
-    public getEnvioById = async (req: Request, res: Response) => {
-        try {
-            const { id_envio } = req.params;
-            const envio = await this.envioRepository.getEnvioById(id_envio);
-            if (!envio) return res.status(404).json({ error: "Envío no encontrado" });
-            return res.json(envio);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    public updateEnvio = async (req: Request, res: Response) => {
-        try {
-            const { id_envio } = req.params;
-            const updated = await this.envioRepository.updateEnvio(id_envio, req.body);
-            return res.json(updated);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+    public programar = (req: Request, res: Response) => {
+        const [error, dto] = ProgramarEnvioDto.create(req.body);
+        if (error) return res.status(400).json({ error });
+
+        new ProgramarEnvio(this.envioRepo)
+            .execute(req.params.id, dto!)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    public deleteEnvio = async (req: Request, res: Response) => {
-        try {
-            const { id_envio } = req.params;
-            const deleted = await this.envioRepository.deleteEnvio(id_envio);
-            return res.json(deleted);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+    public despachar = (req: Request, res: Response) => {
+        if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
+
+        const [error, dto] = DespacharEnvioDto.create({
+            ...req.body,
+            despachado_por_id: req.body.despachado_por_id ?? req.user.id_user,
+        });
+        if (error) return res.status(400).json({ error });
+
+        new DespacharEnvio(
+            this.envioRepo, this.paqueteRepo, this.paqueteItemRepo,
+            this.inventarioRepo, this.movimientoRepo, this.historialRepo,
+        )
+            .execute(req.params.id, dto!)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    public getEnviosByLote = async (req: Request, res: Response) => {
-        try {
-            const { id_lote_tostado } = req.params;
-            const envios = await this.envioRepository.getEnviosByLote(id_lote_tostado);
-            return res.json(envios);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+    public confirmarEntrega = (req: Request, res: Response) => {
+        if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
+
+        const [error, dto] = ConfirmarEntregaEnvioDto.create({
+            ...req.body,
+            entregado_por_id: req.body.entregado_por_id ?? req.user.id_user,
+        });
+        if (error) return res.status(400).json({ error });
+
+        new ConfirmarEntregaEnvio(this.envioRepo)
+            .execute(req.params.id, dto!)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    public getEnviosByCliente = async (req: Request, res: Response) => {
-        try {
-            const { id_cliente } = req.params;
-            const envios = await this.envioRepository.getEnviosByCliente(id_cliente);
-            return res.json(envios);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+    public cancelar = (req: Request, res: Response) => {
+        if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
+
+        const [error, dto] = CancelarEnvioDto.create({
+            ...req.body,
+            cancelado_por_id: req.body.cancelado_por_id ?? req.user.id_user,
+        });
+        if (error) return res.status(400).json({ error });
+
+        new CancelarEnvio(this.envioRepo, this.paqueteRepo)
+            .execute(req.params.id, dto!)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    public getEnviosByFechaRange = async (req: Request, res: Response) => {
-        try {
-            const { from, to } = req.query as { from?: string; to?: string };
-            if (!from || !to) {
-                return res.status(400).json({ error: "Parámetros 'from' y 'to' son requeridos (YYYY-MM-DD)." });
-            }
+    public registrarDevolucion = (req: Request, res: Response) => {
+        if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
 
-            // Inicio de día (local)
-            const fromStart = new Date(`${from}T00:00:00`);
-            // Límite superior EXCLUSIVO = inicio del día siguiente (local)
-            const toExclusive = new Date(`${to}T00:00:00`);
-            toExclusive.setDate(toExclusive.getDate() + 1);
+        const [error, dto] = RegistrarDevolucionEnvioDto.create({
+            ...req.body,
+            registrado_por_id: req.body.registrado_por_id ?? req.user.id_user,
+        });
+        if (error) return res.status(400).json({ error });
 
-            if (isNaN(fromStart.getTime()) || isNaN(toExclusive.getTime())) {
-                return res.status(400).json({ error: "Fechas inválidas. Use formato YYYY-MM-DD." });
-            }
-
-            // IMPORTANTE: en el repo/SQL usar LT, no LTE
-            const envios = await this.envioRepository.getEnviosByFechaRange(fromStart, toExclusive);
-            return res.json(envios);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+        new RegistrarDevolucionEnvio(
+            this.envioRepo, this.paqueteItemRepo, this.inventarioRepo,
+            this.movimientoRepo, this.historialRepo,
+        )
+            .execute(req.params.id, dto!)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-
-    public getEnviosByClasificacion = async (req: Request, res: Response) => {
-        try {
-            const { clasificacion } = req.params as { clasificacion: string };
-            const { from, to } = req.query as { from?: string; to?: string };
-
-            let fromDate: Date | undefined;
-            let toDate: Date | undefined;
-
-            if (from) {
-                fromDate = new Date(from);
-                if (isNaN(fromDate.getTime())) {
-                    return res.status(400).json({ error: "Parametro 'from' inválido (YYYY-MM-DD)." });
-                }
-            }
-            if (to) {
-                toDate = new Date(to);
-                if (isNaN(toDate.getTime())) {
-                    return res.status(400).json({ error: "Parametro 'to' inválido (YYYY-MM-DD)." });
-                }
-            }
-
-            const envios = await this.envioRepository.getEnviosByClasificacion(
-                clasificacion as any,
-                fromDate,
-                toDate
-            );
-            return res.json(envios);
-        } catch (error: any) {
-            return res.status(400).json({ error: error?.message ?? String(error) });
-        }
+    public getById = (req: Request, res: Response) => {
+        new GetEnvio(this.envioRepo)
+            .execute(req.params.id)
+            .then(envio => res.json(envio))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 
-    getAllEnvios = async (req: Request, res: Response) => {
-      try {
-        const envios = await this.envioRepository.getAllenvios();
-        return res.json(envios);
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Error al obtener envíos' });
-      }
+    public getAll = (req: Request, res: Response) => {
+        const estado = req.query.estado as string | undefined;
+        new GetEnvios(this.envioRepo)
+            .execute(estado)
+            .then(envios => res.json(envios))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
-
 }

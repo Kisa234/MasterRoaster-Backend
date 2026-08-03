@@ -2,16 +2,18 @@ import { PedidoEntity } from "../../entities/pedido.entity";
 import { LoteRepository } from "../../repository/lote.repository";
 import { PedidoRepository } from "../../repository/pedido.repository";
 import { TuesteRepository } from "../../repository/tueste.repository";
+import { PedidoItemRepository } from "../../repository/pedido-item.repository";
 
 export interface DeletePedidoUseCase {
   execute(id_pedido: string): Promise<void>;
 }
 
 export class DeletePedido implements DeletePedidoUseCase {
-  constructor(
+    constructor(
     private readonly pedidoRepository: PedidoRepository,
     private readonly loteRepository: LoteRepository,
     private readonly tuesteRepository: TuesteRepository,
+    private readonly pedidoItemRepository: PedidoItemRepository,
   ) {}
 
   async execute(id_pedido: string): Promise<void> {
@@ -28,6 +30,11 @@ export class DeletePedido implements DeletePedidoUseCase {
       await this.eliminarOrdenTueste(pedido);
       return;
     }
+
+    if (pedido.tipo_pedido === "OrdenDespacho") {
+      await this.pedidoItemRepository.deleteByPedido(id_pedido);
+    }
+
 
     await this.pedidoRepository.deletePedido(id_pedido);
   }

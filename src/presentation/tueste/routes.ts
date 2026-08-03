@@ -41,6 +41,15 @@ import { BolsaDataSourceImpl } from '../../infrastructure/datasources/bolsa.data
 import { BolsaRepositoryImpl } from '../../infrastructure/repositories/bolsa.repository';
 import { InventarioBolsaRepositoryImpl } from '../../infrastructure/repositories/inventario-bolsa.repository.impl';
 import { InventarioBolsaDataSourceImpl } from '../../infrastructure/datasources/inventario-bolsa.datasource.impl';
+import { PedidoItemDataSourceImpl } from '../../infrastructure/datasources/pedido-item.datasource.impl';
+import { PedidoItemRepositoryImpl } from '../../infrastructure/repositories/pedido-item.repository.impl';
+import { PaqueteDataSourceImpl } from '../../infrastructure/datasources/paquete.datasource.impl';
+import { PaqueteRepositoryImpl } from '../../infrastructure/repositories/paquete.repository.impl';
+import { PaqueteItemDataSourceImpl } from '../../infrastructure/datasources/paquete-item.datasource.impl';
+import { PaqueteItemRepositoryImpl } from '../../infrastructure/repositories/paquete-item.repository.impl';
+import { InventarioGenericoDataSourceImpl } from '../../infrastructure/datasources/inventario-generico.datasource.impl';
+import { InventarioGenericoRepositoryImpl } from '../../infrastructure/repositories/inventario-generico.repository.impl';
+
 
 export class TuesteRoutes {
 
@@ -129,6 +138,22 @@ export class TuesteRoutes {
         const inventarioBolsaDatasource = new InventarioBolsaDataSourceImpl();
         const inventarioBolsaRepository = new InventarioBolsaRepositoryImpl(inventarioBolsaDatasource);
 
+        // PedidoItem
+        const pedidoItemDatasource = new PedidoItemDataSourceImpl();
+        const pedidoItemRepository = new PedidoItemRepositoryImpl(pedidoItemDatasource);
+
+        // Paquete
+        const paqueteDatasource = new PaqueteDataSourceImpl();
+        const paqueteRepository = new PaqueteRepositoryImpl(paqueteDatasource);
+
+        // PaqueteItem
+        const paqueteItemDatasource = new PaqueteItemDataSourceImpl();
+        const paqueteItemRepository = new PaqueteItemRepositoryImpl(paqueteItemDatasource);
+
+        // InventarioGenerico
+        const inventarioGenericoDatasource = new InventarioGenericoDataSourceImpl();
+        const inventarioGenericoRepository = new InventarioGenericoRepositoryImpl(inventarioGenericoDatasource);
+
 
         const createLoteTostado = new CreateLoteTostado(
             loteTostadoRepository
@@ -165,6 +190,10 @@ export class TuesteRoutes {
             pedidoBolsaRepository,
             bolsaRepository,
             inventarioBolsaRepository,
+            pedidoItemRepository,
+            paqueteRepository,
+            paqueteItemRepository,
+            inventarioGenericoRepository,
         );
 
 

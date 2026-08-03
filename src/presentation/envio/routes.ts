@@ -1,43 +1,50 @@
 import { Router } from "express";
-import { EnvioDataSourceImpl } from "../../infrastructure/datasources/envio.datasource.impl";
-import { EnvioRepositoryImpl } from "../../infrastructure/repositories/envio.repository.impl";
-import { LoteTostadoDataSourceImpl } from "../../infrastructure/datasources/loteTostado.datasource.impl";
-import { LoteTostadoRepositoryImpl } from "../../infrastructure/repositories/loteTostado.repository.impl";
 import { EnvioController } from "./controller";
-import { InventarioLoteTostadoRepositoryImpl } from "../../infrastructure/repositories/inventario-lote-tostado.repository.impl";
-import { InventarioLoteTostadoDataSourceImpl } from "../../infrastructure/datasources/inventario-lote-tostado.datasource.impl";
+import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
+
+import { EnvioDataSourceImpl } from "../../infrastructure/datasources/envio.datasource.impl";
+import { DireccionEnvioDataSourceImpl } from "../../infrastructure/datasources/direccion-envio.datasource.impl";
+import { PaqueteDataSourceImpl } from "../../infrastructure/datasources/paquete.datasource.impl";
+import { PaqueteItemDataSourceImpl } from "../../infrastructure/datasources/paquete-item.datasource.impl";
+import { InventarioGenericoDataSourceImpl } from "../../infrastructure/datasources/inventario-generico.datasource.impl";
+
+import { MovimientoAlmacenDataSourceImpl } from "../../infrastructure/datasources/movimiento-almacen.datasource.impl";
+import { HistorialDataSourceImpl } from "../../infrastructure/datasources/historial.datasource.impl";
+import { EnvioRepositoryImpl } from "../../infrastructure/repositories/envio.repository.impl";
+import { DireccionEnvioRepositoryImpl } from "../../infrastructure/repositories/direccion-envio.repository.impl";
+import { PaqueteRepositoryImpl } from "../../infrastructure/repositories/paquete.repository.impl";
+import { PaqueteItemRepositoryImpl } from "../../infrastructure/repositories/paquete-item.repository.impl";
+import { InventarioGenericoRepositoryImpl } from "../../infrastructure/repositories/inventario-generico.repository.impl";
+import { MovimientoAlmacenRepositoryImpl } from "../../infrastructure/repositories/movimiento-almacen.repository.impl";
+import { HistorialRepositoryImpl } from "../../infrastructure/repositories/historial.repository.impl";
 
 export class EnvioRoutes {
-  static get routes(): Router {
-    const router = Router();
+    static get routes(): Router {
+        const router = Router();
 
-    // Infra
-    const envioDatasource = new EnvioDataSourceImpl();
-    const envioRepository = new EnvioRepositoryImpl(envioDatasource);
+        const envioRepo = new EnvioRepositoryImpl(new EnvioDataSourceImpl());
+        const direccionRepo = new DireccionEnvioRepositoryImpl(new DireccionEnvioDataSourceImpl());
+        const paqueteRepo = new PaqueteRepositoryImpl(new PaqueteDataSourceImpl());
+        const paqueteItemRepo = new PaqueteItemRepositoryImpl(new PaqueteItemDataSourceImpl());
+        const inventarioRepo = new InventarioGenericoRepositoryImpl(new InventarioGenericoDataSourceImpl());
+        const movimientoRepo = new MovimientoAlmacenRepositoryImpl(new MovimientoAlmacenDataSourceImpl());
+        const historialRepo = new HistorialRepositoryImpl(new HistorialDataSourceImpl());
 
-    const loteTostadoDatasource = new LoteTostadoDataSourceImpl();
-    const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteTostadoDatasource);
+        const controller = new EnvioController(
+            envioRepo, direccionRepo, paqueteRepo, paqueteItemRepo,
+            inventarioRepo, movimientoRepo, historialRepo,
+        );
 
-    const inventarioLoteTostadoDatasource = new InventarioLoteTostadoDataSourceImpl();
-    const inventarioLoteTostadoRepository = new InventarioLoteTostadoRepositoryImpl(inventarioLoteTostadoDatasource);
+        router.post('/', authMiddleware, controller.create);
+        router.put('/:id/programar', authMiddleware, controller.programar);
+        router.put('/:id/despachar', authMiddleware, controller.despachar);
+        router.put('/:id/entregar', authMiddleware, controller.confirmarEntrega);
+        router.put('/:id/cancelar', authMiddleware, controller.cancelar);
+        router.put('/:id/devolucion', authMiddleware, controller.registrarDevolucion);
 
-    // Controller
-    const controller = new EnvioController(envioRepository, loteTostadoRepository, inventarioLoteTostadoRepository);
-   
-    // ---- Query routes (específicas primero) ----
-    router.get("/lote/:id_lote_tostado", controller.getEnviosByLote);
-    router.get("/cliente/:id_cliente", controller.getEnviosByCliente);
-    router.get("/rango-fecha", controller.getEnviosByFechaRange);
-    router.get("/clasificacion/:clasificacion", controller.getEnviosByClasificacion);
+        router.get('/', controller.getAll);
+        router.get('/:id', controller.getById);
 
-    // ---- CRUD ----
-    router.post("/", controller.createEnvio);
-    router.put("/:id_envio", controller.updateEnvio);
-    router.delete("/:id_envio", controller.deleteEnvio);
-    router.get("/", controller.getAllEnvios);
-    router.get("/:id_envio", controller.getEnvioById);
-    
-    
-    return router;
-  }
+        return router;
+    }
 }

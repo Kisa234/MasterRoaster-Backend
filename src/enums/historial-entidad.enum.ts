@@ -8,4 +8,6 @@ export enum HistorialEntidad {
   PRODUCTO = "PRODUCTO",
   INVENTARIO = "INVENTARIO",
   TUESTE = "TUESTE",
+  PAQUETE = "PAQUETE",
+  ENVIO = "ENVIO",
 }

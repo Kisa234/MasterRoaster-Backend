@@ -31,6 +31,13 @@ import { InventarioBolsaRepository } from '../../repository/inventario-bolsa.rep
 import { CreateInventarioBolsaDto } from '../../dtos/inventarios/inventario-bolsa/create';
 import { CreateBolsaDto } from '../../dtos/bolsa/create';
 import { getMoliendaAbrev } from '../../utils/molienda-abrev';
+import { PedidoItemRepository } from '../../repository/pedido-item.repository';
+import { PaqueteRepository } from '../../repository/paquete.repository';
+import { PaqueteItemRepository } from '../../repository/paquete-item.repository';
+import { InventarioGenericoRepository } from '../../repository/inventario-generico.repository';
+import { CreatePaqueteDto } from '../../dtos/paquete/create';
+import { CreatePaqueteItemDto } from '../../dtos/paquete-item/create';
+import { getUnidadMedidaDefault } from '../../utils/unidad-medida-default';
 
 export interface CompletarPedidoUseCase {
     execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity>;
@@ -51,6 +58,10 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         private readonly pedidoBolsaRepository: PedidoBolsaRepository,
         private readonly bolsaRepository: BolsaRepository,
         private readonly inventarioBolsaRepository: InventarioBolsaRepository,
+        private readonly pedidoItemRepository: PedidoItemRepository,
+        private readonly paqueteRepository: PaqueteRepository,
+        private readonly paqueteItemRepository: PaqueteItemRepository,
+        private readonly inventarioGenericoRepository: InventarioGenericoRepository,
     ) { }
 
     async execute(id_pedido: string, id_completado_por: string): Promise<PedidoEntity> {
@@ -77,6 +88,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 break
             case 'Maquila':
                 return this.maquilaCompletion(pedido.id_pedido, id_completado_por);
+                break
+            case 'OrdenDespacho':
+                return this.ordenDespachoCompletion(pedido.id_pedido, id_completado_por);
                 break
             case 'Suscripcion':
                 return this.pedidoRepository.completarPedido(id_pedido, id_completado_por);
@@ -705,6 +719,62 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         }
 
         // 11. Marcar pedido como Completado
+        return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
+    }
+
+    async ordenDespachoCompletion(pedidoId: string, id_completado_por: string) {
+        const pedido = await this.pedidoRepository.getPedidoById(pedidoId);
+        if (!pedido || pedido.estado_pedido !== "Pendiente")
+            throw new Error("Pedido no válido o ya completado");
+
+        if (!pedido.id_almacen) throw new Error('El pedido no tiene almacén asociado');
+
+        const pedidoItems = await this.pedidoItemRepository.getByPedido(pedidoId);
+        if (!pedidoItems || pedidoItems.length === 0)
+            throw new Error('El pedido no tiene artículos definidos');
+
+        for (const item of pedidoItems) {
+            const disponible = await this.inventarioGenericoRepository.obtenerStockDisponible({
+                entidad: item.entidad,
+                id_entidad: item.id_entidad,
+                id_almacen: pedido.id_almacen,
+                cantidad: item.cantidad,
+            });
+            if (disponible < item.cantidad) {
+                throw new Error(`Stock insuficiente para ${item.entidad} ${item.id_entidad}: disponible ${disponible}, requerido ${item.cantidad}`);
+            }
+        }
+
+        const [errPaq, paqueteDto] = CreatePaqueteDto.create({
+            id_cliente: pedido.id_user,
+            creado_por_id: id_completado_por,
+            id_pedido_origen: pedido.id_pedido,
+        });
+        if (errPaq || !paqueteDto) throw new Error(errPaq ?? 'Error al crear DTO de paquete');
+        const paquete = await this.paqueteRepository.create(paqueteDto);
+
+        for (const item of pedidoItems) {
+            const [errItem, itemDto] = CreatePaqueteItemDto.create({
+                id_paquete: paquete.id_paquete,
+                entidad: item.entidad,
+                id_entidad: item.id_entidad,
+                id_almacen: pedido.id_almacen,
+                cantidad: item.cantidad,
+                unidad_medida: getUnidadMedidaDefault(item.entidad),
+            });
+            if (errItem || !itemDto) throw new Error(errItem ?? 'Error al crear DTO de artículo de paquete');
+            await this.paqueteItemRepository.create(itemDto);
+        }
+
+        await this.registrarHistorial({
+            entidad: HistorialEntidad.PAQUETE,
+            accion: HistorialAccion.CREATE,
+            id_entidad: paquete.id_paquete,
+            id_user: id_completado_por,
+            id_pedido: pedido.id_pedido,
+            comentario: `Paquete generado a partir de la Orden de Despacho ${pedido.id_pedido}`,
+        });
+
         return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
     }
 

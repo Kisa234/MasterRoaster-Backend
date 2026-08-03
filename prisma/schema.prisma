@@ -33,7 +33,6 @@ model User {
   balonesGasIniciados   BalonGas[]           @relation("BalonGasUserInicioUso")
   boxRespuestas         BoxRespuesta[]
   cambios               Cambios[]
-  envio                 Envio[]
   historial             Historial[]
   ingresosCafe          IngresoCafe[]
   ingresosInsumos       IngresoInsumo[]
@@ -48,6 +47,13 @@ model User {
   pedidos               Pedido[]             @relation("Cliente")
   Rol                   Rol?                 @relation(fields: [id_rol], references: [id_rol])
   bolsas                Bolsa[]
+  paquetesCreados       Paquete[]            @relation("PaqueteCreadoPor")
+  paquetesPreparados    Paquete[]            @relation("PaquetePreparadoPor")
+  paquetesCliente       Paquete[]            @relation("PaqueteCliente")
+  enviosRegistrados     Envio[]              @relation("EnvioRegistradoPor")
+  enviosDespachados     Envio[]              @relation("EnvioDespachadoPor")
+  enviosEntregados      Envio[]              @relation("EnvioEntregadoPor")
+  enviosCancelados      Envio[]              @relation("EnvioCanceladoPor")
 }
 
 model PasswordResetToken {
@@ -107,6 +113,7 @@ model Almacen {
   movimientosOrigen   MovimientoAlmacen[]     @relation("MovimientoOrigen")
   pedidos             Pedido[]                @relation("almacen")
   inventarioBolsas    InventarioBolsa[]
+  paqueteItems        PaqueteItem[]
 }
 
 model MovimientoAlmacen {
@@ -221,9 +228,7 @@ model LoteTostado {
   fecha_registro         DateTime                @default(now())
   eliminado              Boolean                 @default(false)
   id_analisis_rapido     String?                 @unique
-  entregado              DateTime?
   id_user                String?
-  envio                  Envio[]
   inventarioLoteTostados InventarioLoteTostado[]
   inventarios            InventarioProducto[]
   analisisRapido         AnalisisRapido?         @relation(fields: [id_analisis_rapido], references: [id_analisis_rapido])
@@ -267,7 +272,6 @@ model Bolsa {
   pedido      Pedido            @relation(fields: [id_pedido], references: [id_pedido])
   user        User?             @relation(fields: [id_user], references: [id_user])
   inventarios InventarioBolsa[]
-  envios      Envio[]
 }
 
 model InventarioBolsa {
@@ -504,6 +508,8 @@ enum HistorialEntidad {
   PRODUCTO
   INVENTARIO
   TUESTE
+  PAQUETE
+  ENVIO
 }
 
 enum HistorialAccion {
@@ -595,6 +601,8 @@ model Pedido {
   movimientoAlmacens MovimientoAlmacen[]
   // relaciones con pedido de bolsas 
   pedidoBolsas       PedidoBolsa[]
+  pedidoItems        PedidoItem[]
+  paquetesOrigen     Paquete[]           @relation("PaqueteDeEmpaque")
 }
 
 model PedidoBolsa {
@@ -605,6 +613,77 @@ model PedidoBolsa {
   cantidad        Int
 
   pedido Pedido @relation(fields: [id_pedido], references: [id_pedido])
+}
+
+model PedidoItem {
+  id_pedido_item String            @id @default(uuid())
+  id_pedido      String
+  entidad        EntidadInventario
+  id_entidad     String
+  cantidad       Float
+
+  pedido Pedido @relation(fields: [id_pedido], references: [id_pedido])
+}
+
+enum EstadoPaquete {
+  EN_PREPARACION
+  LISTO
+  DESPACHADO
+  CANCELADO
+}
+
+enum EstadoEnvio {
+  PENDIENTE
+  PROGRAMADO
+  DESPACHADO
+  EN_TRANSITO
+  ENTREGADO
+  CANCELADO
+  DEVUELTO
+}
+
+enum QuienPaga {
+  CLIENTE
+  EMPRESA
+}
+
+model Paquete {
+  id_paquete       String        @id @default(uuid())
+  id_cliente       String
+  id_pedido_origen String?
+  estado           EstadoPaquete @default(EN_PREPARACION)
+  comentario       String?
+  eliminado        Boolean       @default(false)
+  fecha_registro   DateTime      @default(now())
+  fecha_editado    DateTime?
+
+  creado_por_id    String
+  preparado_por_id String?
+  fecha_preparado  DateTime?
+
+  cliente      User    @relation("PaqueteCliente", fields: [id_cliente], references: [id_user])
+  pedidoOrigen Pedido? @relation("PaqueteDeEmpaque", fields: [id_pedido_origen], references: [id_pedido])
+  creadoPor    User    @relation("PaqueteCreadoPor", fields: [creado_por_id], references: [id_user])
+  preparadoPor User?   @relation("PaquetePreparadoPor", fields: [preparado_por_id], references: [id_user])
+
+  items PaqueteItem[]
+  envio Envio?
+}
+
+model PaqueteItem {
+  id_item       String            @id @default(uuid())
+  id_paquete    String
+  entidad       EntidadInventario
+  id_entidad    String
+  id_almacen    String
+  cantidad      Float
+  unidad_medida String
+  gramaje       Int?
+  molienda      String?
+  comentario    String?
+
+  paquete Paquete @relation(fields: [id_paquete], references: [id_paquete])
+  almacen Almacen @relation(fields: [id_almacen], references: [id_almacen])
 }
 
 model Tueste {
@@ -664,35 +743,71 @@ model BalonGas {
 }
 
 model Envio {
-  id_envio        String   @id @default(uuid())
-  id_lote_tostado String
-  id_cliente      String
-  cantidad        Int
-  comentario      String?
-  fecha           DateTime @default(now())
-  eliminado       Boolean  @default(false)
+  id_envio           String      @id @default(uuid())
+  numero_correlativo String      @unique
+  id_paquete         String      @unique
+  estado             EstadoEnvio @default(PENDIENTE)
+  eliminado          Boolean     @default(false)
 
-  origen        OrigenEnvio
-  clasificacion ClasificacionEnvio
-  cliente       User               @relation(fields: [id_cliente], references: [id_user])
-  loteTostado   LoteTostado        @relation(fields: [id_lote_tostado], references: [id_lote_tostado])
-  ficha         FichaEnvio?
-  bolsa         Bolsa?             @relation(fields: [bolsaId_bolsa], references: [id_bolsa])
-  bolsaId_bolsa String?
+  id_transportista String?
+  numero_tracking  String?
+  costo_envio      Float?
+  quien_paga       QuienPaga?
+
+  peso_total_kg Float?
+  alto_cm       Float?
+  ancho_cm      Float?
+  largo_cm      Float?
+
+  fecha_registro         DateTime  @default(now())
+  fecha_programada       DateTime?
+  fecha_despacho_real    DateTime?
+  fecha_entrega_estimada DateTime?
+  fecha_entrega_real     DateTime?
+
+  registrado_por_id      String
+  despachado_por_id      String?
+  entregado_por_id       String?
+  cancelado_por_id       String?
+  comentario_cancelacion String?
+
+  paquete       Paquete        @relation(fields: [id_paquete], references: [id_paquete])
+  transportista Transportista? @relation(fields: [id_transportista], references: [id_transportista])
+  registradoPor User           @relation("EnvioRegistradoPor", fields: [registrado_por_id], references: [id_user])
+  despachadoPor User?          @relation("EnvioDespachadoPor", fields: [despachado_por_id], references: [id_user])
+  entregadoPor  User?          @relation("EnvioEntregadoPor", fields: [entregado_por_id], references: [id_user])
+  canceladoPor  User?          @relation("EnvioCanceladoPor", fields: [cancelado_por_id], references: [id_user])
+
+  direccion DireccionEnvio?
 }
 
-model FichaEnvio {
-  id_ficha       String    @id @default(uuid())
-  id_envio       String    @unique
-  nombre         String
-  celular        String
-  direccion      String
-  distrito       String
-  dni            String?
-  referencia     String?
-  fecha_registro DateTime  @default(now())
-  fecha_editado  DateTime?
-  envio          Envio     @relation(fields: [id_envio], references: [id_envio])
+model DireccionEnvio {
+  id_direccion        String   @id @default(uuid())
+  id_envio            String   @unique
+  nombre_destinatario String
+  telefono            String
+  direccion           String
+  distrito            String
+  provincia           String
+  departamento        String
+  pais                String   @default("Perú")
+  codigo_postal       String?
+  referencia          String?
+  observaciones       String?
+  fecha_registro      DateTime @default(now())
+
+  envio Envio @relation(fields: [id_envio], references: [id_envio])
+}
+
+model Transportista {
+  id_transportista String   @id @default(uuid())
+  nombre           String   @unique
+  contacto         String?
+  telefono         String?
+  activo           Boolean  @default(true)
+  fecha_registro   DateTime @default(now())
+
+  envios Envio[]
 }
 
 model Lote_Analisis {

@@ -35,6 +35,10 @@ import { GetEstadisticasTueste } from '../../domain/usecases/pedido/get-estadist
 import { PedidoBolsaRepository } from '../../domain/repository/pedido-bolsa.repository';
 import { BolsaRepository } from '../../domain/repository/bolsa.repository';
 import { InventarioBolsaRepository } from '../../domain/repository/inventario-bolsa.repository';
+import { PedidoItemRepository } from '../../domain/repository/pedido-item.repository';
+import { InventarioGenericoRepository } from '../../domain/repository/inventario-generico.repository';
+import { PaqueteRepository } from '../../domain/repository/paquete.repository';
+import { PaqueteItemRepository } from '../../domain/repository/paquete-item.repository';
 
 export class PedidoController {
 
@@ -54,7 +58,11 @@ export class PedidoController {
         private readonly createLoteTostado: CreateLoteTostado,
         private readonly pedidoBolsaRepository: PedidoBolsaRepository,
         private readonly bolsaRepository: BolsaRepository,
-        private readonly inventarioBolsaRepository: InventarioBolsaRepository
+        private readonly inventarioBolsaRepository: InventarioBolsaRepository,
+        private readonly pedidoItemRepository: PedidoItemRepository,
+        private readonly inventarioGenericoRepository: InventarioGenericoRepository,
+        private readonly paqueteRepository: PaqueteRepository,
+        private readonly paqueteItemRepository: PaqueteItemRepository,
 
 
     ) {
@@ -84,12 +92,14 @@ export class PedidoController {
             this.analisisRepository,
             this.analisisFisicoRepository,
             this.pedidoBolsaRepository,
+            this.pedidoItemRepository,
+            this.inventarioGenericoRepository,
         )
-            .execute(createPedidoDto!, id_completado_por, body.bolsas) 
+            .execute(createPedidoDto!, id_completado_por, body.bolsas, body.items)
             .then(pedido => res.json(pedido))
             .catch(error => {
-                console.error('[createPedido] error en use case:', error); 
-                return res.status(400).json({ error: error?.message ?? String(error) }); 
+                console.error('[createPedido] error en use case:', error);
+                return res.status(400).json({ error: error?.message ?? String(error) });
             });
     };
 
@@ -114,6 +124,10 @@ export class PedidoController {
             this.pedidoBolsaRepository,
             this.bolsaRepository,
             this.inventarioBolsaRepository,
+            this.pedidoItemRepository,
+            this.paqueteRepository,
+            this.paqueteItemRepository,
+            this.inventarioGenericoRepository,
 
         )
             .execute(id_pedido, id_completado_por)
@@ -138,6 +152,8 @@ export class PedidoController {
             this.inventarioLoteRepository,
             this.inventarioLoteTostadoRepository,
             this.pedidoBolsaRepository,
+            this.pedidoItemRepository,
+            this.inventarioGenericoRepository,
         )
             .execute(id_pedido, updatePedidoDto!)
             .then(pedido => res.json(pedido))
@@ -149,6 +165,7 @@ export class PedidoController {
             this.pedidoRepository,
             this.loteRepository,
             this.tuesteRepository,
+            this.pedidoItemRepository
         )
             .execute(req.params.id)
             .then(pedido => res.json(pedido))

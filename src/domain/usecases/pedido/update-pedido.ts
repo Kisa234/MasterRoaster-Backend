@@ -12,6 +12,8 @@ import { LoteTostadoRepository } from "../../repository/loteTostado.repository";
 import { InventarioLoteRepository } from '../../repository/inventario-lote.repository';
 import { InventarioLoteTostadoRepository } from "../../repository/inventario-lote-tostado.repository";
 import { PedidoBolsaRepository } from "../../repository/pedido-bolsa.repository";
+import { PedidoItemRepository } from "../../repository/pedido-item.repository";
+import { InventarioGenericoRepository } from "../../repository/inventario-generico.repository";
 
 export interface UpdatePedidoUseCase {
   execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity>;
@@ -29,8 +31,11 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     private readonly inventarioLoteRepository: InventarioLoteRepository,
     private readonly inventarioLoteTostadoRepository: InventarioLoteTostadoRepository,
     private readonly pedidoBolsaRepository: PedidoBolsaRepository,
+    private readonly pedidoItemRepository: PedidoItemRepository,
+    private readonly inventarioGenericoRepository: InventarioGenericoRepository,
 
   ) { }
+
 
   async execute(id_pedido: string, updateDto: UpdatePedidoDto): Promise<PedidoEntity> {
     const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
@@ -54,6 +59,10 @@ export class UpdatePedido implements UpdatePedidoUseCase {
 
     if (pedido.tipo_pedido === 'Maquila') {
       return this.editarMaquila(pedido, updateDto);
+    }
+
+    if (pedido.tipo_pedido === 'OrdenDespacho') {
+      return this.editarOrdenDespacho(pedido, updateDto);
     }
 
     throw new Error('Tipo de pedido inválido');
@@ -247,6 +256,30 @@ export class UpdatePedido implements UpdatePedidoUseCase {
     return PedidoEntity.fromObject(pedidoActualizado!);
   }
 
+
+  async editarOrdenDespacho(pedido: PedidoEntity, dto: UpdatePedidoDto): Promise<PedidoEntity> {
+    const idAlmacen = dto.id_almacen ?? pedido.id_almacen;
+    if (!idAlmacen) throw new Error('El almacén es requerido para una Orden de Despacho');
+
+    if (dto.id_almacen && dto.id_almacen !== pedido.id_almacen) {
+      const items = await this.pedidoItemRepository.getByPedido(pedido.id_pedido);
+
+      for (const item of items) {
+        const disponible = await this.inventarioGenericoRepository.obtenerStockDisponible({
+          entidad: item.entidad,
+          id_entidad: item.id_entidad,
+          id_almacen: idAlmacen,
+          cantidad: item.cantidad,
+        });
+        if (disponible < item.cantidad) {
+          throw new Error(`Stock insuficiente para ${item.entidad} ${item.id_entidad} en el nuevo almacén`);
+        }
+      }
+    }
+
+    const pedidoActualizado = await this.pedidoRepository.updatePedido(pedido.id_pedido, dto);
+    return PedidoEntity.fromObject(pedidoActualizado!);
+  }
 
 
 }

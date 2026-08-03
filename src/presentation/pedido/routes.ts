@@ -38,6 +38,14 @@ import { BolsaDataSourceImpl } from '../../infrastructure/datasources/bolsa.data
 import { InventarioBolsaDataSourceImpl } from '../../infrastructure/datasources/inventario-bolsa.datasource.impl';
 import { InventarioBolsaRepositoryImpl } from '../../infrastructure/repositories/inventario-bolsa.repository.impl';
 import { BolsaRepositoryImpl } from '../../infrastructure/repositories/bolsa.repository';
+import { PedidoItemDataSourceImpl } from '../../infrastructure/datasources/pedido-item.datasource.impl';
+import { PedidoItemRepositoryImpl } from '../../infrastructure/repositories/pedido-item.repository.impl';
+import { InventarioGenericoDataSourceImpl } from '../../infrastructure/datasources/inventario-generico.datasource.impl';
+import { InventarioGenericoRepositoryImpl } from '../../infrastructure/repositories/inventario-generico.repository.impl';
+import { PaqueteDataSourceImpl } from '../../infrastructure/datasources/paquete.datasource.impl';
+import { PaqueteRepositoryImpl } from '../../infrastructure/repositories/paquete.repository.impl';
+import { PaqueteItemDataSourceImpl } from '../../infrastructure/datasources/paquete-item.datasource.impl';
+import { PaqueteItemRepositoryImpl } from '../../infrastructure/repositories/paquete-item.repository.impl';
 
 export class PedidoRoutes {
 
@@ -112,6 +120,22 @@ export class PedidoRoutes {
         const inventarioBolsaDatasource = new InventarioBolsaDataSourceImpl();
         const inventarioBolsaRepository = new InventarioBolsaRepositoryImpl(inventarioBolsaDatasource);
 
+        // PedidoItem
+        const pedidoItemDatasource = new PedidoItemDataSourceImpl();
+        const pedidoItemRepository = new PedidoItemRepositoryImpl(pedidoItemDatasource);
+
+        // InventarioGenerico
+        const inventarioGenericoDatasource = new InventarioGenericoDataSourceImpl();
+        const inventarioGenericoRepository = new InventarioGenericoRepositoryImpl(inventarioGenericoDatasource);
+
+        // Paquete
+        const paqueteDatasource = new PaqueteDataSourceImpl();
+        const paqueteRepository = new PaqueteRepositoryImpl(paqueteDatasource);
+
+        // PaqueteItem
+        const paqueteItemDatasource = new PaqueteItemDataSourceImpl();
+        const paqueteItemRepository = new PaqueteItemRepositoryImpl(paqueteItemDatasource);
+
         // Use cases
         const createLoteUseCase = new CreateLote(
             LoteRepository,
@@ -150,9 +174,13 @@ export class PedidoRoutes {
             historialRepository,
             movimientoAlmacenRepository,
             CreateLoteTostadoUseCase,
-            pedidoBolsaRepository,       
-            bolsaRepository,             
-            inventarioBolsaRepository,   
+            pedidoBolsaRepository,
+            bolsaRepository,
+            inventarioBolsaRepository,
+            pedidoItemRepository,
+            inventarioGenericoRepository,
+            paqueteRepository,
+            paqueteItemRepository,
         );
 
         // Rutas — sin cambios

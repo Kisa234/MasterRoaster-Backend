@@ -1,40 +1,44 @@
 import { EnvioDataSource } from "../../domain/datasources/envio.datasource";
-import { CreateEnvioDto } from "../../domain/dtos/envio/envio/create";
-import { UpdateEnvioDto } from "../../domain/dtos/envio/envio/update";
-import { EnvioEntity, ClasificacionEnvio } from "../../domain/entities/envio.entity";
+import { CreateEnvioDto } from "../../domain/dtos/envio/create";
+import { ProgramarEnvioDto } from "../../domain/dtos/envio/programar";
+import { DespacharEnvioDto } from "../../domain/dtos/envio/despachar";
+import { ConfirmarEntregaEnvioDto } from "../../domain/dtos/envio/confirmar-entrega";
+import { CancelarEnvioDto } from "../../domain/dtos/envio/cancelar";
+import { RegistrarDevolucionEnvioDto } from "../../domain/dtos/envio/registrar-devolucion";
+import { EnvioEntity, EnvioConDetalleEntity } from "../../domain/entities/envio.entity";
 import { EnvioRepository } from "../../domain/repository/envio.repository";
 
-export class EnvioRepositoryImpl implements EnvioRepository{
-    constructor(
-        private readonly envioDatasource: EnvioDataSource
-    ){}
+export class EnvioRepositoryImpl implements EnvioRepository {
+    constructor(private readonly datasource: EnvioDataSource) { }
 
-    createEnvio(dto: CreateEnvioDto): Promise<EnvioEntity> {
-       return this.envioDatasource.createEnvio(dto);
+    create(dto: CreateEnvioDto, numero_correlativo: string): Promise<EnvioEntity> {
+        return this.datasource.create(dto, numero_correlativo);
     }
-    getEnvioById(id_envio: string): Promise<EnvioEntity | null> {
-        return this.envioDatasource.getEnvioById(id_envio);
+    getById(id_envio: string): Promise<EnvioEntity | null> {
+        return this.datasource.getById(id_envio);
     }
-    updateEnvio(id_envio: string, dto: UpdateEnvioDto): Promise<EnvioEntity> {
-        return this.envioDatasource.updateEnvio(id_envio,dto);
+    getByIdConDetalle(id_envio: string): Promise<EnvioConDetalleEntity | null> {
+        return this.datasource.getByIdConDetalle(id_envio);
     }
-    deleteEnvio(id_envio: string): Promise<EnvioEntity> {
-        return this.envioDatasource.deleteEnvio(id_envio);
+    getAll(estado?: string): Promise<EnvioEntity[]> {
+        return this.datasource.getAll(estado);
     }
-    getEnviosByLote(id_lote_tostado: string): Promise<EnvioEntity[]> {
-        return this.envioDatasource.getEnviosByLote(id_lote_tostado);
+    countTotal(): Promise<number> {
+        return this.datasource.countTotal();
     }
-    getEnviosByCliente(id_cliente: string): Promise<EnvioEntity[]> {
-        return this.envioDatasource.getEnviosByCliente(id_cliente);
+    programar(id_envio: string, dto: ProgramarEnvioDto): Promise<EnvioEntity> {
+        return this.datasource.programar(id_envio, dto);
     }
-    getEnviosByFechaRange(from: Date, to: Date): Promise<EnvioEntity[]> {
-        return this.envioDatasource.getEnviosByFechaRange(from,to);
+    despachar(id_envio: string, dto: DespacharEnvioDto): Promise<EnvioEntity> {
+        return this.datasource.despachar(id_envio, dto);
     }
-    getEnviosByClasificacion(clasificacion: ClasificacionEnvio, from?: Date, to?: Date): Promise<EnvioEntity[]> {
-        return this.envioDatasource.getEnviosByClasificacion(clasificacion,from,to);
+    confirmarEntrega(id_envio: string, dto: ConfirmarEntregaEnvioDto): Promise<EnvioEntity> {
+        return this.datasource.confirmarEntrega(id_envio, dto);
     }
-
-    getAllenvios(): Promise<EnvioEntity[]> {
-      return this.envioDatasource.getAllenvios();
+    cancelar(id_envio: string, dto: CancelarEnvioDto): Promise<EnvioEntity> {
+        return this.datasource.cancelar(id_envio, dto);
+    }
+    registrarDevolucion(id_envio: string, dto: RegistrarDevolucionEnvioDto): Promise<EnvioEntity> {
+        return this.datasource.registrarDevolucion(id_envio, dto);
     }
 }
