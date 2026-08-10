@@ -15,6 +15,9 @@ export class PaqueteItemRepositoryImpl implements PaqueteItemRepository {
     getByPaquete(id_paquete: string): Promise<PaqueteItemEntity[]> {
         return this.datasource.getByPaquete(id_paquete);
     }
+    getByEntidad(entidad: string, id_entidad: string): Promise<PaqueteItemEntity[]> { // 👈 nuevo
+        return this.datasource.getByEntidad(entidad, id_entidad);
+    }
     delete(id_item: string): Promise<PaqueteItemEntity> {
         return this.datasource.delete(id_item);
     }

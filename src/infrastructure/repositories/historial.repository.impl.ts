@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { HistorialDataSource } from "../../domain/datasources/historial.datasource";
 import { CreateHistorialDto } from "../../domain/dtos/historial/create";
 import { HistorialEntity } from "../../domain/entities/historial.entity";
@@ -8,9 +9,9 @@ export class HistorialRepositoryImpl implements HistorialRepository {
     constructor(
         private readonly datasource: HistorialDataSource
     ) {}
-    
-    createHistorial(createLoteHistorialDto: CreateHistorialDto): Promise<HistorialEntity> {
-        return this.datasource.createHistorial(createLoteHistorialDto);
+
+    createHistorial(createLoteHistorialDto: CreateHistorialDto, tx?: Prisma.TransactionClient): Promise<HistorialEntity> {
+        return this.datasource.createHistorial(createLoteHistorialDto, tx);
     }
 
     getHistorialById(id: string): Promise<HistorialEntity | null> {
@@ -26,5 +27,4 @@ export class HistorialRepositoryImpl implements HistorialRepository {
     getAllHistorial(): Promise<HistorialEntity[]> {
         return this.datasource.getAllHistorial();
     }
-    
 }

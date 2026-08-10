@@ -648,14 +648,15 @@ enum QuienPaga {
 }
 
 model Paquete {
-  id_paquete       String        @id @default(uuid())
-  id_cliente       String
-  id_pedido_origen String?
-  estado           EstadoPaquete @default(EN_PREPARACION)
-  comentario       String?
-  eliminado        Boolean       @default(false)
-  fecha_registro   DateTime      @default(now())
-  fecha_editado    DateTime?
+  id_paquete         String        @id @default(uuid())
+  numero_correlativo String?       @unique
+  id_cliente         String
+  id_pedido_origen   String?
+  estado             EstadoPaquete @default(EN_PREPARACION)
+  comentario         String?
+  eliminado          Boolean       @default(false)
+  fecha_registro     DateTime      @default(now())
+  fecha_editado      DateTime?
 
   creado_por_id    String
   preparado_por_id String?
@@ -666,8 +667,8 @@ model Paquete {
   creadoPor    User    @relation("PaqueteCreadoPor", fields: [creado_por_id], references: [id_user])
   preparadoPor User?   @relation("PaquetePreparadoPor", fields: [preparado_por_id], references: [id_user])
 
-  items PaqueteItem[]
-  envio Envio?
+  items  PaqueteItem[]
+  envios Envio[]
 }
 
 model PaqueteItem {
@@ -745,14 +746,14 @@ model BalonGas {
 model Envio {
   id_envio           String      @id @default(uuid())
   numero_correlativo String      @unique
-  id_paquete         String      @unique
+  id_paquete         String
   estado             EstadoEnvio @default(PENDIENTE)
   eliminado          Boolean     @default(false)
 
-  id_transportista String?
-  numero_tracking  String?
-  costo_envio      Float?
-  quien_paga       QuienPaga?
+  medio_envio     String?
+  numero_tracking String?
+  costo_envio     Float?
+  quien_paga      QuienPaga?
 
   peso_total_kg Float?
   alto_cm       Float?
@@ -771,12 +772,11 @@ model Envio {
   cancelado_por_id       String?
   comentario_cancelacion String?
 
-  paquete       Paquete        @relation(fields: [id_paquete], references: [id_paquete])
-  transportista Transportista? @relation(fields: [id_transportista], references: [id_transportista])
-  registradoPor User           @relation("EnvioRegistradoPor", fields: [registrado_por_id], references: [id_user])
-  despachadoPor User?          @relation("EnvioDespachadoPor", fields: [despachado_por_id], references: [id_user])
-  entregadoPor  User?          @relation("EnvioEntregadoPor", fields: [entregado_por_id], references: [id_user])
-  canceladoPor  User?          @relation("EnvioCanceladoPor", fields: [cancelado_por_id], references: [id_user])
+  paquete       Paquete @relation(fields: [id_paquete], references: [id_paquete])
+  registradoPor User    @relation("EnvioRegistradoPor", fields: [registrado_por_id], references: [id_user])
+  despachadoPor User?   @relation("EnvioDespachadoPor", fields: [despachado_por_id], references: [id_user])
+  entregadoPor  User?   @relation("EnvioEntregadoPor", fields: [entregado_por_id], references: [id_user])
+  canceladoPor  User?   @relation("EnvioCanceladoPor", fields: [cancelado_por_id], references: [id_user])
 
   direccion DireccionEnvio?
 }
@@ -797,17 +797,6 @@ model DireccionEnvio {
   fecha_registro      DateTime @default(now())
 
   envio Envio @relation(fields: [id_envio], references: [id_envio])
-}
-
-model Transportista {
-  id_transportista String   @id @default(uuid())
-  nombre           String   @unique
-  contacto         String?
-  telefono         String?
-  activo           Boolean  @default(true)
-  fecha_registro   DateTime @default(now())
-
-  envios Envio[]
 }
 
 model Lote_Analisis {

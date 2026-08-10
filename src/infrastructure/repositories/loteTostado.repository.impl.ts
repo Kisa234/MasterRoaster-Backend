@@ -33,8 +33,8 @@ export class LoteTostadoRepositoryImpl implements LoteTostadoRepository {
     GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]> {
         return this.datasource.GetLotesTostadoandLote();
     }
-    getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]> {
-        return  this.datasource.getLotesTostadosConInventario();
+    getLotesTostadosConInventario(incluirEliminados?: boolean): Promise<LoteTostadoConInventarioEntity[]> {
+        return this.datasource.getLotesTostadosConInventario(incluirEliminados);
     }
     GetLoteTostadoConInventario(id: string): Promise<LoteTostadoConInventarioEntity> {
         return this.datasource.GetLoteTostadoConInventario(id);

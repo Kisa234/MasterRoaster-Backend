@@ -3,12 +3,14 @@ import { EntidadInventario } from '../../enums/entidad-inventario.enum';
 import { CreateMovimientoAlmacenDto } from '../dtos/almacen/movimiento-almacen/create';
 import { UpdateMovimientoAlmacenDto } from '../dtos/almacen/movimiento-almacen/update';
 import { TipoMovimiento } from '../../enums/tipo-movimiento.enum';
+import { Prisma } from '@prisma/client';
 
 export abstract class MovimientoAlmacenRepository {
 
   abstract createMovimiento(
-    dto: CreateMovimientoAlmacenDto
-  ): Promise<MovimientoAlmacenEntity>;  
+    dto: CreateMovimientoAlmacenDto,
+    tx?: Prisma.TransactionClient
+  ): Promise<MovimientoAlmacenEntity>;
 
   abstract getMovimientoById(
     id_movimiento: string

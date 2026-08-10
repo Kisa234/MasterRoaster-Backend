@@ -7,10 +7,16 @@ import { PedidoRepository } from "../../../repository/pedido.repository";
 import { HistorialRepository } from "../../../repository/historial.repository";
 import { MovimientoAlmacenRepository } from "../../../repository/movimiento-almacen.repository";
 import { InventarioLoteRepository } from "../../../repository/inventario-lote.repository";
+import { CreateHistorialDto } from "../../../dtos/historial/create";
+import { HistorialEntidad } from "../../../../enums/historial-entidad.enum";
+import { HistorialAccion } from "../../../../enums/historial-accion.enum";
+import { TipoMovimiento } from "../../../../enums/tipo-movimiento.enum";
+import { EntidadInventario } from "../../../../enums/entidad-inventario.enum";
+import { CreateMovimientoAlmacenDto } from "../../../dtos/almacen/movimiento-almacen/create";
 
 
 export interface CreateLoteUseCase {
-    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string): Promise<LoteEntity>;
+    execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string, id_pedido?: string, id_user_accion?: string): Promise<LoteEntity>;
 }
 
 export class CreateLote implements CreateLoteUseCase {
@@ -24,7 +30,7 @@ export class CreateLote implements CreateLoteUseCase {
         private readonly inventarioLoteRepository: InventarioLoteRepository
     ) { }
 
-    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string): Promise<LoteEntity> {
+    async execute(createLoteDto: CreateLoteDto, tueste?: Boolean, id_c?: string, id_almacen?: string, id_pedido?: string, id_user_accion?: string): Promise<LoteEntity> {
         const id = await this.generarId(createLoteDto, tueste, id_c);
         const [error, dto] = CreateLoteDto.create({
             ...createLoteDto,
@@ -34,14 +40,47 @@ export class CreateLote implements CreateLoteUseCase {
             console.log('Error DTO:', error);
         }
         const lote = await this.loteRepository.createLote(dto!);
-        
+
         if (id_almacen) {
             await this.inventarioLoteRepository.createInventario({
                 id_lote: lote.id_lote,
                 id_almacen: id_almacen,
                 cantidad_kg: lote.peso,
             });
+
+            // Ingreso inicial de stock — mismo criterio que cualquier otra entrada a almacén.
+            const [movError, movDto] = CreateMovimientoAlmacenDto.create({
+                tipo: TipoMovimiento.INGRESO,
+                entidad: EntidadInventario.LOTE,
+                id_entidad_primario: lote.id_lote,
+                id_almacen_destino: id_almacen,
+                cantidad: lote.peso,
+                id_user: id_user_accion ?? createLoteDto.id_user!,
+                id_pedido: id_pedido,
+                objeto_despues: lote,
+                comentario: id_pedido
+                    ? `Ingreso inicial por lote creado desde pedido ${id_pedido}`
+                    : `Ingreso inicial por creación manual de lote`,
+            });
+            if (movError || !movDto) throw new Error(movError ?? 'Error al construir movimiento de ingreso de lote');
+            await this.movimientoAlmacenRepository.createMovimiento(movDto);
         }
+
+        // Historial de creación — único punto de entrada, sin importar si el lote
+        // nace manual, desde un Pedido (vía DuplicateLote), o desde una Muestra.
+        const [histError, histDto] = CreateHistorialDto.create({
+            entidad: HistorialEntidad.LOTE,
+            accion: HistorialAccion.CREATE,
+            id_entidad: lote.id_lote,
+            id_user: createLoteDto.id_user!,
+            id_pedido: id_pedido ?? undefined,
+            comentario: id_pedido
+                ? `Lote creado a partir del pedido ${id_pedido}`
+                : `Lote creado manualmente`,
+        });
+        if (histError || !histDto) throw new Error(histError ?? 'Error al construir historial de creación de lote');
+        await this.historialRepository.createHistorial(histDto);
+
         return lote;
     }
 

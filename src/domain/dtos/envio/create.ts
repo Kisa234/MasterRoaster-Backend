@@ -16,7 +16,7 @@ export class CreateEnvioDto {
         public readonly id_paquete: string,
         public readonly registrado_por_id: string,
         public readonly direccion: CreateDireccionEnvioProps,
-        public readonly id_transportista?: string,
+        public readonly medio_envio?: string,
         public readonly peso_total_kg?: number,
         public readonly alto_cm?: number,
         public readonly ancho_cm?: number,
@@ -29,7 +29,7 @@ export class CreateEnvioDto {
     static create(props: { [key: string]: any }): [string?, CreateEnvioDto?] {
         const {
             id_paquete, registrado_por_id, direccion,
-            id_transportista, peso_total_kg, alto_cm, ancho_cm, largo_cm,
+            medio_envio, peso_total_kg, alto_cm, ancho_cm, largo_cm,
             costo_envio, quien_paga, fecha_programada,
         } = props;
 
@@ -47,7 +47,7 @@ export class CreateEnvioDto {
 
         return [undefined, new CreateEnvioDto(
             id_paquete, registrado_por_id, direccion,
-            id_transportista, peso_total_kg, alto_cm, ancho_cm, largo_cm,
+            medio_envio, peso_total_kg, alto_cm, ancho_cm, largo_cm,
             costo_envio, quien_paga,
             fecha_programada ? new Date(fecha_programada) : undefined,
         )];

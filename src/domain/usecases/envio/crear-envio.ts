@@ -22,9 +22,14 @@ export class CrearEnvio implements CrearEnvioUseCase {
         if (paquete.estado !== 'LISTO')
             throw new Error('El paquete debe estar en estado LISTO antes de registrar el envío');
 
-        // Regla de negocio: correlativo tipo ENV-000001, secuencial simple por conteo total.
-        // (Si el volumen de envíos simultáneos creciera mucho, convendría un contador
-        // dedicado para evitar condiciones de carrera; con el volumen actual alcanza.)
+        // Ya que Envio.id_paquete perdió el @unique (para permitir reintentos tras
+        // cancelar/devolver), esta validación reemplaza esa garantía a nivel de código:
+        // no puede haber más de un Envio "vivo" a la vez para el mismo Paquete.
+        const activos = await this.envioRepo.getActivosByPaquete(dto.id_paquete);
+        if (activos.length > 0) {
+            throw new Error('Este paquete ya tiene un envío activo. Cancélalo o espera su devolución antes de crear uno nuevo.');
+        }
+
         const total = await this.envioRepo.countTotal();
         const numero_correlativo = `ENV-${(total + 1).toString().padStart(6, '0')}`;
 

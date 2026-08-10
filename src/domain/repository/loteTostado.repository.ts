@@ -3,15 +3,13 @@ import { CreateLoteTostadoDto } from '../dtos/lotes/lote-tostado/create';
 import { UpdateLoteTostadoDto } from "../dtos/lotes/lote-tostado/update";
 
 export abstract class LoteTostadoRepository {
-    abstract createLoteTostado(createLoteTostadoDto:CreateLoteTostadoDto): Promise<LoteTostadoEntity>;
+    abstract createLoteTostado(createLoteTostadoDto: CreateLoteTostadoDto): Promise<LoteTostadoEntity>;
     abstract getLoteTostadoById(id: string): Promise<LoteTostadoEntity | null>;
-    abstract updateLoteTostado(id: string, updateLoteTostadoDto:UpdateLoteTostadoDto): Promise<LoteTostadoEntity>;
+    abstract updateLoteTostado(id: string, updateLoteTostadoDto: UpdateLoteTostadoDto): Promise<LoteTostadoEntity>;
     abstract deleteLoteTostado(id: string): Promise<LoteTostadoEntity>;
     abstract getLoteTostados(): Promise<LoteTostadoEntity[]>;
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
     abstract GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]>;
-    abstract getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]>
+    abstract getLotesTostadosConInventario(incluirEliminados?: boolean): Promise<LoteTostadoConInventarioEntity[]>; // 👈 nuevo parámetro
     abstract GetLoteTostadoConInventario(id: string): Promise<LoteTostadoConInventarioEntity>;
-    
-    
 }

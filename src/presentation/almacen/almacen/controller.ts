@@ -15,6 +15,7 @@ import { InventarioProductoRepository } from "../../../domain/repository/inventa
 import { InventarioMuestraRepository } from "../../../domain/repository/inventario-muestra.repository";
 import { InventarioLoteTostadoRepository } from "../../../domain/repository/inventario-lote-tostado.repository";
 import { InventarioLoteRepository } from "../../../domain/repository/inventario-lote.repository";
+import { InventarioBolsaRepository } from "../../../domain/repository/inventario-bolsa.repository";
 import { MovimientoAlmacenRepository } from "../../../domain/repository/movimiento-almacen.repository";
 import { HistorialRepository } from "../../../domain/repository/historial.repository";
 import { AjustarStockAlmacenDto } from "../../../domain/dtos/almacen/almacen/ajustar-stock";
@@ -35,6 +36,7 @@ export class AlmacenController {
     private readonly inventarioMuestraRepository: InventarioMuestraRepository,
     private readonly inventarioProductoRepository: InventarioProductoRepository,
     private readonly inventarioInsumoRepository: InventarioInsumoRepository,
+    private readonly inventarioBolsaRepository: InventarioBolsaRepository, // 👈 nuevo
     private readonly loteTostadoRepository: LoteTostadoRepository,
     private readonly loteRepository: LoteRepository,
   ) { }
@@ -132,6 +134,7 @@ export class AlmacenController {
       this.inventarioMuestraRepository,
       this.inventarioProductoRepository,
       this.inventarioInsumoRepository,
+      this.inventarioBolsaRepository, // 👈 en su posición correcta ahora
       this.loteRepository,
       this.loteTostadoRepository,
     )
@@ -157,7 +160,8 @@ export class AlmacenController {
       this.inventarioLoteTostadoRepository,
       this.inventarioMuestraRepository,
       this.inventarioProductoRepository,
-      this.inventarioInsumoRepository
+      this.inventarioInsumoRepository,
+      this.inventarioBolsaRepository, // 👈 faltaba por completo
     )
       .execute(trasladarStockDto!)
       .then(() => res.json({ message: "Stock trasladado correctamente" }))
@@ -165,4 +169,3 @@ export class AlmacenController {
 
   };
 }
-

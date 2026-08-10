@@ -10,6 +10,9 @@ export class CrearPaquete implements CrearPaqueteUseCase {
     constructor(private readonly paqueteRepo: PaqueteRepository) { }
 
     async execute(dto: CreatePaqueteDto): Promise<PaqueteEntity> {
-        return this.paqueteRepo.create(dto);
+        const total = await this.paqueteRepo.countTotal();
+        const numero_correlativo = `PAQ-${(total + 1).toString().padStart(6, '0')}`;
+
+        return this.paqueteRepo.create(dto, numero_correlativo);
     }
 }

@@ -22,6 +22,7 @@ import { CancelarEnvio } from "../../domain/usecases/envio/cancelar-envio";
 import { RegistrarDevolucionEnvio } from "../../domain/usecases/envio/registrar-devolucion-envio";
 import { GetEnvio } from "../../domain/usecases/envio/get-envio";
 import { GetEnvios } from "../../domain/usecases/envio/get-envios";
+import { GetEnviosPorEntidad } from "../../domain/usecases/envio/get-envios-por-entidad";
 
 export class EnvioController {
     constructor(
@@ -109,16 +110,14 @@ export class EnvioController {
 
     public registrarDevolucion = (req: Request, res: Response) => {
         if (!req.user?.id_user) return res.status(401).json({ error: 'Usuario no autenticado' });
-
         const [error, dto] = RegistrarDevolucionEnvioDto.create({
             ...req.body,
             registrado_por_id: req.body.registrado_por_id ?? req.user.id_user,
         });
         if (error) return res.status(400).json({ error });
-
         new RegistrarDevolucionEnvio(
-            this.envioRepo, this.paqueteItemRepo, this.inventarioRepo,
-            this.movimientoRepo, this.historialRepo,
+            this.envioRepo, this.paqueteItemRepo, this.paqueteRepo, // 👈 agregado this.paqueteRepo
+            this.inventarioRepo, this.movimientoRepo, this.historialRepo,
         )
             .execute(req.params.id, dto!)
             .then(envio => res.json(envio))
@@ -136,6 +135,15 @@ export class EnvioController {
         const estado = req.query.estado as string | undefined;
         new GetEnvios(this.envioRepo)
             .execute(estado)
+            .then(envios => res.json(envios))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    };
+
+    public getByEntidad = (req: Request, res: Response) => {
+        const { entidad, id_entidad } = req.params;
+
+        new GetEnviosPorEntidad(this.paqueteItemRepo, this.envioRepo)
+            .execute(entidad, id_entidad)
             .then(envios => res.json(envios))
             .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };

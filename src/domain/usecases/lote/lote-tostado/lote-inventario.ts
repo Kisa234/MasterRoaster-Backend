@@ -1,17 +1,16 @@
-import { LoteTostadoConInventarioEntity } from "../../../entities/loteTostado.entity";
-import { LoteTostadoRepository } from "../../../repository/loteTostado.repository";
+import { LoteTostadoRepository } from '../../../repository/loteTostado.repository';
+import { LoteTostadoConInventarioEntity } from '../../../entities/loteTostado.entity';
 
-interface GetLotesTostadosConInventarioUseCase {
-  execute(): Promise<LoteTostadoConInventarioEntity[]>;
+export interface GetLotesTostadosConInventarioUseCase {
+    execute(incluirEliminados?: boolean): Promise<LoteTostadoConInventarioEntity[]>;
 }
 
 export class GetLotesTostadosConInventario implements GetLotesTostadosConInventarioUseCase {
+    constructor(
+        private readonly loteTostadoRepository: LoteTostadoRepository
+    ) { }
 
-  constructor(
-    private readonly repository: LoteTostadoRepository
-  ) {}
-
-  async execute(): Promise<LoteTostadoConInventarioEntity[]> {
-    return await this.repository.getLotesTostadosConInventario();
-  }
+    execute(incluirEliminados: boolean = false): Promise<LoteTostadoConInventarioEntity[]> {
+        return this.loteTostadoRepository.getLotesTostadosConInventario(incluirEliminados);
+    }
 }

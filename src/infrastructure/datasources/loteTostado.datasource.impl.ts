@@ -85,8 +85,9 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
         );
     }
 
-    async getLotesTostadosConInventario(): Promise<LoteTostadoConInventarioEntity[]> {
+    async getLotesTostadosConInventario(incluirEliminados: boolean = false): Promise<LoteTostadoConInventarioEntity[]> {
         const lotesTostados = await prisma.loteTostado.findMany({
+            where: incluirEliminados ? {} : { eliminado: false }, 
             include: {
                 lote: true,
                 inventarioLoteTostados: {
@@ -96,7 +97,6 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
                 }
             }
         });
-
         return lotesTostados.map(l =>
             LoteTostadoConInventarioEntity.fromObject(l)
         );

@@ -5,14 +5,15 @@ import { UpdateMovimientoAlmacenDto } from "../../domain/dtos/almacen/movimiento
 import { MovimientoAlmacenEntity } from "../../domain/entities/movimiento-almacen.entity";
 import { EntidadInventario } from "../../enums/entidad-inventario.enum";
 import { TipoMovimiento } from "../../enums/tipo-movimiento.enum";
+import { Prisma } from "@prisma/client";
 
 export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSource {
 
   async createMovimiento(
-    dto: CreateMovimientoAlmacenDto
+    dto: CreateMovimientoAlmacenDto,
+    tx: Prisma.TransactionClient | typeof prisma = prisma
   ): Promise<MovimientoAlmacenEntity> {
-
-    const movimiento = await prisma.movimientoAlmacen.create({
+    const movimiento = await tx.movimientoAlmacen.create({
       data: {
         tipo: dto.tipo,
         entidad: dto.entidad,
@@ -24,18 +25,15 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
         comentario: dto.comentario,
       },
     });
-
     return MovimientoAlmacenEntity.fromObject(movimiento);
   }
 
   async getMovimientoById(
     id_movimiento: string
   ): Promise<MovimientoAlmacenEntity | null> {
-
     const movimiento = await prisma.movimientoAlmacen.findFirst({
       where: { id_movimiento },
     });
-
     if (!movimiento) return null;
     return MovimientoAlmacenEntity.fromObject(movimiento);
   }
@@ -44,12 +42,10 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     id_movimiento: string,
     dto: UpdateMovimientoAlmacenDto
   ): Promise<MovimientoAlmacenEntity> {
-
     const movimiento = await prisma.movimientoAlmacen.update({
       where: { id_movimiento },
       data: dto.values,
     });
-
     return MovimientoAlmacenEntity.fromObject(movimiento);
   }
 
@@ -57,14 +53,12 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     from?: Date,
     to?: Date
   ): Promise<MovimientoAlmacenEntity[]> {
-
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         ...(from && to ? { fecha: { gte: from, lt: to } } : {}),
       },
       orderBy: { fecha: 'desc' },
     });
-
     return movimientos.map(MovimientoAlmacenEntity.fromObject);
   }
 
@@ -74,7 +68,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     from?: Date,
     to?: Date
   ): Promise<MovimientoAlmacenEntity[]> {
-
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         entidad,
@@ -83,7 +76,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
       },
       orderBy: { fecha: 'desc' },
     });
-
     return movimientos.map(MovimientoAlmacenEntity.fromObject);
   }
 
@@ -92,7 +84,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     from?: Date,
     to?: Date
   ): Promise<MovimientoAlmacenEntity[]> {
-
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         OR: [
@@ -103,7 +94,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
       },
       orderBy: { fecha: 'desc' },
     });
-
     return movimientos.map(MovimientoAlmacenEntity.fromObject);
   }
 
@@ -112,7 +102,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     from?: Date,
     to?: Date
   ): Promise<MovimientoAlmacenEntity[]> {
-
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         tipo,
@@ -120,7 +109,6 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
       },
       orderBy: { fecha: 'desc' },
     });
-
     return movimientos.map(MovimientoAlmacenEntity.fromObject);
   }
 
@@ -128,14 +116,12 @@ export class MovimientoAlmacenDataSourceImpl implements MovimientoAlmacenDataSou
     from: Date,
     to: Date
   ): Promise<MovimientoAlmacenEntity[]> {
-
     const movimientos = await prisma.movimientoAlmacen.findMany({
       where: {
         fecha: { gte: from, lt: to },
       },
       orderBy: { fecha: 'desc' },
     });
-
     return movimientos.map(MovimientoAlmacenEntity.fromObject);
   }
 }

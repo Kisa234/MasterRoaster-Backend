@@ -16,7 +16,7 @@ import {AnalisisDefectosRespository} from '../../../repository/analisisDefectos.
 import { CreateAnalisisDefectosDto } from '../../../dtos/analisis/defectos/create';
 
 export interface CreateLoteFromMuestraUseCase {
-    execute(id: string, createLoteDto:CreateLoteDto): Promise<LoteEntity>;
+    execute(id: string, createLoteDto: CreateLoteDto): Promise<LoteEntity>;
 }
 
 export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
@@ -38,8 +38,7 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         if (!muestra) throw new Error('Muestra no encontrada');
 
         // 2) Crea el nuevo lote
-        const lote = await this.createLoteUseCase.execute(createLoteDto!);
-
+        const lote = await this.createLoteUseCase.execute(createLoteDto!, undefined, undefined, undefined, undefined, createLoteDto.id_user!);
         // 3) Si la muestra original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
         if (muestra.id_analisis) {
             let nuevoFis, nuevoSen, nuevoDef;

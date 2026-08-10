@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../data/postgres";
 import { HistorialDataSource } from "../../domain/datasources/historial.datasource";
 import { CreateHistorialDto } from "../../domain/dtos/historial/create";
@@ -5,8 +6,11 @@ import { HistorialEntity } from "../../domain/entities/historial.entity";
 
 export class HistorialDataSourceImpl implements HistorialDataSource {
 
-    async createHistorial(createLoteHistorialDto: CreateHistorialDto): Promise<HistorialEntity> {
-        const historial = await prisma.historial.create({
+    async createHistorial(
+        createLoteHistorialDto: CreateHistorialDto,
+        tx: Prisma.TransactionClient | typeof prisma = prisma
+    ): Promise<HistorialEntity> {
+        const historial = await tx.historial.create({
             data: createLoteHistorialDto!
         });
 
@@ -21,7 +25,6 @@ export class HistorialDataSourceImpl implements HistorialDataSource {
         });
         if (!historial) return null;
         return HistorialEntity.fromObject(historial);
-
     }
 
     async getHistorialByUserId(id: string): Promise<HistorialEntity[]> {
@@ -34,7 +37,7 @@ export class HistorialDataSourceImpl implements HistorialDataSource {
 
         return historial.map(historial => HistorialEntity.fromObject(historial));
     }
-    
+
     async getHistorialByEntidadId(id: string): Promise<HistorialEntity[]> {
         const historial = await prisma.historial.findMany({
             where: {
@@ -47,13 +50,8 @@ export class HistorialDataSourceImpl implements HistorialDataSource {
     }
 
     async getAllHistorial(): Promise<HistorialEntity[]> {
-        const historial = await prisma.historial.findMany({
-
-        });
+        const historial = await prisma.historial.findMany({});
         if (!historial) return [];
         return historial.map(historial => HistorialEntity.fromObject(historial));
     }
-    
-    
-    
 }

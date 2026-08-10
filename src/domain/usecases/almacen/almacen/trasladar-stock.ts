@@ -28,6 +28,9 @@ import { InventarioLoteRepository } from "../../../repository/inventario-lote.re
 import { InventarioMuestraRepository } from "../../../repository/inventario-muestra.repository";
 import { InventarioProductoRepository } from "../../../repository/inventario-producto.repository";
 import { MovimientoAlmacenRepository } from "../../../repository/movimiento-almacen.repository";
+import { InventarioBolsaRepository } from '../../../repository/inventario-bolsa.repository';
+import { CreateInventarioBolsaDto } from '../../../dtos/inventarios/inventario-bolsa/create';
+import { UpdateInventarioBolsaDto } from '../../../dtos/inventarios/inventario-bolsa/update';
 
 export interface TrasladarStockAlmacenUseCase {
   execute(dto: TrasladarStockAlmacenDto): Promise<void>;
@@ -43,7 +46,8 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
     private readonly inventarioMuestraRepository: InventarioMuestraRepository,
     private readonly inventarioProductoRepository: InventarioProductoRepository,
     private readonly inventarioInsumoRepository: InventarioInsumoRepository,
-  ) {}
+    private readonly inventarioBolsaRepository: InventarioBolsaRepository, 
+  ) { }
 
   async execute(dto: TrasladarStockAlmacenDto): Promise<void> {
     if (!dto.id_user) {
@@ -490,6 +494,87 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
         break;
       }
 
+      case "BOLSA": {
+        inventarioOrigen = await this.inventarioBolsaRepository.getByBolsaAndAlmacen(
+          dto.id_entidad,
+          dto.id_almacen_origen
+        );
+
+        if (!inventarioOrigen) {
+          throw new Error("No existe inventario de la bolsa en el almacén origen");
+        }
+
+        if (Number(inventarioOrigen.cantidad) < dto.cantidad) {
+          throw new Error("Stock insuficiente en el almacén origen");
+        }
+
+        inventarioDestino = await this.inventarioBolsaRepository.getByBolsaAndAlmacen(
+          dto.id_entidad,
+          dto.id_almacen_destino
+        );
+
+        objetoAntes = {
+          origen: inventarioOrigen,
+          destino: inventarioDestino,
+        };
+
+        const nuevaCantidadOrigen = Number(inventarioOrigen.cantidad) - dto.cantidad;
+
+        const [errorOrigen, updateOrigenDto] = UpdateInventarioBolsaDto.update({
+          cantidad: nuevaCantidadOrigen,
+        });
+
+        if (errorOrigen || !updateOrigenDto) {
+          throw new Error(errorOrigen ?? "No se pudo construir el DTO de actualización de bolsa origen");
+        }
+
+        await this.inventarioBolsaRepository.updateInventario(
+          inventarioOrigen.id_inventario,
+          updateOrigenDto
+        );
+
+        if (inventarioDestino) {
+          const nuevaCantidadDestino = Number(inventarioDestino.cantidad) + dto.cantidad;
+
+          const [errorDestino, updateDestinoDto] = UpdateInventarioBolsaDto.update({
+            cantidad: nuevaCantidadDestino,
+          });
+
+          if (errorDestino || !updateDestinoDto) {
+            throw new Error(errorDestino ?? "No se pudo construir el DTO de actualización de bolsa destino");
+          }
+
+          inventarioDestino = await this.inventarioBolsaRepository.updateInventario(
+            inventarioDestino.id_inventario,
+            updateDestinoDto
+          );
+        } else {
+          const [errorCreate, createDestinoDto] = CreateInventarioBolsaDto.create({
+            id_bolsa: dto.id_entidad,
+            id_almacen: dto.id_almacen_destino,
+            cantidad: dto.cantidad,
+          });
+
+          if (errorCreate || !createDestinoDto) {
+            throw new Error(errorCreate ?? "No se pudo construir el DTO de creación de bolsa destino");
+          }
+
+          inventarioDestino = await this.inventarioBolsaRepository.createInventario(createDestinoDto);
+        }
+
+        const inventarioOrigenActualizado = await this.inventarioBolsaRepository.getByBolsaAndAlmacen(
+          dto.id_entidad,
+          dto.id_almacen_origen
+        );
+
+        objetoDespues = {
+          origen: inventarioOrigenActualizado,
+          destino: inventarioDestino,
+        };
+
+        break;
+      }
+
       default:
         throw new Error("Entidad no soportada para traslado de stock");
     }
@@ -532,35 +617,25 @@ export class TrasladarStockAlmacen implements TrasladarStockAlmacenUseCase {
 
   private mapEntidadInventario(entidad: TrasladarStockAlmacenDto["entidad"]): EntidadInventario {
     switch (entidad) {
-      case "LOTE":
-        return EntidadInventario.LOTE;
-      case "LOTE_TOSTADO":
-        return EntidadInventario.LOTE_TOSTADO;
-      case "PRODUCTO":
-        return EntidadInventario.PRODUCTO;
-      case "MUESTRA":
-        return EntidadInventario.MUESTRA;
-      case "INSUMO":
-        return EntidadInventario.INSUMO;
-      default:
-        throw new Error("Entidad de inventario no soportada");
+      case "LOTE": return EntidadInventario.LOTE;
+      case "LOTE_TOSTADO": return EntidadInventario.LOTE_TOSTADO;
+      case "PRODUCTO": return EntidadInventario.PRODUCTO;
+      case "MUESTRA": return EntidadInventario.MUESTRA;
+      case "INSUMO": return EntidadInventario.INSUMO;
+      case "BOLSA": return EntidadInventario.BOLSA; 
+      default: throw new Error("Entidad de inventario no soportada");
     }
   }
 
   private mapHistorialEntidad(entidad: TrasladarStockAlmacenDto["entidad"]): HistorialEntidad {
     switch (entidad) {
-      case "LOTE":
-        return HistorialEntidad.LOTE;
-      case "LOTE_TOSTADO":
-        return HistorialEntidad.LOTE_TOSTADO;
-      case "PRODUCTO":
-        return HistorialEntidad.PRODUCTO;
-      case "MUESTRA":
-        return HistorialEntidad.MUESTRA;
-      case "INSUMO":
-        return HistorialEntidad.INSUMO;
-      default:
-        throw new Error("Entidad de historial no soportada");
+      case "LOTE": return HistorialEntidad.LOTE;
+      case "LOTE_TOSTADO": return HistorialEntidad.LOTE_TOSTADO;
+      case "PRODUCTO": return HistorialEntidad.PRODUCTO;
+      case "MUESTRA": return HistorialEntidad.MUESTRA;
+      case "INSUMO": return HistorialEntidad.INSUMO;
+      case "BOLSA": return HistorialEntidad.BOLSA; 
+      default: throw new Error("Entidad de historial no soportada");
     }
   }
 }

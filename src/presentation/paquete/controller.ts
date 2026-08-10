@@ -13,6 +13,7 @@ import { MarcarListoPaquete } from "../../domain/usecases/paquete/marcar-listo";
 import { CancelarPaquete } from "../../domain/usecases/paquete/cancelar-paquete";
 import { GetPaquete } from "../../domain/usecases/paquete/get-paquete";
 import { GetPaquetes } from "../../domain/usecases/paquete/get-paquetes";
+import { GetPaqueteByPedidoOrigen } from "../../domain/usecases/paquete/get-pedido";
 
 export class PaqueteController {
     constructor(
@@ -97,6 +98,13 @@ export class PaqueteController {
         new GetPaquetes(this.paqueteRepo)
             .execute(incluirEliminados)
             .then(paquetes => res.json(paquetes))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    };
+
+    public getByPedidoOrigen = (req: Request, res: Response) => {
+        new GetPaqueteByPedidoOrigen(this.paqueteRepo)
+            .execute(req.params.id_pedido)
+            .then(paquete => res.json(paquete))
             .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };
 }

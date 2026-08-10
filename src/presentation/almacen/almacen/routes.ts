@@ -4,20 +4,15 @@ import { AlmacenController } from "./controller";
 import { AlmacenDataSourceImpl } from "../../../infrastructure/datasources/almacen.datasource.impl";
 import { AlmacenRepositoryImpl } from "../../../infrastructure/repositories/almacen.repository.impl";
 
-
 import { HistorialRepositoryImpl } from "../../../infrastructure/repositories/historial.repository.impl";
-
 import { MovimientoAlmacenRepositoryImpl } from "../../../infrastructure/repositories/movimiento-almacen.repository.impl";
-
 import { InventarioLoteRepositoryImpl } from "../../../infrastructure/repositories/inventario-lote.repository.impl";
-
 import { InventarioLoteTostadoRepositoryImpl } from "../../../infrastructure/repositories/inventario-lote-tostado.repository.impl";
-
 import { InventarioMuestraRepositoryImpl } from "../../../infrastructure/repositories/inventario-muestra.repository.impl";
-
 import { InventarioProductoRepositoryImpl } from "../../../infrastructure/repositories/inventario-producto.repository.impl";
-
 import { InventarioInsumoRepositoryImpl } from "../../../infrastructure/repositories/inventario-insumo.repository.impl";
+import { InventarioBolsaRepositoryImpl } from "../../../infrastructure/repositories/inventario-bolsa.repository.impl";
+
 import { HistorialDataSourceImpl } from "../../../infrastructure/datasources/historial.datasource.impl";
 import { MovimientoAlmacenDataSourceImpl } from "../../../infrastructure/datasources/movimiento-almacen.datasource.impl";
 import { InventarioLoteDataSourceImpl } from "../../../infrastructure/datasources/inventario-lote.datasource.impl";
@@ -25,6 +20,8 @@ import { InventarioLoteTostadoDataSourceImpl } from "../../../infrastructure/dat
 import { InventarioMuestraDataSourceImpl } from "../../../infrastructure/datasources/inventario-muestra.datasource.impl";
 import { InventarioProductoDataSourceImpl } from "../../../infrastructure/datasources/inventario-producto.datasource.impl";
 import { InventarioInsumoDataSourceImpl } from "../../../infrastructure/datasources/inventario-insumo.datasource.impl";
+import { InventarioBolsaDataSourceImpl } from "../../../infrastructure/datasources/inventario-bolsa.datasource.impl";
+
 import { authMiddleware } from "../../../infrastructure/middlewares/auth.middleware";
 import { LoteTostadoRepositoryImpl } from "../../../infrastructure/repositories/loteTostado.repository.impl";
 import { LoteTostadoDataSourceImpl } from "../../../infrastructure/datasources/loteTostado.datasource.impl";
@@ -64,12 +61,15 @@ export class AlmacenRoutes {
     const inventarioInsumoDatasource = new InventarioInsumoDataSourceImpl();
     const inventarioInsumoRepository = new InventarioInsumoRepositoryImpl(inventarioInsumoDatasource);
 
+    const inventarioBolsaDatasource = new InventarioBolsaDataSourceImpl();
+    const inventarioBolsaRepository = new InventarioBolsaRepositoryImpl(inventarioBolsaDatasource);
+
     const loteTostadoDatasource = new LoteTostadoDataSourceImpl();
     const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteTostadoDatasource);
 
     const loteDatasource = new LoteDataSourceImpl();
     const loteRepository = new LoteRepositoryImpl(loteDatasource);
-    
+
     // --- Controller ---
     const controller = new AlmacenController(
       almacenRepository,
@@ -80,14 +80,15 @@ export class AlmacenRoutes {
       inventarioMuestraRepository,
       inventarioProductoRepository,
       inventarioInsumoRepository,
+      inventarioBolsaRepository, 
       loteTostadoRepository,
-      loteRepository
+      loteRepository,
     );
 
     // ---- Query routes (específicas primero) ----
     router.get("/activos", controller.getAlmacenesActivos);
     router.post("/ajustar-stock", authMiddleware, controller.ajustarStock);
-    router.post("/trasladar-stock",authMiddleware ,  controller.trasladarStock);
+    router.post("/trasladar-stock", authMiddleware, controller.trasladarStock);
 
     // ---- CRUD ----
     router.post("/", controller.createAlmacen);

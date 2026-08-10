@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { EnvioDataSource } from "../../domain/datasources/envio.datasource";
 import { CreateEnvioDto } from "../../domain/dtos/envio/create";
 import { ProgramarEnvioDto } from "../../domain/dtos/envio/programar";
@@ -23,14 +24,17 @@ export class EnvioRepositoryImpl implements EnvioRepository {
     getAll(estado?: string): Promise<EnvioEntity[]> {
         return this.datasource.getAll(estado);
     }
+    getByPaquetes(id_paquetes: string[]): Promise<EnvioEntity[]> {
+        return this.datasource.getByPaquetes(id_paquetes);
+    }
     countTotal(): Promise<number> {
         return this.datasource.countTotal();
     }
     programar(id_envio: string, dto: ProgramarEnvioDto): Promise<EnvioEntity> {
         return this.datasource.programar(id_envio, dto);
     }
-    despachar(id_envio: string, dto: DespacharEnvioDto): Promise<EnvioEntity> {
-        return this.datasource.despachar(id_envio, dto);
+    despachar(id_envio: string, dto: DespacharEnvioDto, tx?: Prisma.TransactionClient): Promise<EnvioEntity> {
+        return this.datasource.despachar(id_envio, dto, tx);
     }
     confirmarEntrega(id_envio: string, dto: ConfirmarEntregaEnvioDto): Promise<EnvioEntity> {
         return this.datasource.confirmarEntrega(id_envio, dto);
@@ -38,7 +42,10 @@ export class EnvioRepositoryImpl implements EnvioRepository {
     cancelar(id_envio: string, dto: CancelarEnvioDto): Promise<EnvioEntity> {
         return this.datasource.cancelar(id_envio, dto);
     }
-    registrarDevolucion(id_envio: string, dto: RegistrarDevolucionEnvioDto): Promise<EnvioEntity> {
-        return this.datasource.registrarDevolucion(id_envio, dto);
+    registrarDevolucion(id_envio: string, dto: RegistrarDevolucionEnvioDto, tx?: Prisma.TransactionClient): Promise<EnvioEntity> {
+        return this.datasource.registrarDevolucion(id_envio, dto, tx);
+    }
+    getActivosByPaquete(id_paquete: string): Promise<EnvioEntity[]> {
+        return this.datasource.getActivosByPaquete(id_paquete);
     }
 }

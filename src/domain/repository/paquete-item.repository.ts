@@ -5,5 +5,6 @@ export abstract class PaqueteItemRepository {
     abstract create(dto: CreatePaqueteItemDto): Promise<PaqueteItemEntity>;
     abstract getById(id_item: string): Promise<PaqueteItemEntity | null>;
     abstract getByPaquete(id_paquete: string): Promise<PaqueteItemEntity[]>;
+    abstract getByEntidad(entidad: string, id_entidad: string): Promise<PaqueteItemEntity[]>;
     abstract delete(id_item: string): Promise<PaqueteItemEntity>;
 }

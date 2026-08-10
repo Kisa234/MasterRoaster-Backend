@@ -122,15 +122,7 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         const hasLote = await this.verifyIfUserHasLote(pedido.id_user, loteOrigen.id_lote, 'Lote Verde');
         if (!hasLote) {
             // crear nuevo lote
-            const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false);
-            // historial de creacion de lote
-            await this.registrarHistorial({
-                entidad: HistorialEntidad.LOTE,
-                accion: HistorialAccion.CREATE,
-                id_entidad: nuevoLoteDestino.id_lote,
-                id_user: id_completado_por,
-                id_pedido: pedido.id_pedido,
-            });
+            const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(loteOrigen, pedido, false, id_completado_por);
             // crear un inventario para el nuevo lote 
             const nuevoInventarioLote = await this.inventarioLoteRepository.createInventario({
                 id_lote: nuevoLoteDestino.id_lote!,
@@ -237,17 +229,23 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         await this.inventarioLoteRepository.updateInventario(inventarioLote.id_inventario, updateInventarioLoteDto!);
         //eliminar lote si el nuevo peso es  0 
         if (nuevoPesoLote == 0) {
-            // se elimina el lote pero no el inventario
-            await this.loteRepository.deleteLote(loteOrigen.id_lote);
+            const todosInventarios = await this.inventarioLoteRepository.getByLote(loteOrigen.id_lote);
+            const stockTotal = todosInventarios.reduce(
+                (sum, inv) => sum + Number(inv.cantidad_kg), 0
+            );
 
-            await this.registrarHistorial({
-                entidad: HistorialEntidad.LOTE,
-                id_entidad: pedido.id_lote!,
-                id_user: id_completado_por,
-                accion: HistorialAccion.DELETE,
-                comentario: `Lote eliminado por consumo total en pedido`,
-                id_pedido: pedido.id_pedido
-            })
+            if (stockTotal === 0) {
+                // se elimina el lote pero no el inventario
+                await this.loteRepository.deleteLote(loteOrigen.id_lote);
+                await this.registrarHistorial({
+                    entidad: HistorialEntidad.LOTE,
+                    id_entidad: pedido.id_lote!,
+                    id_user: id_completado_por,
+                    accion: HistorialAccion.DELETE,
+                    comentario: `Lote eliminado por consumo total en pedido`,
+                    id_pedido: pedido.id_pedido
+                })
+            }
         }
         // marcar pedido como completado
         return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
@@ -288,16 +286,9 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             const nuevoLoteDestino = await this.duplicateLoteUseCase.execute(
                 loteOrigen,
                 pedido,
-                true
+                true,
+                id_completado_por
             );
-
-            await this.registrarHistorial({
-                entidad: HistorialEntidad.LOTE,
-                accion: HistorialAccion.CREATE,
-                id_entidad: nuevoLoteDestino.id_lote,
-                id_user: id_completado_por,
-                id_pedido: pedido.id_pedido,
-            });
 
             await this.inventarioLoteRepository.createInventario({
                 id_lote: nuevoLoteDestino.id_lote!,
@@ -417,17 +408,27 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             updateInventarioLoteDto!
         );
 
+        // El delete debe evaluar el STOCK TOTAL del lote en todos los almacenes,
+        // no solo en el almacén de esta orden puntual — mismo criterio que ya
+        // usa AjustarStockAlmacen. Sin esto, un lote con stock en otro almacén
+        // se borraba igual solo porque este almacén puntual llegó a 0.
         if (nuevoPesoLote === 0) {
-            await this.loteRepository.deleteLote(loteOrigen.id_lote);
+            const todosInventarios = await this.inventarioLoteRepository.getByLote(loteOrigen.id_lote);
+            const stockTotal = todosInventarios.reduce(
+                (sum, inv) => sum + Number(inv.cantidad_kg), 0
+            );
 
-            await this.registrarHistorial({
-                entidad: HistorialEntidad.LOTE,
-                id_entidad: pedido.id_lote!,
-                id_user: id_completado_por,
-                accion: HistorialAccion.DELETE,
-                comentario: `Lote eliminado por consumo total en pedido`,
-                id_pedido: pedido.id_pedido,
-            });
+            if (stockTotal === 0) {
+                await this.loteRepository.deleteLote(loteOrigen.id_lote);
+                await this.registrarHistorial({
+                    entidad: HistorialEntidad.LOTE,
+                    accion: HistorialAccion.DELETE,
+                    id_entidad: loteOrigen.id_lote,
+                    id_user: id_completado_por,
+                    id_pedido: pedido.id_pedido,
+                    comentario: `Lote eliminado por consumo total en orden de tueste ${pedido.id_pedido}`,
+                });
+            }
         }
 
         return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
@@ -522,17 +523,27 @@ export class CompletarPedido implements CompletarPedidoUseCase {
 
 
 
+        // El delete debe evaluar el STOCK TOTAL del lote en todos los almacenes,
+        // no solo en el almacén de esta orden puntual — mismo criterio que ya
+        // usa AjustarStockAlmacen. Sin esto, un lote con stock en otro almacén
+        // se borraba igual solo porque este almacén puntual llegó a 0.
         if (nuevoPesoLote === 0) {
-            await this.loteRepository.deleteLote(loteOrigen.id_lote);
+            const todosInventarios = await this.inventarioLoteRepository.getByLote(loteOrigen.id_lote);
+            const stockTotal = todosInventarios.reduce(
+                (sum, inv) => sum + Number(inv.cantidad_kg), 0
+            );
 
-            await this.registrarHistorial({
-                entidad: HistorialEntidad.LOTE,
-                accion: HistorialAccion.DELETE,
-                id_entidad: loteOrigen.id_lote,
-                id_user: id_completado_por,
-                id_pedido: pedido.id_pedido,
-                comentario: `Lote eliminado por consumo total en orden de tueste ${pedido.id_pedido}`,
-            });
+            if (stockTotal === 0) {
+                await this.loteRepository.deleteLote(loteOrigen.id_lote);
+                await this.registrarHistorial({
+                    entidad: HistorialEntidad.LOTE,
+                    accion: HistorialAccion.DELETE,
+                    id_entidad: loteOrigen.id_lote,
+                    id_user: id_completado_por,
+                    id_pedido: pedido.id_pedido,
+                    comentario: `Lote eliminado por consumo total en orden de tueste ${pedido.id_pedido}`,
+                });
+            }
         }
 
         const [createLoteTostadoError, createLoteTostadoDto] = CreateLoteTostadoDto.create({
@@ -751,7 +762,12 @@ export class CompletarPedido implements CompletarPedidoUseCase {
             id_pedido_origen: pedido.id_pedido,
         });
         if (errPaq || !paqueteDto) throw new Error(errPaq ?? 'Error al crear DTO de paquete');
-        const paquete = await this.paqueteRepository.create(paqueteDto);
+
+        // Regla de negocio: correlativo tipo PAQ-000001, mismo patrón que ENV-000001 en CrearEnvio.
+        const totalPaquetes = await this.paqueteRepository.countTotal();
+        const numero_correlativo = `PAQ-${(totalPaquetes + 1).toString().padStart(6, '0')}`;
+
+        const paquete = await this.paqueteRepository.create(paqueteDto, numero_correlativo);
 
         for (const item of pedidoItems) {
             const [errItem, itemDto] = CreatePaqueteItemDto.create({

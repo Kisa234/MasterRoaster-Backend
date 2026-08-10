@@ -43,7 +43,6 @@ import { BolsaRoutes } from "./bolsa/routes";
 import { InventarioBolsaRoutes } from "./inventarios/inventario-bolsa/routes";
 import { PedidoBolsaRoutes } from "./pedido-bolsa/routes";
 import { PaqueteRoutes } from "./paquete/routes";
-import { TransportistaRoutes } from "./transportista/routes";
 import { PedidoItemRoutes } from "./pedido-item/routes";
 import { PaqueteItemRoutes } from "./paquete-item/routes";
 
@@ -96,7 +95,6 @@ export class AppRoutes {
         router.use('/envio', EnvioRoutes.routes);
         router.use('/paquete', PaqueteRoutes.routes);
         router.use('/paquete-item', PaqueteItemRoutes.routes);
-        router.use('/transportista', TransportistaRoutes.routes);
 
         router.use('/historial', HistorialRoutes.routes);
         router.use('/cambio', CambioRoutes.routes);

@@ -1,12 +1,12 @@
 import { CreateHistorialDto } from "../dtos/historial/create";
 import { HistorialEntity } from "../entities/historial.entity";
 import { UserEntity } from "../entities/user.entity";
-
+import { Prisma } from "@prisma/client";
 
 export abstract class HistorialDataSource {
-    abstract createHistorial(createLoteHistorialDto: CreateHistorialDto): Promise<HistorialEntity>;
+    abstract createHistorial(createLoteHistorialDto: CreateHistorialDto, tx?: Prisma.TransactionClient): Promise<HistorialEntity>;
     abstract getHistorialByUserId(id: string): Promise<HistorialEntity[]>;
     abstract getHistorialByEntidadId(id: string): Promise<HistorialEntity[]>;
     abstract getAllHistorial(): Promise<HistorialEntity[]>;
-    abstract getHistorialById(id: string): Promise<HistorialEntity| null>;
+    abstract getHistorialById(id: string): Promise<HistorialEntity | null>;
 }

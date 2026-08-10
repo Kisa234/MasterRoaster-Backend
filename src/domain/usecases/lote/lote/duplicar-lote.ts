@@ -19,9 +19,8 @@ import { UpdateLoteDto } from "../../../dtos/lotes/lote/update";
 import { create } from 'domain';
 
 export interface DuplicateLoteUseCase {
-    execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean): Promise<LoteEntity>;
+    execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean, id_completado_por?: string): Promise<LoteEntity>;
 }
-
 export class DuplicateLote implements DuplicateLoteUseCase {
 
     constructor(
@@ -34,7 +33,7 @@ export class DuplicateLote implements DuplicateLoteUseCase {
         private readonly loteAnalisisRepository: LoteAnalisisRepository
     ) { }
 
-    async execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean): Promise<LoteEntity> {
+    async execute(lote: LoteEntity, pedido: PedidoEntity, tueste?: Boolean, id_completado_por?: string): Promise<LoteEntity> {
 
         const tipo_lote = pedido.tipo_pedido === 'Venta Verde' ? 'Lote Verde' : 'Lote Tostado';
          
@@ -61,7 +60,14 @@ export class DuplicateLote implements DuplicateLoteUseCase {
         });
 
         
-        const nuevoLoteDestino = await this.createLoteUseCase.execute(createLoteDto!, tueste, lote.id_lote);
+        const nuevoLoteDestino = await this.createLoteUseCase.execute(
+            createLoteDto!,
+            tueste,
+            lote.id_lote,
+            undefined,
+            pedido.id_pedido, 
+            id_completado_por 
+        );
 
         if (lote.id_analisis) {
             let nuevoFis, nuevoSen, nuevoDef;

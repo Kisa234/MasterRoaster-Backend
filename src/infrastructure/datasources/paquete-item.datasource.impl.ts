@@ -33,8 +33,15 @@ export class PaqueteItemDataSourceImpl implements PaqueteItemDataSource {
         return items.map(PaqueteItemEntity.fromObject);
     }
 
+    async getByEntidad(entidad: string, id_entidad: string): Promise<PaqueteItemEntity[]> {
+        const items = await prisma.paqueteItem.findMany({
+            where: { entidad: entidad as any, id_entidad },
+            orderBy: { id_paquete: 'desc' }, // orden estable; el orden real por fecha lo da el Envio/Historial, no PaqueteItem
+        });
+        return items.map(PaqueteItemEntity.fromObject);
+    }
+
     async delete(id_item: string): Promise<PaqueteItemEntity> {
-        // Hard delete real: PaqueteItem no tiene `eliminado` en el schema.
         const deleted = await prisma.paqueteItem.delete({ where: { id_item } });
         return PaqueteItemEntity.fromObject(deleted);
     }

@@ -101,8 +101,9 @@ export class LoteTostadoController {
     }
 
     public getLotesTostadosConInventario = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
         new GetLotesTostadosConInventario(this.loteTostadoRepository)
-            .execute()
+            .execute(incluirEliminados) 
             .then(data => {
                 res.json(data)
             })

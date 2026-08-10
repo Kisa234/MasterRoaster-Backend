@@ -23,6 +23,8 @@ import { InventarioProductoRepository } from "../../../repository/inventario-pro
 import { MovimientoAlmacenRepository } from "../../../repository/movimiento-almacen.repository";
 import { LoteRepository } from '../../../repository/lote.repository';
 import { LoteTostadoRepository } from '../../../repository/loteTostado.repository';
+import { InventarioBolsaRepository } from "../../../repository/inventario-bolsa.repository";
+import { UpdateInventarioBolsaDto } from "../../../dtos/inventarios/inventario-bolsa/update";
 
 export interface AjustarStockAlmacenUseCase {
   execute(dto: AjustarStockAlmacenDto): Promise<void>;
@@ -38,6 +40,7 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
     private readonly inventarioMuestraRepository: InventarioMuestraRepository,
     private readonly inventarioProductoRepository: InventarioProductoRepository,
     private readonly inventarioInsumoRepository: InventarioInsumoRepository,
+    private readonly inventarioBolsaRepository: InventarioBolsaRepository,
     private readonly loteRepository: LoteRepository,
     private readonly loteTostadoRepository: LoteTostadoRepository
   ) {}
@@ -271,21 +274,53 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
         break;
       }
 
+
+      case "BOLSA": {
+        inventarioActual = await this.inventarioBolsaRepository.getByBolsaAndAlmacen(
+          dto.id_entidad,
+          dto.id_almacen
+        );
+
+        if (!inventarioActual) {
+          throw new Error("No existe inventario de la bolsa en el almacén indicado");
+        }
+
+        cantidadAnterior = Number(inventarioActual.cantidad);
+
+        if (cantidadAnterior === dto.nueva_cantidad) {
+          throw new Error("No hay cambios que aplicar al inventario");
+        }
+
+        const [error, updateDto] = UpdateInventarioBolsaDto.update({
+          cantidad: dto.nueva_cantidad,
+        });
+
+        if (error || !updateDto) {
+          throw new Error(error ?? "No se pudo construir el DTO de actualización de bolsa");
+        }
+
+        objetoDespues = await this.inventarioBolsaRepository.updateInventario(
+          inventarioActual.id_inventario,
+          updateDto
+        );
+        break;
+      }
+
       default:
         throw new Error("Entidad no soportada para ajuste de stock");
     }
 
-    const diferencia = Math.abs(dto.nueva_cantidad - cantidadAnterior);
+    const delta = dto.nueva_cantidad - cantidadAnterior;
 
     const [movError, movimientoDto] = CreateMovimientoAlmacenDto.create({
       tipo: TipoMovimiento.AJUSTE,
       entidad: this.mapEntidadInventario(dto.entidad),
       id_user: dto.id_user,
       id_entidad_primario: dto.id_entidad,
-      cantidad: diferencia,
+      cantidad: delta,
       id_almacen_origen: dto.id_almacen,
       id_almacen_destino: dto.id_almacen,
-      comentario: dto.motivo ?? `Ajuste de ${cantidadAnterior} a ${dto.nueva_cantidad}`,
+      comentario: `De ${cantidadAnterior} a ${dto.nueva_cantidad}${dto.motivo ? ' — ' + dto.motivo : ''}`,
     });
 
     if (movError || !movimientoDto) {
@@ -299,7 +334,7 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
       id_user: dto.id_user,
       entidad: this.mapHistorialEntidad(dto.entidad),
       accion: HistorialAccion.AJUSTE,
-      comentario: dto.motivo ?? `Ajuste de stock de ${cantidadAnterior} a ${dto.nueva_cantidad}`,
+      comentario: `De ${cantidadAnterior} a ${dto.nueva_cantidad}${dto.motivo ? ' — ' + dto.motivo : ''}`,
       objeto_antes: inventarioActual,
       objeto_despues: objetoDespues,
     });
@@ -318,6 +353,7 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
       case "PRODUCTO": return EntidadInventario.PRODUCTO;
       case "MUESTRA": return EntidadInventario.MUESTRA;
       case "INSUMO": return EntidadInventario.INSUMO;
+      case "BOLSA": return EntidadInventario.BOLSA; 
       default: throw new Error("Entidad de inventario no soportada");
     }
   }
@@ -329,6 +365,7 @@ export class AjustarStockAlmacen implements AjustarStockAlmacenUseCase {
       case "PRODUCTO": return HistorialEntidad.PRODUCTO;
       case "MUESTRA": return HistorialEntidad.MUESTRA;
       case "INSUMO": return HistorialEntidad.INSUMO;
+      case "BOLSA": return HistorialEntidad.BOLSA; 
       default: throw new Error("Entidad de historial no soportada");
     }
   }

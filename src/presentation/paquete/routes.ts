@@ -25,6 +25,7 @@ export class PaqueteRoutes {
         router.put('/:id/cancelar', authMiddleware, controller.cancelar);
 
         router.get('/', controller.getAll);
+        router.get('/pedido-origen/:id_pedido', controller.getByPedidoOrigen); // antes de /:id
         router.get('/:id', controller.getById);
 
         return router;

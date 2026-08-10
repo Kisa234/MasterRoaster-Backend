@@ -2,7 +2,7 @@ import { Molienda } from "@prisma/client";
 
 export class TrasladarStockAlmacenDto {
   private constructor(
-    public readonly entidad: "LOTE" | "LOTE_TOSTADO" | "PRODUCTO" | "MUESTRA" | "INSUMO",
+    public readonly entidad: "LOTE" | "LOTE_TOSTADO" | "PRODUCTO" | "MUESTRA" | "INSUMO" | "BOLSA",
     public readonly id_entidad: string,
     public readonly id_almacen_origen: string,
     public readonly id_almacen_destino: string,

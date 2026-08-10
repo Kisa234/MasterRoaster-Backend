@@ -3,18 +3,19 @@ import { UpdateMovimientoAlmacenDto } from '../dtos/almacen/movimiento-almacen/u
 import { MovimientoAlmacenEntity } from '../entities/movimiento-almacen.entity';
 import { EntidadInventario } from '../../enums/entidad-inventario.enum';
 import { TipoMovimiento } from '../../enums/tipo-movimiento.enum';
+import { Prisma } from '@prisma/client';
 
 export abstract class MovimientoAlmacenDataSource {
 
   abstract createMovimiento(
-    dto: CreateMovimientoAlmacenDto
+    dto: CreateMovimientoAlmacenDto,
+    tx?: Prisma.TransactionClient
   ): Promise<MovimientoAlmacenEntity>;
 
   abstract getMovimientoById(
     id_movimiento: string
   ): Promise<MovimientoAlmacenEntity | null>;
 
-  // solo comentario
   abstract updateMovimiento(
     id_movimiento: string,
     dto: UpdateMovimientoAlmacenDto

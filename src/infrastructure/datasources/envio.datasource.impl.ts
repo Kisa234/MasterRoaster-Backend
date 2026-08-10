@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../data/postgres";
 import { EnvioDataSource } from "../../domain/datasources/envio.datasource";
 import { CreateEnvioDto } from "../../domain/dtos/envio/create";
@@ -9,14 +10,13 @@ import { RegistrarDevolucionEnvioDto } from "../../domain/dtos/envio/registrar-d
 import { EnvioEntity, EnvioConDetalleEntity } from "../../domain/entities/envio.entity";
 
 export class EnvioDataSourceImpl implements EnvioDataSource {
-
     async create(dto: CreateEnvioDto, numero_correlativo: string): Promise<EnvioEntity> {
         const envio = await prisma.envio.create({
             data: {
                 numero_correlativo,
                 id_paquete: dto.id_paquete,
                 registrado_por_id: dto.registrado_por_id,
-                id_transportista: dto.id_transportista,
+                medio_envio: dto.medio_envio,
                 peso_total_kg: dto.peso_total_kg,
                 alto_cm: dto.alto_cm,
                 ancho_cm: dto.ancho_cm,
@@ -24,7 +24,7 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
                 costo_envio: dto.costo_envio,
                 quien_paga: dto.quien_paga as any,
                 fecha_programada: dto.fecha_programada,
-                estado: dto.fecha_programada && dto.id_transportista ? 'PROGRAMADO' : 'PENDIENTE',
+                estado: dto.fecha_programada ? 'PROGRAMADO' : 'PENDIENTE',
             },
         });
         return EnvioEntity.fromObject(envio);
@@ -40,9 +40,8 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
         const envio = await prisma.envio.findUnique({
             where: { id_envio },
             include: {
-                paquete: { include: { items: true } }, // 👈 debe coincidir con EnvioConDetalleEntity.fromObject
+                paquete: { include: { items: true } },
                 direccion: true,
-                transportista: true,
             },
         });
         if (!envio) return null;
@@ -57,6 +56,15 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
         return envios.map(EnvioEntity.fromObject);
     }
 
+    async getByPaquetes(id_paquetes: string[]): Promise<EnvioEntity[]> {
+        if (id_paquetes.length === 0) return [];
+        const envios = await prisma.envio.findMany({
+            where: { id_paquete: { in: id_paquetes }, eliminado: false },
+            orderBy: { fecha_registro: 'desc' },
+        });
+        return envios.map(EnvioEntity.fromObject);
+    }
+
     async countTotal(): Promise<number> {
         return prisma.envio.count();
     }
@@ -66,15 +74,19 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
             where: { id_envio },
             data: {
                 fecha_programada: dto.fecha_programada,
-                id_transportista: dto.id_transportista,
+                medio_envio: dto.medio_envio,
                 estado: 'PROGRAMADO',
             },
         });
         return EnvioEntity.fromObject(envio);
     }
 
-    async despachar(id_envio: string, dto: DespacharEnvioDto): Promise<EnvioEntity> {
-        const envio = await prisma.envio.update({
+    async despachar(
+        id_envio: string,
+        dto: DespacharEnvioDto,
+        tx: Prisma.TransactionClient | typeof prisma = prisma
+    ): Promise<EnvioEntity> {
+        const envio = await tx.envio.update({
             where: { id_envio },
             data: {
                 estado: 'DESPACHADO',
@@ -110,8 +122,12 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
         return EnvioEntity.fromObject(envio);
     }
 
-    async registrarDevolucion(id_envio: string, dto: RegistrarDevolucionEnvioDto): Promise<EnvioEntity> {
-        const envio = await prisma.envio.update({
+    async registrarDevolucion(
+        id_envio: string,
+        dto: RegistrarDevolucionEnvioDto,
+        tx: Prisma.TransactionClient | typeof prisma = prisma
+    ): Promise<EnvioEntity> {
+        const envio = await tx.envio.update({
             where: { id_envio },
             data: {
                 estado: 'DEVUELTO',
@@ -119,5 +135,15 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
             },
         });
         return EnvioEntity.fromObject(envio);
+    }
+
+    async getActivosByPaquete(id_paquete: string): Promise<EnvioEntity[]> {
+        const envios = await prisma.envio.findMany({
+            where: {
+                id_paquete,
+                estado: { notIn: ['CANCELADO', 'DEVUELTO'] },
+            },
+        });
+        return envios.map(EnvioEntity.fromObject);
     }
 }
