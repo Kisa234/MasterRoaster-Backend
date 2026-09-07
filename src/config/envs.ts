@@ -11,5 +11,7 @@ export const envs = {
   EMAIL_USER: get('EMAIL_USER').required().asString(),
   EMAIL_APP_PASSWORD: get('EMAIL_APP_PASSWORD').required().asString(),
 
-  FRONTEND_URL: get('FRONTEND_URL').default('http://localhost:4200').asString()
+  FRONTEND_URL: get('FRONTEND_URL').default('http://localhost:4200').asString(),
+
+  SUPER_ADMIN_ROL_ID: get('SUPER_ADMIN_ROL_ID').default('').asString(),
 }

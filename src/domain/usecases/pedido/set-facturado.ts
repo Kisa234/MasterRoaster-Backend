@@ -17,9 +17,9 @@ export class SetPedidoFacturado implements SetPedidoFacturadoUseCase {
     const pedido = await this.pedidoRepository.getPedidoById(id_pedido);
     if (!pedido) throw new Error('Pedido no encontrado');
 
-    const rol = await this.userRepository.getRole(pedido.id_user);
-
-    if (rol === 'admin') {
+    // Un pedido de tienda nunca se factura — antes se inferia por rol del
+    // usuario dueño, ahora se usa el campo explícito owned_by_store.
+    if (pedido.owned_by_store) {
       state = false;
     }
 

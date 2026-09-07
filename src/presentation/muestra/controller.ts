@@ -12,6 +12,8 @@ import { UserRepository } from "../../domain/repository/user.repository";
 import { HistorialRepository } from "../../domain/repository/historial.repository";
 import { GetMuestrasConInventario } from "../../domain/usecases/muestra/muestra-inventario";
 import { InventarioMuestraRepository } from "../../domain/repository/inventario-muestra.repository";
+import { GetMuestrasOwnedByStore } from "../../domain/usecases/muestra/get-muestras-owned-by-store";
+import { GetMuestrasByUserId } from "../../domain/usecases/muestra/get-muestras-user";
 
 export class MuestraController {
 
@@ -19,7 +21,7 @@ export class MuestraController {
     private readonly muestraRepository: MuestraRepository,
     private readonly userRepository: UserRepository,
     private readonly historialRepository: HistorialRepository,
-    private readonly inventarioMuestraRepository : InventarioMuestraRepository
+    private readonly inventarioMuestraRepository: InventarioMuestraRepository
 
   ) { }
 
@@ -29,29 +31,48 @@ export class MuestraController {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    // 2. Decide de dónde viene el id_user:
-    //    - Si el DTO entrante trae un id_user válido lo usamos.
-    //    - Si no lo trae, lo tomamos del token (req.user.id).
-    // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
-    // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
-    const idUserFromBody = req.body.id_user as string | undefined;
-    const effectiveUserId = idUserFromBody ?? req.user.id_user;
+    // 2. Un cliente no puede crear muestras (no debería ni tener acceso al ERP,
+    //    pero se valida igual como defensa en profundidad)
+    if (req.user.rol === 'cliente') {
+      return res.status(403).json({ error: 'No tienes permisos para crear muestras' });
+    }
 
-    // 3. Arma el body final para el DTO
+    const idUserFromBody = req.body.id_user as string | undefined;
+    const ownedByStoreFromBody = req.body.owned_by_store as boolean | undefined;
+
+    let effectiveOwnedByStore: boolean;
+    let effectiveUserId: string | undefined;
+
+    if (ownedByStoreFromBody === true && idUserFromBody) {
+      return res.status(400).json({
+        error: 'Una muestra no puede ser de tienda y de cliente al mismo tiempo'
+      });
+    }
+
+    if (ownedByStoreFromBody === true) {
+      effectiveOwnedByStore = true;
+      effectiveUserId = undefined;
+    } else if (idUserFromBody) {
+      effectiveOwnedByStore = false;
+      effectiveUserId = idUserFromBody;
+    } else {
+      return res.status(400).json({
+        error: 'Debes indicar si la muestra es de tienda (owned_by_store) o seleccionar un cliente (id_user)'
+      });
+    }
+
     const bodyWithUser = {
       ...req.body,
+      owned_by_store: effectiveOwnedByStore,
       id_user: effectiveUserId,
     };
 
-    // 4. Crea el DTO y valida
     const [error, createMuestraDto] = CreateMuestraDto.create(bodyWithUser);
-
 
     if (error) {
       return res.status(400).json({ error });
     }
 
-    // 5. Ejecuta el caso de uso
     new CreateMuestra(this.muestraRepository, this.userRepository)
       .execute(createMuestraDto!)
       .then((muestra) => {
@@ -112,14 +133,31 @@ export class MuestraController {
   }
 
   public getMuestrasConInventario = (req: Request, res: Response) => {
-    new GetMuestrasConInventario(this.muestraRepository)
-      .execute()
-      .then(muestras => {
-        res.json(muestras)
-      }
-      )
-      .catch(error => res.status(400).json({ error }));
+    const incluirEliminados = req.query.incluirEliminados === 'true';
 
+    new GetMuestrasConInventario(this.muestraRepository)
+      .execute(incluirEliminados)
+      .then(muestras => res.json(muestras))
+      .catch(error => res.status(400).json({ error: error.message ?? error }));
   }
+
+  public getMuestrasOwnedByStore = (req: Request, res: Response) => {
+    const incluirEliminados = req.query.incluirEliminados === 'true';
+
+    new GetMuestrasOwnedByStore(this.muestraRepository)
+      .execute(incluirEliminados)
+      .then((muestras) => res.json(muestras))
+      .catch((error) => res.status(400).json({ error: error.message ?? error }));
+  };
+
+  public getMuestrasByUserId = (req: Request, res: Response) => {
+    const incluirEliminados = req.query.incluirEliminados === 'true';
+
+    new GetMuestrasByUserId(this.muestraRepository)
+      .execute(req.params.id, incluirEliminados)
+      .then((muestras) => res.json(muestras))
+      .catch((error) => res.status(400).json({ error: error.message ?? error }));
+  };
+
 
 }

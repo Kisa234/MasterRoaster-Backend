@@ -83,8 +83,7 @@ export class LoteDataSourceImpl implements LoteDataSource {
     return LoteEntity.fromObject(lote);
   }
 
-  async getLotesByUserId(id: string): Promise<LoteEntity[]> {
-    //verificar si existe el usuario
+  async getLotesByUserId(id: string, incluirEliminados: boolean = false): Promise<LoteEntity[]> {
     const user = await prisma.user.findUnique({
       where: {
         id_user: id,
@@ -92,15 +91,17 @@ export class LoteDataSourceImpl implements LoteDataSource {
       }
     });
     if (!user) throw new Error("No existe el usuario");
-    //obtener los lotes del usuario
+
     const lotes = await prisma.lote.findMany({
       where: {
         id_user: id,
+        ...(incluirEliminados ? {} : { eliminado: false })
       }
     });
     if (!lotes) throw new Error("No existen lotes para el usuario");
     return lotes.map(lote => LoteEntity.fromObject(lote));
   }
+  
   async getLotesTostados(): Promise<LoteEntity[]> {
     const lotes = await prisma.lote.findMany({
       where: {
@@ -169,7 +170,15 @@ export class LoteDataSourceImpl implements LoteDataSource {
     return LoteConInventarioEntity.fromObject(lote);
   }
 
-
+  async getLotesOwnedByStore(incluirEliminados: boolean = false): Promise<LoteEntity[]> {
+    const lotes = await prisma.lote.findMany({
+      where: {
+        owned_by_store: true,
+        ...(incluirEliminados ? {} : { eliminado: false })
+      }
+    });
+    return lotes.map(lote => LoteEntity.fromObject(lote));
+  }
 
 
 

@@ -9,7 +9,8 @@ export class LoteTostadoEntity {
         public perfil_tostado: string,
         public peso: number,
         public fecha_registro: Date,
-        public id_user:string,
+        public owned_by_store: boolean,
+        public id_user?: string,
         public id_analisis_rapido?: string,
         public entregado?: Date,
         public eliminado?: boolean
@@ -23,6 +24,7 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             fecha_registro,
+            owned_by_store,
             id_user,
             id_analisis_rapido,
             entregado,
@@ -48,6 +50,7 @@ export class LoteTostadoEntity {
             perfil_tostado,
             peso,
             newFechaRegistro,
+            owned_by_store ?? false,
             id_user,
             id_analisis_rapido,
             entregado,
@@ -65,11 +68,12 @@ export class LoteTostadoConLoteEntity {
     public perfil_tostado: string,
     public peso: number,
     public fecha_registro: Date,
-    public id_user: string,
+    public owned_by_store: boolean,
 
     // extra solo para estos casos
     public lote: LoteEntity,
 
+    public id_user?: string,
     public id_analisis_rapido?: string,
     public entregado?: Date,
     public eliminado?: boolean
@@ -83,6 +87,7 @@ export class LoteTostadoConLoteEntity {
       perfil_tostado,
       peso,
       fecha_registro,
+      owned_by_store,
       id_user,
       id_analisis_rapido,
       entregado,
@@ -117,8 +122,9 @@ export class LoteTostadoConLoteEntity {
       perfil_tostado,
       peso,
       newFechaRegistro,
-      id_user,
+      owned_by_store ?? false,
       LoteEntity.fromObject(lote),
+      id_user,
       id_analisis_rapido,
       newEntregado,
       eliminado
@@ -134,9 +140,10 @@ export class LoteTostadoConInventarioEntity {
     public perfil_tostado: string,
     public peso: number,
     public fecha_registro: Date,
-    public id_user: string,
+    public owned_by_store: boolean,
     public lote: LoteEntity,
     public inventarioLotesTostados: InventarioLoteTostadoEntity[],
+    public id_user?: string,
     public id_analisis_rapido?: string,
     public entregado?: Date,
     public eliminado?: boolean
@@ -150,6 +157,7 @@ export class LoteTostadoConInventarioEntity {
       perfil_tostado,
       peso,
       fecha_registro,
+      owned_by_store,
       id_user,
       id_analisis_rapido,
       entregado,
@@ -185,11 +193,12 @@ export class LoteTostadoConInventarioEntity {
       perfil_tostado,
       peso,
       newFechaRegistro,
-      id_user,
+      owned_by_store ?? false,
       LoteEntity.fromObject(lote),
       inventarioLoteTostados.map((inv: any) =>
         InventarioLoteTostadoEntity.fromObject(inv)
       ),
+      id_user,
       id_analisis_rapido,
       newEntregado,
       eliminado

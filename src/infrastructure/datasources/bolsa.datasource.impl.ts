@@ -98,4 +98,25 @@ export class BolsaDataSourceImpl implements BolsaDataSource {
             where: { id_lote_tostado, gramaje, molienda }
         });
     }
+
+    async getBolsasOwnedByStore(incluirEliminados: boolean = false): Promise<BolsaEntity[]> {
+        const bolsas = await prisma.bolsa.findMany({
+            where: {
+                owned_by_store: true,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return bolsas.map(b => BolsaEntity.fromObject(b));
+    }
+
+    async getBolsasByUserId(id_user: string, incluirEliminados: boolean = false): Promise<BolsaEntity[]> {
+        const bolsas = await prisma.bolsa.findMany({
+            where: {
+                id_user,
+                owned_by_store: false,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return bolsas.map(b => BolsaEntity.fromObject(b));
+    }
 }

@@ -39,6 +39,9 @@ import { PedidoItemRepository } from '../../domain/repository/pedido-item.reposi
 import { InventarioGenericoRepository } from '../../domain/repository/inventario-generico.repository';
 import { PaqueteRepository } from '../../domain/repository/paquete.repository';
 import { PaqueteItemRepository } from '../../domain/repository/paquete-item.repository';
+import { GetEstadisticasPedidos } from '../../domain/usecases/pedido/get-estadisticas-pedidos';
+import { GetPedidosOwnedByStore } from '../../domain/usecases/pedido/get-pedidos-owned-by-store';
+import { GetPedidosByUserId } from '../../domain/usecases/pedido/get-pedidos-user';
 
 export class PedidoController {
 
@@ -72,9 +75,29 @@ export class PedidoController {
         if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
-        const body = { ...req.body, creado_por_id: req.user?.id_user as string };
-        const id_completado_por = req.user?.id_user as string;
 
+        const idUserFromBody = req.body.id_user as string | undefined;
+        const ownedByStoreFromBody = req.body.owned_by_store === true;
+
+        let effectiveUserId: string | undefined;
+
+        if (ownedByStoreFromBody) {
+            effectiveUserId = undefined;
+        } else if (idUserFromBody) {
+            effectiveUserId = idUserFromBody;
+        } else {
+            return res.status(400).json({
+                error: 'Debes indicar si el pedido es de tienda (owned_by_store) o seleccionar un cliente (id_user)'
+            });
+        }
+
+        const body = {
+            ...req.body,
+            id_user: effectiveUserId,
+            owned_by_store: ownedByStoreFromBody,
+            creado_por_id: req.user.id_user as string,
+        };
+        const id_completado_por = req.user.id_user as string;
 
         const [error, createPedidoDto] = CreatePedidoDto.create(body);
         if (error) {
@@ -132,7 +155,10 @@ export class PedidoController {
         )
             .execute(id_pedido, id_completado_por)
             .then(pedido => res.json(pedido))
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => {
+                console.log('Error en completarPedido:', error);
+                res.status(400).json({ error: error.message ?? String(error) });
+            });
     };
 
     public updatePedido = async (req: Request, res: Response) => {
@@ -291,5 +317,35 @@ export class PedidoController {
             .execute(new Date(desde as string), new Date(hasta as string))
             .then(estadisticas => res.json(estadisticas))
             .catch(error => res.status(400).json({ error }));
+    }
+
+    public getEstadisticasPedidos = async (req: Request, res: Response) => {
+        const { desde, hasta } = req.query;
+        if (!desde || !hasta) {
+            return res.status(400).json({ error: 'Se requieren los parámetros desde y hasta' });
+        }
+        new GetEstadisticasPedidos(
+            this.pedidoRepository,
+            this.userRepository
+        )
+            .execute(new Date(desde as string), new Date(hasta as string))
+            .then(estadisticas => res.json(estadisticas))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    }
+
+    public getPedidosOwnedByStore = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetPedidosOwnedByStore(this.pedidoRepository)
+            .execute(incluirEliminados)
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    }
+
+    public getPedidosByUserId = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetPedidosByUserId(this.pedidoRepository)
+            .execute(req.params.id, incluirEliminados)
+            .then(pedidos => res.json(pedidos))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     }
 }

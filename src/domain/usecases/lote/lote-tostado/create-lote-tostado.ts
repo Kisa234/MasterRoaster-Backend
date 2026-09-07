@@ -1,8 +1,7 @@
-import e from "express";
 import { CreateLoteTostadoDto } from "../../../dtos/lotes/lote-tostado/create";
 import { LoteTostadoEntity } from "../../../entities/loteTostado.entity";
 import { LoteTostadoRepository } from "../../../repository/loteTostado.repository";
-import { PedidoRepository } from "../../../repository/pedido.repository";
+import { LoteRepository } from "../../../repository/lote.repository";
 
 export default interface CreateLoteTostadoUseCase {
     execute(createLoteTostadoDto: CreateLoteTostadoDto): Promise<LoteTostadoEntity>;
@@ -11,11 +10,24 @@ export default interface CreateLoteTostadoUseCase {
 export class CreateLoteTostado implements CreateLoteTostadoUseCase {
     constructor(
         private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly loteRepository: LoteRepository,
     ) { }
 
     async execute(dto: CreateLoteTostadoDto): Promise<LoteTostadoEntity> {
+        // Herencia obligatoria: un LoteTostado nunca decide su propio dueño ni
+        // si es de tienda — siempre toma exactamente lo que tenga el Lote
+        // verde padre, sin importar qué haya venido en el DTO desde el
+        // controller. Esto evita que un lote tostado quede desincronizado
+        // de su lote origen (ej. con id_user de un admin cuando el padre
+        // era de tienda, o viceversa).
+        const loteOrigen = await this.loteRepository.getLoteById(dto.id_lote);
+        if (!loteOrigen) throw new Error('Lote origen no encontrado');
+
+        dto.id_user = loteOrigen.id_user;
+        dto.owned_by_store = loteOrigen.owned_by_store;
+
         const id = await this.generarId(dto);
-        dto.id_lote_tostado = id; 
+        dto.id_lote_tostado = id;
         return this.loteTostadoRepository.createLoteTostado(dto);
     }
 

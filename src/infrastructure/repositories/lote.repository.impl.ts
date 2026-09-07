@@ -5,10 +5,10 @@ import { UpdateLoteDto } from "../../domain/dtos/lotes/lote/update";
 import { LoteConInventarioEntity, LoteEntity } from "../../domain/entities/lote.entity";
 import { LoteRepository } from "../../domain/repository/lote.repository";
 
-export class LoteRepositoryImpl  implements LoteRepository {
+export class LoteRepositoryImpl implements LoteRepository {
     constructor(
         private readonly datasource: LoteDataSource
-    ){}
+    ) { }
 
     createLote(createLoteDto: CreateLoteDto): Promise<LoteEntity> {
         return this.datasource.createLote(createLoteDto);
@@ -28,16 +28,16 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getLotes(): Promise<LoteEntity[]> {
         return this.datasource.getLotes();
     }
-    createLoteFromMuestra(id: string, dto:CreateLoteDto): Promise<LoteEntity> {
-        return this.datasource.createLoteFromMuestra(id,dto);
+    createLoteFromMuestra(id: string, dto: CreateLoteDto): Promise<LoteEntity> {
+        return this.datasource.createLoteFromMuestra(id, dto);
     }
-    getLotesByUserId(id: string): Promise<LoteEntity[]> {
-        return this.datasource.getLotesByUserId(id);
+    getLotesByUserId(id: string, incluirEliminados: boolean = false): Promise<LoteEntity[]> {
+        return this.datasource.getLotesByUserId(id, incluirEliminados);
     }
-    getLotesTostados(): Promise<LoteEntity[]>{
+    getLotesTostados(): Promise<LoteEntity[]> {
         return this.datasource.getLotesTostados();
     }
-    getLotesVerdes(): Promise<LoteEntity[]>{
+    getLotesVerdes(): Promise<LoteEntity[]> {
         return this.datasource.getLotesVerdes();
     }
     getUserByLote(id: string): Promise<string> {
@@ -49,5 +49,7 @@ export class LoteRepositoryImpl  implements LoteRepository {
     getLoteConInventarioById(id: string): Promise<LoteConInventarioEntity | null> {
         return this.datasource.getLoteConInventarioById(id);
     }
-
+    getLotesOwnedByStore(incluirEliminados: boolean = false): Promise<LoteEntity[]> {
+        return this.datasource.getLotesOwnedByStore(incluirEliminados);
+    }
 }

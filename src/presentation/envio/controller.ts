@@ -23,6 +23,7 @@ import { RegistrarDevolucionEnvio } from "../../domain/usecases/envio/registrar-
 import { GetEnvio } from "../../domain/usecases/envio/get-envio";
 import { GetEnvios } from "../../domain/usecases/envio/get-envios";
 import { GetEnviosPorEntidad } from "../../domain/usecases/envio/get-envios-por-entidad";
+import { GetEnviosPorCliente } from "../../domain/usecases/envio/get-envios-por-cliente";
 
 export class EnvioController {
     constructor(
@@ -144,6 +145,13 @@ export class EnvioController {
 
         new GetEnviosPorEntidad(this.paqueteItemRepo, this.envioRepo)
             .execute(entidad, id_entidad)
+            .then(envios => res.json(envios))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    };
+
+    public getByCliente = (req: Request, res: Response) => {
+        new GetEnviosPorCliente(this.envioRepo)
+            .execute(req.params.id_cliente)
             .then(envios => res.json(envios))
             .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     };

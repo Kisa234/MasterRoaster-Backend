@@ -8,6 +8,7 @@ export class BolsaEntity {
         public cantidad: number,
         public fecha_embolsado: Date,
         public eliminado: boolean,
+        public owned_by_store: boolean,
         public id_user?: string,
         public comentario?: string,
     ) { }
@@ -21,6 +22,7 @@ export class BolsaEntity {
             molienda,
             cantidad,
             eliminado,
+            owned_by_store,
             id_user,
             comentario,
             fecha_embolsado,
@@ -47,6 +49,7 @@ export class BolsaEntity {
             cantidad,
             newFechaEmbolsado,
             eliminado,
+            owned_by_store ?? false,
             id_user,
             comentario,
         );
@@ -76,6 +79,7 @@ export class BolsaConInventarioEntity {
         public cantidad: number,
         public fecha_embolsado: Date,
         public eliminado: boolean,
+        public owned_by_store: boolean,
 
         // ✅ extra solo para estos casos
         public inventarioBolsas: InventarioBolsaMini[] = [],
@@ -93,10 +97,11 @@ export class BolsaConInventarioEntity {
             molienda,
             cantidad,
             eliminado,
+            owned_by_store,
             id_user,
             comentario,
             fecha_embolsado,
-            inventarios, // 👈 fix: coincide con el nombre de la relación en el include de Prisma
+            inventarios,
         } = obj;
 
         if (!id_bolsa) throw new Error('id_bolsa property is required');
@@ -107,8 +112,8 @@ export class BolsaConInventarioEntity {
         const newFechaEmbolsado = new Date(fecha_embolsado);
         if (isNaN(newFechaEmbolsado.getTime())) throw new Error('fecha_embolsado no es válida');
 
-        const invMapped: InventarioBolsaMini[] = Array.isArray(inventarios) // 👈 fix
-            ? inventarios.map((i: any) => ({ // 👈 fix
+        const invMapped: InventarioBolsaMini[] = Array.isArray(inventarios) 
+            ? inventarios.map((i: any) => ({ 
                 id_inventario: i.id_inventario,
                 id_bolsa: i.id_bolsa,
                 id_almacen: i.id_almacen,
@@ -130,6 +135,7 @@ export class BolsaConInventarioEntity {
             cantidad,
             newFechaEmbolsado,
             eliminado,
+            owned_by_store ?? false,
             invMapped,
             id_user,
             comentario,

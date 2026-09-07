@@ -68,11 +68,13 @@ export class CreateLote implements CreateLoteUseCase {
 
         // Historial de creación — único punto de entrada, sin importar si el lote
         // nace manual, desde un Pedido (vía DuplicateLote), o desde una Muestra.
+        // id_user aquí es quien EJECUTÓ la acción, no necesariamente el dueño del lote
+        // (un lote de tienda no tiene dueño/cliente, así que createLoteDto.id_user puede venir undefined).
         const [histError, histDto] = CreateHistorialDto.create({
             entidad: HistorialEntidad.LOTE,
             accion: HistorialAccion.CREATE,
             id_entidad: lote.id_lote,
-            id_user: createLoteDto.id_user!,
+            id_user: id_user_accion ?? createLoteDto.id_user!,
             id_pedido: id_pedido ?? undefined,
             comentario: id_pedido
                 ? `Lote creado a partir del pedido ${id_pedido}`
@@ -85,7 +87,25 @@ export class CreateLote implements CreateLoteUseCase {
     }
 
     generarId = async (dto: CreateLoteDto, tueste?: Boolean, id_c?: string): Promise<string> => {
-        //  lOTE NUEVO
+        const user = dto.id_user
+            ? await this.userRepository.getUserById(dto.id_user)
+            : null;
+        const esCliente = user?.rol === 'cliente';
+
+        // CASO: lote derivado (cliente, con origen en un lote padre vía pedido).
+        if (esCliente && id_c) {
+            const partesNombre = user!.nombre.trim().split(' ');
+            const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
+            const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
+
+            let idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
+            if (tueste) {
+                idGenerado = `${idGenerado}-T`;
+            }
+            return idGenerado;
+        }
+
+        //  lOTE NUEVO (raíz — tienda o cliente desde cero)
         const { productor, variedades, proceso } = dto;
         const nombres = productor.trim().split(' ');
         const inicialNombre = nombres[0]?.charAt(0).toUpperCase() || '';
@@ -100,9 +120,9 @@ export class CreateLote implements CreateLoteUseCase {
             for (const variedad of variedades) {
                 const palabras = variedad.trim().split(' ');
                 if (palabras.length > 0) {
-                    inicialVariedad += palabras[0].slice(0, 2).toUpperCase(); // Primeras 2 letras de la primera palabra
+                    inicialVariedad += palabras[0].slice(0, 2).toUpperCase();
                     for (let i = 1; i < palabras.length; i++) {
-                        inicialVariedad += palabras[i].charAt(0).toUpperCase(); // 1ra letra de cada palabra adicional
+                        inicialVariedad += palabras[i].charAt(0).toUpperCase();
                     }
                 }
             }
@@ -119,48 +139,26 @@ export class CreateLote implements CreateLoteUseCase {
 
         let idGenerado = `${inicialNombre}${inicialApellido}${inicialVariedad}${inicialProceso}`;
 
-        // NUMERO FINAL
-        const lotes = await this.loteRepository.getLotes();               // Todos los lotes existentes
-        const lotesPedidos = await this.pedidoRepository.getLotesCreados(); // Todos los id_nuevoLote de pedidos
-        const uniquePedidos = new Set(lotesPedidos);                      // Elimina duplicados
-
-        // Calcular: total lotes menos lotes ya “usados” por pedidos, +1 para el siguiente
-        const numeroLoteFinal = lotes.length - uniquePedidos.size + 1;
+        // NUMERO FINAL — solo se calcula para lotes raíz (nunca para derivados)
+        const numeroLoteFinal = dto.owned_by_store
+            ? (await this.loteRepository.getLotesOwnedByStore(true)).length + 1
+            : (await this.loteRepository.getLotesByUserId(dto.id_user!, true)).length + 1;
         idGenerado = `${idGenerado}-${numeroLoteFinal}`;
 
 
-        // LOTE PARA CLIENTE
-        const user = await this.userRepository.getUserById(dto.id_user!);
-        if (user) {
-            if (user?.rol === 'cliente') {
+        // LOTE PARA CLIENTE (raíz, sin id_c)
+        if (esCliente) {
+            const partesNombre = user!.nombre.trim().split(' ');
+            const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
+            const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
 
-                const partesNombre = user.nombre.trim().split(' ');
-                const inicialNombreUser = partesNombre[0]?.charAt(0).toUpperCase() || '';
-                const inicialApellidoUser = partesNombre[1]?.charAt(0).toUpperCase() || '';
-                if (id_c) {
-                    idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${id_c}`;
-                    if (tueste) {
-                        idGenerado = `${idGenerado}-T`;
-                    }
-                    return idGenerado;
-                }
+            idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
 
-                idGenerado = `${inicialNombreUser}${inicialApellidoUser}-${idGenerado}`;
-
-                if (tueste) {
-                    idGenerado = `${idGenerado}-T`;
-                }
-
+            if (tueste) {
+                idGenerado = `${idGenerado}-T`;
             }
-            else if (user?.rol !== 'cliente') {
-                return idGenerado;
-            }
-
-
-
         }
+
         return idGenerado;
     }
-
-
 }

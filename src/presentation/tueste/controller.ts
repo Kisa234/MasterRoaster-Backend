@@ -17,6 +17,8 @@ import { GetTostadosByPedido } from "../../domain/usecases/tueste/get-by-pedido"
 import { GetReferenceTueste } from "../../domain/usecases/tueste/reference-tueste";
 import { HistorialRepository } from '../../domain/repository/historial.repository';
 import { GetTuestesByRango } from '../../domain/usecases/tueste/get-by-rango';
+import { GetTuestesOwnedByStore } from '../../domain/usecases/tueste/get-tuestes-owned-by-store';
+import { GetTuestesByUserId } from '../../domain/usecases/tueste/get-tuestes-user';
 
 export class TuesteController {
 
@@ -57,7 +59,6 @@ export class TuesteController {
     };
 
     public completarTostados = async (req: Request, res: Response) => {
-        // verificamos que el usuario este autenticado
         if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
@@ -74,7 +75,10 @@ export class TuesteController {
         )
             .execute(id_tueste, completeTuesteDto!, id_completado_por)
             .then(tueste => res.json(tueste))
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => {
+                console.log('Error en completarTostados:', error);
+                res.status(400).json({ error: error.message ?? String(error) });
+            });
     }
 
     public deleteTueste = async (req: Request, res: Response) => {
@@ -138,6 +142,21 @@ export class TuesteController {
         }
         new GetTuestesByRango(this.tuesteRepository)
             .execute(new Date(desde as string), new Date(hasta as string))
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
+    }
+    public getTuestesOwnedByStore = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetTuestesOwnedByStore(this.tuesteRepository)
+            .execute(incluirEliminados)
+            .then(tuestes => res.json(tuestes))
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getTuestesByUserId = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetTuestesByUserId(this.tuesteRepository)
+            .execute(req.params.id, incluirEliminados)
             .then(tuestes => res.json(tuestes))
             .catch(error => res.status(400).json({ error }));
     }

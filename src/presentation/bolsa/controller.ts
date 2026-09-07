@@ -12,6 +12,8 @@ import { GetBolsaInventarioById } from "../../domain/usecases/bolsa/get-bolsa-in
 import { UpdateBolsa } from "../../domain/usecases/bolsa/update-bolsa";
 import { DeleteBolsa } from "../../domain/usecases/bolsa/delete-bolsa";
 import { InventarioBolsaRepository } from "../../domain/repository/inventario-bolsa.repository";
+import { GetBolsasOwnedByStore } from "../../domain/usecases/bolsa/get-bolsas-owned-by-store";
+import { GetBolsasByUserId } from "../../domain/usecases/bolsa/get-bolsas-user";
 
 export class BolsaController {
 
@@ -25,9 +27,30 @@ export class BolsaController {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
 
+        const idUserFromBody = req.body.id_user as string | undefined;
+        const ownedByStoreFromBody = req.body.owned_by_store === true;
+
+        if (ownedByStoreFromBody && idUserFromBody) {
+            return res.status(400).json({
+                error: 'Una bolsa no puede ser de tienda y de cliente al mismo tiempo'
+            });
+        }
+
+        let effectiveUserId: string | undefined;
+        if (ownedByStoreFromBody) {
+            effectiveUserId = undefined;
+        } else if (idUserFromBody) {
+            effectiveUserId = idUserFromBody;
+        } else {
+            return res.status(400).json({
+                error: 'Debes indicar si la bolsa es de tienda (owned_by_store) o seleccionar un cliente (id_user)'
+            });
+        }
+
         const [error, createBolsaDto] = CreateBolsaDto.create({
             ...req.body,
-            id_user: req.body.id_user ?? req.user.id_user,
+            owned_by_store: ownedByStoreFromBody,
+            id_user: effectiveUserId,
         });
         if (error) return res.status(400).json({ error });
 
@@ -94,6 +117,22 @@ export class BolsaController {
         new GetBolsaInventarioById(this.bolsaRepository)
             .execute(req.params.id)
             .then(bolsa => res.json(bolsa))
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
+    }
+
+    public getBolsasOwnedByStore = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetBolsasOwnedByStore(this.bolsaRepository)
+            .execute(incluirEliminados)
+            .then(bolsas => res.json(bolsas))
+            .catch(error => res.status(400).json({ error: error.message ?? error }));
+    }
+
+    public getBolsasByUserId = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetBolsasByUserId(this.bolsaRepository)
+            .execute(req.params.id, incluirEliminados)
+            .then(bolsas => res.json(bolsas))
             .catch(error => res.status(400).json({ error: error.message ?? error }));
     }
 }

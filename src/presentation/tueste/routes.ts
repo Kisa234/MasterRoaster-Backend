@@ -156,7 +156,8 @@ export class TuesteRoutes {
 
 
         const createLoteTostado = new CreateLoteTostado(
-            loteTostadoRepository
+            loteTostadoRepository,
+            loteRepository
         )
 
         const createLoteUseCase = new CreateLote(
@@ -204,7 +205,8 @@ export class TuesteRoutes {
         router.put('/:id', authMiddleware, tuesteController.updateTueste);
         router.delete('/:id', authMiddleware, tuesteController.deleteTueste);
 
-        router.get('/', tuesteController.getAllTuestes);
+        router.get('/owned-by-store', tuesteController.getTuestesOwnedByStore);
+        router.get('/user/:id', tuesteController.getTuestesByUserId);
         router.get('/rango', tuesteController.getTuestesByRango);
         router.get('/lote/:id', tuesteController.getTuestesByLoteTostado);
         router.get('/ref/:id', tuesteController.getReferenceTueste);

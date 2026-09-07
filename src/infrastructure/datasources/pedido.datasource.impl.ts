@@ -311,4 +311,30 @@ export class PedidoDataSourceImpl implements PedidoDatasource {
 
         return pedidos.map(PedidoEntity.fromObject);
     }
+
+    async getPedidosOwnedByStore(incluirEliminados: boolean = false): Promise<PedidoEntity[]> {
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                owned_by_store: true,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+    }
+
+    async getPedidosByUserId(id_user: string, incluirEliminados: boolean = false): Promise<PedidoEntity[]> {
+        const user = await prisma.user.findUnique({
+            where: { id_user, eliminado: false }
+        });
+        if (!user) throw new Error('El cliente no existe');
+
+        const pedidos = await prisma.pedido.findMany({
+            where: {
+                id_user,
+                owned_by_store: false,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return pedidos.map((pedido) => PedidoEntity.fromObject(pedido));
+    }
 }

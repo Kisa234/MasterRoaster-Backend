@@ -12,11 +12,11 @@ export abstract class LoteRepository {
   abstract deleteLote(id: string): Promise<LoteEntity>;
   abstract getLotes(): Promise<LoteEntity[]>;
   abstract createLoteFromMuestra(id: string, dto: CreateLoteDto): Promise<LoteEntity>;
-  abstract getLotesByUserId(id: string): Promise<LoteEntity[]>;
+  abstract getLotesByUserId(id: string, incluirEliminados?: boolean): Promise<LoteEntity[]>;
   abstract getLotesTostados(): Promise<LoteEntity[]>;
   abstract getLotesVerdes(): Promise<LoteEntity[]>;
   abstract getUserByLote(id: string): Promise<string>;
   abstract getLotesConInventario(incluirEliminados: boolean): Promise<LoteConInventarioEntity[]>;
   abstract getLoteConInventarioById(id: string): Promise<LoteConInventarioEntity | null>;
-
+  abstract getLotesOwnedByStore(incluirEliminados?: boolean): Promise<LoteEntity[]>;
 }

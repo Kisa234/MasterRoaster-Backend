@@ -4,13 +4,13 @@ import { UpdatePedidoDto } from "../dtos/pedido/update";
 import { PedidoConLoteEntity, PedidoEntity } from "../entities/pedido.entity";
 
 export abstract class PedidoDatasource {
-    abstract createPedido(createPedidoDto:CreatePedidoDto): Promise<PedidoEntity>;
+    abstract createPedido(createPedidoDto: CreatePedidoDto): Promise<PedidoEntity>;
     abstract getPedidoById(id: string): Promise<PedidoEntity | null>;
-    abstract updatePedido(id: string, updatePedidoDto:UpdatePedidoDto): Promise<PedidoEntity>;
+    abstract updatePedido(id: string, updatePedidoDto: UpdatePedidoDto): Promise<PedidoEntity>;
     abstract deletePedido(id: string): Promise<PedidoEntity>;
     abstract getPedidosByEstado(estado: string): Promise<PedidoEntity[]>;
     abstract getPedidosByCliente(cliente_id: string): Promise<PedidoEntity[]>;
-    abstract completarPedido(id_pedido: string, id_completado_por:string): Promise<PedidoEntity>;
+    abstract completarPedido(id_pedido: string, id_completado_por: string): Promise<PedidoEntity>;
     abstract getAllPedidos(): Promise<PedidoEntity[]>;
     abstract getHistoricoPedidos(): Promise<PedidoEntity[]>;
     abstract getPedidosOrdenTueste(): Promise<PedidoEntity[]>;
@@ -18,10 +18,12 @@ export abstract class PedidoDatasource {
     abstract getPedidosByLote(id_lote: string): Promise<PedidoEntity[]>;
     abstract getLotesCreados(): Promise<string[]>;
     abstract getLotesTostadoCreados(): Promise<string[]>;
-    abstract setFacturado(state:boolean, id_pedido: string): Promise<PedidoEntity>;
+    abstract setFacturado(state: boolean, id_pedido: string): Promise<PedidoEntity>;
     abstract getPedidosByRango(desde: Date, hasta: Date): Promise<PedidoEntity[]>
 
     abstract getPedidosConLote(): Promise<PedidoConLoteEntity[]>;
     abstract getPedidoConLote(id: string): Promise<PedidoConLoteEntity>;
     abstract getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]>;
+    abstract getPedidosOwnedByStore(incluirEliminados?: boolean): Promise<PedidoEntity[]>;
+    abstract getPedidosByUserId(id_user: string, incluirEliminados?: boolean): Promise<PedidoEntity[]>;
 }

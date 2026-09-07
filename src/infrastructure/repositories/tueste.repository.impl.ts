@@ -6,17 +6,17 @@ import { TuesteEntity } from '../../domain/entities/tueste.entity';
 import { TuesteRepository } from '../../domain/repository/tueste.repository';
 
 
-export class TuesteRepositoryImpl implements TuesteRepository{
+export class TuesteRepositoryImpl implements TuesteRepository {
 
     constructor(
         private readonly tuesteDataSource: TuesteDataSource
     ) { }
-    
+
     createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity> {
         return this.tuesteDataSource.createTueste(createTuesteDto);
     }
     getTuesteById(id: string): Promise<TuesteEntity | null> {
-        return this.tuesteDataSource.getTuesteById(id); 
+        return this.tuesteDataSource.getTuesteById(id);
     }
     updateTueste(id: string, updateTuesteDto: UpdateTuesteDto): Promise<TuesteEntity> {
         return this.tuesteDataSource.updateTueste(id, updateTuesteDto);
@@ -33,8 +33,8 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTostadosByPedido(id_pedido);
     }
-    completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity> {
-        return this.tuesteDataSource.completarTueste(id,completeTuesteDto);
+    completarTueste(id: string, completeTuesteDto: CompleteTuesteDto): Promise<TuesteEntity> {
+        return this.tuesteDataSource.completarTueste(id, completeTuesteDto);
     }
     getTostadosByLoteTostado(id_lote_tostado: string): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTostadosByLoteTostado(id_lote_tostado);
@@ -45,6 +45,11 @@ export class TuesteRepositoryImpl implements TuesteRepository{
     getTuestesByRango(desde: Date, hasta: Date): Promise<TuesteEntity[]> {
         return this.tuesteDataSource.getTuestesByRango(desde, hasta);
     }
-    
-    
+    getTuestesOwnedByStore(incluirEliminados: boolean = false): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getTuestesOwnedByStore(incluirEliminados);
+    }
+    getTuestesByUserId(id_cliente: string, incluirEliminados: boolean = false): Promise<TuesteEntity[]> {
+        return this.tuesteDataSource.getTuestesByUserId(id_cliente, incluirEliminados);
+    }
+
 }

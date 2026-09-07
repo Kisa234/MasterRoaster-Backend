@@ -3,13 +3,15 @@ import { UpdateMuestraDto } from "../dtos/muestra/update";
 import { MuestraConInventarioEntity, MuestraEntity } from "../entities/muestra.entity";
 
 export abstract class MuestraDataSource {
-    
-    abstract createMuestra(createMuestraDto:CreateMuestraDto): Promise<MuestraEntity>;
+
+    abstract createMuestra(createMuestraDto: CreateMuestraDto): Promise<MuestraEntity>;
     abstract getMuestraById(id: string): Promise<MuestraEntity | null>;
-    abstract updateMuestra(id: string, updateMuestraDto:UpdateMuestraDto): Promise<MuestraEntity>;
+    abstract updateMuestra(id: string, updateMuestraDto: UpdateMuestraDto): Promise<MuestraEntity>;
     abstract deleteMuestra(id: string): Promise<MuestraEntity>;
-    abstract completeMuestra(id:string): Promise<MuestraEntity>;
+    abstract completeMuestra(id: string): Promise<MuestraEntity>;
     abstract getMuestras(): Promise<MuestraEntity[]>;
     abstract getAllMuestras(): Promise<MuestraEntity[]>;
-    abstract getMuestrasConInventario(): Promise<MuestraConInventarioEntity[]>;
+    abstract getMuestrasConInventario(incluirEliminados?: boolean): Promise<MuestraConInventarioEntity[]>;
+    abstract getMuestrasOwnedByStore(incluirEliminados?: boolean): Promise<MuestraEntity[]>;
+    abstract getMuestrasByUserId(id_user: string, incluirEliminados?: boolean): Promise<MuestraEntity[]>;
 }

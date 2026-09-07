@@ -75,10 +75,12 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         return MuestraEntity.fromObject(completedMuestra);
     }
 
-    async getMuestrasConInventario(): Promise<MuestraConInventarioEntity[]> {
+    async getMuestrasConInventario(incluirEliminados: boolean = false): Promise<MuestraConInventarioEntity[]> {
 
         const muestras = await prisma.muestra.findMany({
-            where: { eliminado: false },
+            where: {
+                ...(incluirEliminados ? {} : { eliminado: false })
+            },
             include: {
                 inventarioMuestras: {
                     include: { almacen: true }
@@ -87,7 +89,29 @@ export class MuestraDataSourceImpl implements MuestraDataSource {
         });
 
         return muestras.map(m => MuestraConInventarioEntity.fromObject(m));
-
     }
+
+    async getMuestrasOwnedByStore(incluirEliminados: boolean = false): Promise<MuestraEntity[]> {
+        const muestras = await prisma.muestra.findMany({
+            where: {
+                owned_by_store: true,
+                ...(incluirEliminados ? {} : { eliminado: false }) // Si es false, solo trae activos
+            }
+        });
+        return muestras.map(MuestraEntity.fromObject);
+    }
+
+    async getMuestrasByUserId(id_user: string, incluirEliminados: boolean = false): Promise<MuestraEntity[]> {
+        const muestras = await prisma.muestra.findMany({
+            where: {
+                id_user,
+                owned_by_store: false,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return muestras.map(MuestraEntity.fromObject);
+    }
+
+
 
 }

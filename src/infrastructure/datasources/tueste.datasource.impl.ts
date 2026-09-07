@@ -115,4 +115,25 @@ export class TuesteDataSourceImpl implements TuesteDataSource {
 
     return tuestes.map(TuesteEntity.fromObject);
   }
+
+  async getTuestesOwnedByStore(incluirEliminados: boolean = false): Promise<TuesteEntity[]> {
+    const tuestes = await prisma.tueste.findMany({
+      where: {
+        owned_by_store: true,
+        ...(incluirEliminados ? {} : { eliminado: false })
+      }
+    });
+    return tuestes.map(TuesteEntity.fromObject);
+  }
+
+  async getTuestesByUserId(id_cliente: string, incluirEliminados: boolean = false): Promise<TuesteEntity[]> {
+    const tuestes = await prisma.tueste.findMany({
+      where: {
+        id_cliente,
+        owned_by_store: false,
+        ...(incluirEliminados ? {} : { eliminado: false })
+      }
+    });
+    return tuestes.map(TuesteEntity.fromObject);
+  }
 }

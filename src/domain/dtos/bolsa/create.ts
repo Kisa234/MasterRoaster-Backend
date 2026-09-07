@@ -6,6 +6,7 @@ export class CreateBolsaDto {
         public readonly gramaje: number,
         public readonly molienda: string,
         public readonly cantidad: number,
+        public readonly owned_by_store: boolean,
         public readonly id_user?: string,
         public readonly comentario?: string,
     ) { }
@@ -18,6 +19,7 @@ export class CreateBolsaDto {
             gramaje,
             molienda,
             cantidad,
+            owned_by_store,
             id_user,
             comentario,
         } = props;
@@ -29,6 +31,16 @@ export class CreateBolsaDto {
         if (!molienda) return ['La molienda es requerida', undefined];
         if (!cantidad || cantidad <= 0) return ['La cantidad debe ser mayor a 0', undefined];
 
+        const esOwnedByStore = owned_by_store === true;
+
+        // Nunca ambos, nunca ninguno — siempre se especifica explícitamente.
+        if (esOwnedByStore && id_user) {
+            return ['Una bolsa no puede ser de tienda y de cliente al mismo tiempo', undefined];
+        }
+        if (!esOwnedByStore && !id_user) {
+            return ['Debes indicar si la bolsa es de tienda (owned_by_store) o de un cliente (id_user)', undefined];
+        }
+
         return [undefined, new CreateBolsaDto(
             id_lote_tostado,
             id_pedido,
@@ -36,7 +48,8 @@ export class CreateBolsaDto {
             gramaje,
             molienda,
             cantidad,
-            id_user,
+            esOwnedByStore,
+            esOwnedByStore ? undefined : id_user,
             comentario,
         )];
     }

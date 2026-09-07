@@ -87,7 +87,7 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
 
     async getLotesTostadosConInventario(incluirEliminados: boolean = false): Promise<LoteTostadoConInventarioEntity[]> {
         const lotesTostados = await prisma.loteTostado.findMany({
-            where: incluirEliminados ? {} : { eliminado: false }, 
+            where: incluirEliminados ? {} : { eliminado: false },
             include: {
                 lote: true,
                 inventarioLoteTostados: {
@@ -117,6 +117,26 @@ export class LoteTostadoDataSourceImpl implements LoteTostadoDataSource {
         });
         if (!loteTostado) throw new Error("LoteTostado not found");
         return LoteTostadoConInventarioEntity.fromObject(loteTostado);
+    }
+
+    async getLoteTostadoByUser(id_user: string, incluirEliminados: boolean = false): Promise<LoteTostadoEntity[]> {
+        const lotesTostados = await prisma.loteTostado.findMany({
+            where: {
+                id_user,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return lotesTostados.map(lote => LoteTostadoEntity.fromObject(lote));
+    }
+
+    async getLotesTostadosOwnedByStore(incluirEliminados: boolean = false): Promise<LoteTostadoEntity[]> {
+        const lotes = await prisma.loteTostado.findMany({
+            where: {
+                owned_by_store: true,
+                ...(incluirEliminados ? {} : { eliminado: false })
+            }
+        });
+        return lotes.map(lote => LoteTostadoEntity.fromObject(lote));
     }
 
 }

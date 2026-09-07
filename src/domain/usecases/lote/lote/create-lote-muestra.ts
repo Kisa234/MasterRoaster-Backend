@@ -12,11 +12,11 @@ import { CreateAnalisisDto } from '../../../dtos/analisis/analisis/create';
 import { LoteRepository } from '../../../repository/lote.repository';
 import { CreateAnalisisSensorialDTO } from '../../../dtos/analisis/sensorial/create';
 import { LoteAnalisisRepository } from '../../../repository/lote-analisis.repository';
-import {AnalisisDefectosRespository} from '../../../repository/analisisDefectos.repository';
+import { AnalisisDefectosRespository } from '../../../repository/analisisDefectos.repository';
 import { CreateAnalisisDefectosDto } from '../../../dtos/analisis/defectos/create';
 
 export interface CreateLoteFromMuestraUseCase {
-    execute(id: string, createLoteDto: CreateLoteDto): Promise<LoteEntity>;
+    execute(id: string, createLoteDto: CreateLoteDto, id_user_accion: string, id_almacen?: string): Promise<LoteEntity>;
 }
 
 export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
@@ -31,14 +31,25 @@ export class CreateLoteFromMuestra implements CreateLoteFromMuestraUseCase {
         private readonly loteRepository: LoteRepository,
     ) { }
 
-    async execute(id: string, createLoteDto:CreateLoteDto): Promise<LoteEntity> {
+    async execute(id: string, createLoteDto: CreateLoteDto, id_user_accion: string,id_almacen?: string): Promise<LoteEntity> {
 
         // 1) Obtener la muestra y validar
         const muestra = await this.muestraRepository.getMuestraById(id);
         if (!muestra) throw new Error('Muestra no encontrada');
 
-        // 2) Crea el nuevo lote
-        const lote = await this.createLoteUseCase.execute(createLoteDto!, undefined, undefined, undefined, undefined, createLoteDto.id_user!);
+        // Si la muestra es de tienda, forzamos el DTO del lote a ser de tienda
+        const [err, finalDto] = CreateLoteDto.create({
+            ...createLoteDto,
+            owned_by_store: muestra.owned_by_store, // Mandan los datos originales de la muestra
+            id_user: muestra.owned_by_store ? undefined : createLoteDto.id_user
+        });
+        if (err) throw new Error(err);
+
+        // 2) Crea el nuevo lote — id_user_accion es SIEMPRE quien ejecuta (el autenticado),
+        //    nunca el dueño del lote (que puede ser undefined si es de tienda).
+        const lote = await this.createLoteUseCase.execute(finalDto!, undefined, undefined, id_almacen, undefined, id_user_accion);
+
+
         // 3) Si la muestra original tiene un análisis asociado, clonarlo y asociarlo al nuevo lote
         if (muestra.id_analisis) {
             let nuevoFis, nuevoSen, nuevoDef;

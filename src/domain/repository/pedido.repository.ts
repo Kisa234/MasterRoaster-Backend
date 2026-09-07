@@ -22,5 +22,7 @@ export abstract class PedidoRepository {
     abstract getPedidosConLote(): Promise<PedidoConLoteEntity[]>;
     abstract getPedidoConLote(id: string): Promise<PedidoConLoteEntity>;
     abstract getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Promise<PedidoConLoteEntity[]>;
+    abstract getPedidosOwnedByStore(incluirEliminados?: boolean): Promise<PedidoEntity[]>;
+    abstract getPedidosByUserId(id_user: string, incluirEliminados?: boolean): Promise<PedidoEntity[]>;
 
 }

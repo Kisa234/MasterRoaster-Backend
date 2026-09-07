@@ -146,4 +146,19 @@ export class EnvioDataSourceImpl implements EnvioDataSource {
         });
         return envios.map(EnvioEntity.fromObject);
     }
+
+        async getByCliente(id_cliente: string): Promise<EnvioConDetalleEntity[]> {
+        const envios = await prisma.envio.findMany({
+            where: {
+                eliminado: false,
+                paquete: { id_cliente },
+            },
+            include: {
+                paquete: { include: { items: true } },
+                direccion: true,
+            },
+            orderBy: { fecha_registro: 'desc' },
+        });
+        return envios.map(EnvioConDetalleEntity.fromObject);
+    }
 }

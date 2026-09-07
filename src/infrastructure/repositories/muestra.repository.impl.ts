@@ -30,8 +30,18 @@ export class MuestraRepositoryImpl implements MuestraRepository {
     completeMuestra(id: string): Promise<MuestraEntity> {
         return this.muestraDataSource.completeMuestra(id);
     }
-    getMuestrasConInventario(): Promise<MuestraConInventarioEntity[]> {
-        return this.muestraDataSource.getMuestrasConInventario();
+    getMuestrasConInventario(incluirEliminados: boolean = false): Promise<MuestraConInventarioEntity[]> {
+        return this.muestraDataSource.getMuestrasConInventario(incluirEliminados);
     }
+
+    getMuestrasOwnedByStore(incluirEliminados: boolean = false): Promise<MuestraEntity[]> {
+        return this.muestraDataSource.getMuestrasOwnedByStore(incluirEliminados);
+    }
+
+    getMuestrasByUserId(id_user: string, incluirEliminados: boolean = false): Promise<MuestraEntity[]> {
+        return this.muestraDataSource.getMuestrasByUserId(id_user, incluirEliminados);
+    }
+
+
 
 }

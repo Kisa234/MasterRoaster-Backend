@@ -76,8 +76,8 @@ export class LoteRoutes {
 
         // Use cases
         const createLoteUseCase = new CreateLote(
-            loteRepository, 
-            userRepository, 
+            loteRepository,
+            userRepository,
             pedidoRepository,
             historialRepository,
             movimientoAlmacenRepository,
@@ -100,24 +100,23 @@ export class LoteRoutes {
             movimientoAlmacenRepository
         );
 
-        router.post('/', authMiddleware,  loteController.createLote);
-        router.post('/rapido', authMiddleware,  loteController.createLoteRapido);
-        router.post('/muestra/:id', authMiddleware,  loteController.createLoteFromMuestra);
-        router.put('/:id', authMiddleware, loteController.updateLote);
-        router.delete('/:id', authMiddleware,  loteController.deleteLote);
-
+        router.post('/', authMiddleware, loteController.createLote);
+        router.post('/muestra/:id', authMiddleware, loteController.createLoteFromMuestra);
         router.post('/fusionar', authMiddleware, loteController.FusionarLotes);
-        router.post('/blend', authMiddleware,loteController.blendLotes);
+        router.post('/blend', authMiddleware, loteController.blendLotes);
+        router.put('/:id', authMiddleware, loteController.updateLote);
+        router.delete('/:id', authMiddleware, loteController.deleteLote);
 
         router.get('/tostados', loteController.getAllTostados);
         router.get('/verdes', loteController.getAllVerdes);
-        router.get('/inventario/', loteController.getLoteInventario);
-        router.get('/inventario/:id', loteController.getLoteInventarioById);
+        router.get('/owned-by-store', loteController.getLotesOwnedByStore);
         router.get('/roaster', loteController.getLotesRoaster);
+        router.get('/inventario', loteController.getLoteInventario);
+        router.get('/inventario/:id', loteController.getLoteInventarioById);
         router.get('/user/:id', loteController.getLotesByUserId);
         router.get('/byLote/:id', loteController.getUserByLote);
-        router.get('/:id', loteController.getLoteById);
         router.get('/', loteController.getLotes);
+        router.get('/:id', loteController.getLoteById);
 
 
         return router;

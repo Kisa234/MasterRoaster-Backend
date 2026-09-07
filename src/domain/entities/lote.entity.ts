@@ -12,6 +12,7 @@ export class LoteEntity {
         public tipo_lote: string,
         public fecha_registro: Date,
         public eliminado: boolean,
+        public owned_by_store: boolean,
         public clasificacion?: string,
         public costo?: number,
         public altura?: number,
@@ -34,6 +35,7 @@ export class LoteEntity {
             proceso,
             tipo_lote,
             eliminado,
+            owned_by_store,
             clasificacion,
             costo,
             altura,
@@ -68,6 +70,7 @@ export class LoteEntity {
             tipo_lote,
             newFechaRegistro,
             eliminado,
+            owned_by_store ?? false,
             clasificacion,
             costo,
             altura,
@@ -108,6 +111,7 @@ export class LoteConInventarioEntity {
     public tipo_lote: string,
     public fecha_registro: Date,
     public eliminado: boolean,
+    public owned_by_store: boolean,
 
     // ✅ extra solo para estos casos
     public inventarioLotes: InventarioLoteMini[] = [],
@@ -133,6 +137,7 @@ export class LoteConInventarioEntity {
       proceso,
       tipo_lote,
       eliminado,
+      owned_by_store,
       clasificacion,
       costo,
       altura,
@@ -178,13 +183,14 @@ export class LoteConInventarioEntity {
       tipo_lote,
       newFechaRegistro,
       eliminado,
+      owned_by_store ?? false,
       invMapped,
       clasificacion,
       costo,
       altura,
       id_user,
       id_analisis,
-      peso_tostado
+      peso_tostado,
     );
   }
 }

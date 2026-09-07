@@ -72,4 +72,11 @@ export default class PedidoRepositoryImpl implements PedidoRepository {
     async getPedidosByRango(desde: Date, hasta: Date): Promise<PedidoEntity[]> {
         return this.pedidoDataSource.getPedidosByRango(desde, hasta);
     }
+
+    async getPedidosOwnedByStore(incluirEliminados: boolean = false): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getPedidosOwnedByStore(incluirEliminados);
+    }
+    async getPedidosByUserId(id_user: string, incluirEliminados: boolean = false): Promise<PedidoEntity[]> {
+        return this.pedidoDataSource.getPedidosByUserId(id_user, incluirEliminados);
+    }
 }

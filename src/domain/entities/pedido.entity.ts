@@ -7,8 +7,9 @@ export class PedidoEntity {
         public tipo_pedido: string,
         public cantidad: number,
         public estado_pedido: string,
-        public id_user: string,
+        public owned_by_store: boolean,
         public eliminado: boolean,
+        public id_user?: string,
         public facturado?: boolean,
         public id_lote?: string,
         public id_nuevoLote?: string,
@@ -30,7 +31,7 @@ export class PedidoEntity {
     static fromObject(obj: { [key: string]: any }): PedidoEntity {
         const {
             id_pedido, fecha_registro, tipo_pedido, cantidad, estado_pedido,
-            id_user, eliminado, facturado, id_lote, id_nuevoLote,
+            id_user, owned_by_store, eliminado, facturado, id_lote, id_nuevoLote,
             id_nuevoLote_tostado, id_almacen, comentario, pesos, fecha_tueste,
             tostadora, id_lote_tostado, id_producto, creado_por_id,
             completado_por_id, fecha_completado, id_lote_destino, usuario_nombre
@@ -38,7 +39,8 @@ export class PedidoEntity {
 
         if (!tipo_pedido) throw new Error('tipo_pedido is required');
         if (!cantidad) throw new Error('cantidad is required');
-        if (!id_user) throw new Error('id_user is required');
+        // id_user ya no es siempre requerido — puede ser undefined si owned_by_store es true
+        if (!owned_by_store && !id_user) throw new Error('id_user is required cuando el pedido no es de tienda');
 
         if (fecha_registro && isNaN(new Date(fecha_registro).getTime()))
             throw new Error('fecha_registro is invalid');
@@ -49,7 +51,7 @@ export class PedidoEntity {
 
         return new PedidoEntity(
             id_pedido, fecha_registro, tipo_pedido, cantidad, estado_pedido,
-            id_user, eliminado, facturado, id_lote, id_nuevoLote,
+            !!owned_by_store, eliminado, id_user, facturado, id_lote, id_nuevoLote,
             id_nuevoLote_tostado, id_almacen, comentario, pesos, fecha_tueste,
             tostadora, id_lote_tostado, id_producto, creado_por_id,
             completado_por_id, fecha_completado, id_lote_destino, usuario_nombre
@@ -64,8 +66,8 @@ export class PedidoConLoteEntity extends PedidoEntity {
     ) {
         super(
             pedido.id_pedido, pedido.fecha_registro, pedido.tipo_pedido,
-            pedido.cantidad, pedido.estado_pedido, pedido.id_user,
-            pedido.eliminado, pedido.facturado, pedido.id_lote,
+            pedido.cantidad, pedido.estado_pedido, pedido.owned_by_store,
+            pedido.eliminado, pedido.id_user, pedido.facturado, pedido.id_lote,
             pedido.id_nuevoLote, pedido.id_nuevoLote_tostado, pedido.id_almacen,
             pedido.comentario, pedido.pesos, pedido.fecha_tueste, pedido.tostadora,
             pedido.id_lote_tostado, pedido.id_producto, pedido.creado_por_id,

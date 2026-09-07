@@ -35,6 +35,9 @@ export class MuestraRoutes {
         router.put('/:id', authMiddleware, muestraController.updateMuestra);
         router.patch('/complete/:id', authMiddleware, muestraController.completeMuestra);
         router.delete('/:id', authMiddleware, muestraController.deleteMuestra);
+
+        router.get('/owned-by-store', muestraController.getMuestrasOwnedByStore);
+        router.get('/user/:id', muestraController.getMuestrasByUserId);
         router.get('/inventario', muestraController.getMuestrasConInventario);
         router.get('/:id', muestraController.getMuestraById);
         router.get('/', muestraController.getAllMuestra);

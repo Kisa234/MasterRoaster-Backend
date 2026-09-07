@@ -48,4 +48,7 @@ export class EnvioRepositoryImpl implements EnvioRepository {
     getActivosByPaquete(id_paquete: string): Promise<EnvioEntity[]> {
         return this.datasource.getActivosByPaquete(id_paquete);
     }
+    getByCliente(id_cliente: string): Promise<EnvioConDetalleEntity[]> {
+        return this.datasource.getByCliente(id_cliente);
+    }
 }

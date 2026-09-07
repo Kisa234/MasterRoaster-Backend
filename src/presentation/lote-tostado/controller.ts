@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { CreateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/create";
 import { LoteTostadoRepository } from "../../domain/repository/loteTostado.repository";
+import { LoteRepository } from "../../domain/repository/lote.repository";
 import { CreateLoteTostado } from "../../domain/usecases/lote/lote-tostado/create-lote-tostado";
 import { GetLoteTostado } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado";
 import { UpdateLoteTostadoDto } from "../../domain/dtos/lotes/lote-tostado/update";
@@ -16,10 +17,13 @@ import { HistorialRepository } from "../../domain/repository/historial.repositor
 import { GetLotesTostadoConLote } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-con-lote";
 import { GetLotesTostadosConInventario } from "../../domain/usecases/lote/lote-tostado/lote-inventario";
 import { GetLoteTostadoConInventario } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-inventario";
+import { GetLoteTostadoByUser } from "../../domain/usecases/lote/lote-tostado/get-lote-tostado-by-user";
+import { GetLotesTostadosOwnedByStore } from "../../domain/usecases/lote/lote-tostado/get-lotes-tostados-owned-by-store";
 
 export class LoteTostadoController {
     constructor(
         private readonly loteTostadoRepository: LoteTostadoRepository,
+        private readonly loteRepository: LoteRepository,
         private readonly tuesteRepository: TuesteRepository,
         private readonly pedidoRepository: PedidoRepository,
         private readonly historialRepository: HistorialRepository
@@ -32,7 +36,7 @@ export class LoteTostadoController {
             return res.status(400).json({ error });
         }
 
-        new CreateLoteTostado(this.loteTostadoRepository)
+        new CreateLoteTostado(this.loteTostadoRepository, this.loteRepository)
             .execute(createLoteTostadoDto!)
             .then(lote => res.json(lote))
             .catch(error => res.status(400).json({ error }));
@@ -103,7 +107,7 @@ export class LoteTostadoController {
     public getLotesTostadosConInventario = (req: Request, res: Response) => {
         const incluirEliminados = req.query.incluirEliminados === 'true';
         new GetLotesTostadosConInventario(this.loteTostadoRepository)
-            .execute(incluirEliminados) 
+            .execute(incluirEliminados)
             .then(data => {
                 res.json(data)
             })
@@ -117,6 +121,22 @@ export class LoteTostadoController {
             .then(data => {
                 res.json(data)
             })
+            .catch(error => res.status(400).json({ error }));
+    }
+
+    public getLoteTostadoByUserId = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetLoteTostadoByUser(this.loteTostadoRepository)
+            .execute(req.params.id, incluirEliminados)
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
+    }
+
+    public getLotesTostadosOwnedByStore = (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetLotesTostadosOwnedByStore(this.loteTostadoRepository)
+            .execute(incluirEliminados)
+            .then(lotes => res.json(lotes))
             .catch(error => res.status(400).json({ error }));
     }
 }

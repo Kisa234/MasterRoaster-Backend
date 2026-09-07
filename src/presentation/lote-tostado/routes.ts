@@ -8,6 +8,8 @@ import { PedidoDataSourceImpl } from "../../infrastructure/datasources/pedido.da
 import { TuesteRepositoryImpl } from "../../infrastructure/repositories/tueste.repository.impl";
 import { HistorialDataSourceImpl } from "../../infrastructure/datasources/historial.datasource.impl";
 import { HistorialRepositoryImpl } from "../../infrastructure/repositories/historial.repository.impl";
+import { LoteDataSourceImpl } from "../../infrastructure/datasources/lote.datasource.impl";
+import { LoteRepositoryImpl } from "../../infrastructure/repositories/lote.repository.impl";
 import { authMiddleware } from "../../infrastructure/middlewares/auth.middleware";
 
 export class LoteTostadoRoutes {
@@ -16,6 +18,9 @@ export class LoteTostadoRoutes {
 
         const loteDatasource = new LoteTostadoDataSourceImpl();
         const loteTostadoRepository = new LoteTostadoRepositoryImpl(loteDatasource);
+
+        const loteVerdeDatasource = new LoteDataSourceImpl();
+        const loteRepository = new LoteRepositoryImpl(loteVerdeDatasource);
 
         const tuesteDatasource = new TuesteDataSourceImpl();
         const tuesteRepository = new TuesteRepositoryImpl(tuesteDatasource);
@@ -29,6 +34,7 @@ export class LoteTostadoRoutes {
 
         const loteController = new LoteTostadoController(
             loteTostadoRepository,
+            loteRepository,
             tuesteRepository,
             pedidoRepository,
             historialRepository
@@ -39,12 +45,14 @@ export class LoteTostadoRoutes {
         router.put('/:id', authMiddleware, loteController.updateLoteTostado);
         router.delete('/:id', authMiddleware, loteController.deleteLoteTostado);
 
-        // GET específicos
+        // GET específicos (literales primero, ':id' comodín al final)
         router.get('/lote-con-lote', loteController.getLotesTostadoandLote);
         router.get('/inventario', loteController.getLotesTostadosConInventario);
         router.get('/inventario/:id', loteController.getLoteTostadoConInventario);
+        router.get('/owned-by-store', loteController.getLotesTostadosOwnedByStore);
         router.get('/ficha/:id', loteController.getFichaTueste);
         router.get('/lote/:id', loteController.getLotesTostadoByLoteId);
+        router.get('/user/:id', loteController.getLoteTostadoByUserId);
 
         // GET general
         router.get('/', loteController.getLotesTostados);

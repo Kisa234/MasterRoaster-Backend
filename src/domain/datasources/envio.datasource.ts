@@ -13,6 +13,7 @@ export abstract class EnvioDataSource {
     abstract getByIdConDetalle(id_envio: string): Promise<EnvioConDetalleEntity | null>;
     abstract getAll(estado?: string): Promise<EnvioEntity[]>;
     abstract getByPaquetes(id_paquetes: string[]): Promise<EnvioEntity[]>;
+    abstract getByCliente(id_cliente: string): Promise<EnvioConDetalleEntity[]>;
     abstract getActivosByPaquete(id_paquete: string): Promise<EnvioEntity[]>;
     abstract countTotal(): Promise<number>;
 

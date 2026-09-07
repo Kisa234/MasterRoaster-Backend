@@ -47,6 +47,7 @@ import { PaqueteRepositoryImpl } from '../../infrastructure/repositories/paquete
 import { PaqueteItemDataSourceImpl } from '../../infrastructure/datasources/paquete-item.datasource.impl';
 import { PaqueteItemRepositoryImpl } from '../../infrastructure/repositories/paquete-item.repository.impl';
 
+
 export class PedidoRoutes {
 
     static get routes(): Router {
@@ -148,6 +149,7 @@ export class PedidoRoutes {
 
         const CreateLoteTostadoUseCase = new CreateLoteTostado(
             LoteTostadoRepository,
+            LoteRepository,
         );
 
         const duplicateLote = new DuplicateLote(
@@ -185,6 +187,7 @@ export class PedidoRoutes {
 
         // Rutas — sin cambios
         router.get('/estadisticas/tueste', authMiddleware, controller.getEstadisticasTueste);
+        router.get('/estadisticas/pedidos', authMiddleware, controller.getEstadisticasPedidos);
         router.get('/orden/tueste', authMiddleware, controller.getPedidosOrdenTueste);
         router.get('/orden/tueste/:fecha', authMiddleware, controller.getPedidosOrdenTuesteByFecha);
         router.get('/estado/:estado', authMiddleware, controller.getPedidosByEstado);
@@ -194,6 +197,8 @@ export class PedidoRoutes {
         router.get('/con-lote/estado/:estado/tipo/:tipo', controller.getPedidosConLoteByEstadoYTipo);
         router.get('/con-lote', controller.getPedidosConLote);
         router.get('/con-lote/:id', controller.getPedidoConLote);
+        router.get('/owned-by-store', authMiddleware, controller.getPedidosOwnedByStore);
+        router.get('/user/:id', authMiddleware, controller.getPedidosByUserId);
 
         router.put('/completar/:id', authMiddleware, controller.completarPedido);
         router.put('/facturar/:id_pedido', authMiddleware, controller.SetPedidoFacturado);

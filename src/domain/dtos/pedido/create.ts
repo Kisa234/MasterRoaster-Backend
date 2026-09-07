@@ -1,10 +1,9 @@
-// dtos/pedido/create.ts
-
 export class CreatePedidoDto {
     private constructor(
         public readonly tipo_pedido: string,
         public readonly cantidad: number,
-        public readonly id_user: string,
+        public readonly owned_by_store: boolean,
+        public readonly id_user?: string,
         public readonly comentario?: string,
         public readonly facturado?: boolean,
         public readonly id_lote?: string,
@@ -17,7 +16,6 @@ export class CreatePedidoDto {
         public readonly id_lote_tostado?: string,
         public readonly id_producto?: string,
         public readonly creado_por_id?: string,
-        // bolsas ya NO va aquí
     ) { }
 
     static create(props: { [key: string]: any }): [string?, CreatePedidoDto?] {
@@ -25,6 +23,7 @@ export class CreatePedidoDto {
             tipo_pedido,
             cantidad,
             id_user,
+            owned_by_store,
             comentario,
             facturado,
             id_lote,
@@ -41,7 +40,24 @@ export class CreatePedidoDto {
 
         if (!tipo_pedido) return ['El tipo de pedido es requerido', undefined];
         if (!cantidad) return ['La cantidad es requerida', undefined];
-        if (!id_user) return ['El ID del usuario es requerido', undefined];
+
+        // Solo "Orden Tueste" y "Maquila" pueden ser de tienda (sin cliente).
+        // Todos los demás tipos siguen exigiendo id_user siempre.
+        const esOwnedByStore = !!owned_by_store;
+        const puedeSerDeTienda = ['Orden Tueste', 'Maquila'].includes(tipo_pedido);
+
+        if (esOwnedByStore && !puedeSerDeTienda) {
+            return [`El tipo de pedido "${tipo_pedido}" no puede ser de tienda, requiere un cliente`, undefined];
+        }
+
+        // Nunca ambos, nunca ninguno — siempre se especifica explícitamente.
+        if (esOwnedByStore && id_user) {
+            return ['Un pedido no puede ser de tienda y de cliente al mismo tiempo', undefined];
+        }
+
+        if (!esOwnedByStore && !id_user) {
+            return ['El ID del usuario es requerido', undefined];
+        }
 
         if (['Venta Verde', 'Tostado Verde', 'Orden Tueste'].includes(tipo_pedido) && !id_lote)
             return ['El ID del lote es requerido para este tipo de pedido', undefined];
@@ -49,13 +65,13 @@ export class CreatePedidoDto {
         if (['Venta Verde', 'Tostado Verde', 'Orden Tueste'].includes(tipo_pedido) && !id_almacen)
             return ['El ID del almacén es requerido para este tipo de pedido', undefined];
 
-
         const fechaTuesteDate = fecha_tueste ? new Date(fecha_tueste) : undefined;
 
         const dto = new CreatePedidoDto(
             tipo_pedido,
             cantidad,
-            id_user,
+            esOwnedByStore,
+            esOwnedByStore ? undefined : id_user,
             comentario,
             facturado,
             id_lote,

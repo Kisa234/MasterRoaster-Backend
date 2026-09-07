@@ -5,15 +5,17 @@ import { CompleteTuesteDto } from '../dtos/tueste/complete';
 import { LoteTostadoEntity } from "../entities/loteTostado.entity";
 
 export abstract class TuesteDataSource {
-    abstract createTueste(createTuesteDto:CreateTuesteDto): Promise<TuesteEntity>;
-    abstract getTuesteById(id: string): Promise<TuesteEntity|null>;
-    abstract updateTueste(id: string, updateTuesteDto:UpdateTuesteDto): Promise<TuesteEntity>;
+    abstract createTueste(createTuesteDto: CreateTuesteDto): Promise<TuesteEntity>;
+    abstract getTuesteById(id: string): Promise<TuesteEntity | null>;
+    abstract updateTueste(id: string, updateTuesteDto: UpdateTuesteDto): Promise<TuesteEntity>;
     abstract deleteTueste(id: string): Promise<TuesteEntity>;
     abstract getTostadosByFecha(fecha: Date): Promise<TuesteEntity[]>;
     abstract getAllTuestes(): Promise<TuesteEntity[]>;
     abstract getTostadosByPedido(id_pedido: string): Promise<TuesteEntity[]>;
-    abstract completarTueste(id: string,completeTuesteDto:CompleteTuesteDto): Promise<TuesteEntity>;
+    abstract completarTueste(id: string, completeTuesteDto: CompleteTuesteDto): Promise<TuesteEntity>;
     abstract getTostadosByLoteTostado(id_lote_tostado: string): Promise<TuesteEntity[]>;
     abstract getTuestesCantByLote(id_lote: string): Promise<number>;
     abstract getTuestesByRango(desde: Date, hasta: Date): Promise<TuesteEntity[]>;
+    abstract getTuestesOwnedByStore(incluirEliminados?: boolean): Promise<TuesteEntity[]>;
+    abstract getTuestesByUserId(id_cliente: string, incluirEliminados?: boolean): Promise<TuesteEntity[]>;
 }

@@ -184,6 +184,7 @@ export class UpdatePedido implements UpdatePedidoUseCase {
           fecha_tueste: dto.fecha_tueste ?? pedido.fecha_tueste,
           tostadora: dto.tostadora ?? pedido.tostadora,
           id_cliente: dto.id_user ?? pedido.id_user,
+          owned_by_store: pedido.owned_by_store,
           densidad: density,
           humedad: humidity,
           peso_entrada: peso,

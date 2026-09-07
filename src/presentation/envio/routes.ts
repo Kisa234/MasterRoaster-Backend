@@ -43,7 +43,8 @@ export class EnvioRoutes {
         router.put('/:id/devolucion', authMiddleware, controller.registrarDevolucion);
 
         router.get('/', controller.getAll);
-        router.get('/por-entidad/:entidad/:id_entidad', controller.getByEntidad); 
+        router.get('/por-entidad/:entidad/:id_entidad', controller.getByEntidad);
+        router.get('/cliente/:id_cliente', controller.getByCliente);   // ← nuevo, antes de :id
         router.get('/:id', controller.getById);
 
         return router;

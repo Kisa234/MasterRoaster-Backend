@@ -137,6 +137,7 @@ model MovimientoAlmacen {
 
 model Muestra {
   id_muestra         String              @id
+  owned_by_store     Boolean             @default(false)
   productor          String?
   finca              String?
   distrito           String?             @map("region")
@@ -172,6 +173,7 @@ model InventarioMuestra {
 
 model Lote {
   id_lote          String           @id
+  owned_by_store   Boolean          @default(false)
   productor        String?
   finca            String?
   distrito         String?          @map("region")
@@ -222,6 +224,7 @@ model InventarioLote {
 model LoteTostado {
   id_lote_tostado        String                  @id
   id_lote                String
+  owned_by_store         Boolean                 @default(false)
   fecha_tostado          DateTime
   perfil_tostado         String
   peso                   Float
@@ -256,7 +259,8 @@ model InventarioLoteTostado {
 //BOLSA
 
 model Bolsa {
-  id_bolsa        String @id
+  id_bolsa        String  @id
+  owned_by_store  Boolean @default(false)
   id_lote_tostado String
   id_pedido       String
   gramaje         Int
@@ -552,11 +556,12 @@ model Cambios {
 
 model Pedido {
   id_pedido            String    @id @default(uuid())
+  owned_by_store       Boolean   @default(false)
   fecha_registro       DateTime  @default(now())
   tipo_pedido          String
   cantidad             Float
   estado_pedido        String    @default("Pendiente")
-  id_user              String
+  id_user              String?
   id_lote              String?
   id_nuevoLote         String?
   id_nuevoLote_tostado String?   @unique
@@ -575,7 +580,7 @@ model Pedido {
   eliminado            Boolean   @default(false)
 
   // Relación con Usuario como Cliente
-  cliente            User                @relation("Cliente", fields: [id_user], references: [id_user])
+  cliente            User?               @relation("Cliente", fields: [id_user], references: [id_user])
   // Relación con Usuario como quien lo creó
   creadoPor          User?               @relation("PedidoCreadoPor", fields: [creado_por_id], references: [id_user])
   // Relación con Usuario como quien lo completó
@@ -691,7 +696,8 @@ model Tueste {
   id_tueste                 String       @id @default(uuid())
   id_lote                   String
   tostadora                 String
-  id_cliente                String
+  owned_by_store            Boolean      @default(false)
+  id_cliente                String?
   id_pedido                 String
   densidad                  Float
   humedad                   Float

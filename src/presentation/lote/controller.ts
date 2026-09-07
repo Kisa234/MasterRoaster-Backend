@@ -19,7 +19,6 @@ import { AnalisisSensorialRepository } from "../../domain/repository/analisisSen
 import { LoteAnalisisRepository } from "../../domain/repository/lote-analisis.repository";
 import { UserRepository } from "../../domain/repository/user.repository";
 import { CreateLoteRapidoDto } from '../../domain/dtos/lotes/lote/create-rapido';
-import { CreateLoteRapido } from '../../domain/usecases/lote/lote/create-lote-rapido';
 import { PedidoRepository } from '../../domain/repository/pedido.repository';
 import { BlendLotes } from '../../domain/usecases/lote/lote/blend-lotes';
 import { BlendLotesDto } from '../../domain/dtos/lotes/lote/blend-lotes';
@@ -33,6 +32,8 @@ import { InventarioLoteRepository } from '../../domain/repository/inventario-lot
 import { TipoMovimiento } from '../../enums/tipo-movimiento.enum';
 import { EntidadInventario } from '../../enums/entidad-inventario.enum';
 import { MovimientoAlmacenRepository } from '../../domain/repository/movimiento-almacen.repository';
+import { GetLotesByUserId } from '../../domain/usecases/lote/lote/get-lotes-user';
+import { GetLotesOwnedByStore } from '../../domain/usecases/lote/lote/get-lotes-owned-by-store';
 
 
 export class LoteController {
@@ -54,26 +55,44 @@ export class LoteController {
 
     ) { }
 
-    public createLote = (req: Request, res: Response) => {
-        // 1. Verifica que req.user esté presente
+    public createLote = async (req: Request, res: Response) => {
         if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
 
-        // 2. Decide de dónde viene el id_user
         const idUserFromBody = req.body.id_user as string | undefined;
-        const effectiveUserId = idUserFromBody ?? req.user.id_user;
+        const ownedByStoreFromBody = req.body.owned_by_store as boolean | undefined;
 
-        // 3. Arma el body final para el DTO
+        // ← falta este bloque acá también
+        if (ownedByStoreFromBody === true && idUserFromBody) {
+            return res.status(400).json({
+                error: 'Un lote no puede ser de tienda y de cliente al mismo tiempo'
+            });
+        }
+
+        let ownedByStore: boolean;
+        let effectiveUserId: string | undefined;
+
+        if (ownedByStoreFromBody === true) {
+            ownedByStore = true;
+            effectiveUserId = undefined;
+        } else if (idUserFromBody) {
+            ownedByStore = false;
+            effectiveUserId = idUserFromBody;
+        } else {
+            return res.status(400).json({
+                error: 'Debes indicar si el lote es de tienda (owned_by_store) o seleccionar un cliente (id_user)'
+            });
+        }
+
         const bodyWithUser = {
             ...req.body,
             id_user: effectiveUserId,
+            owned_by_store: ownedByStore,
         };
 
-        // 4. Obtener el almacén en caso se quiera crear el lote con inventario directamente
         const idAlmacen = req.body.almacen as string | undefined;
 
-        // 5. Crea el DTO y valida
         const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
         if (error) {
             return res.status(400).json({ error });
@@ -87,29 +106,14 @@ export class LoteController {
             this.movimientoAlmacenRepository,
             this.inventarioLoteRepository
         )
-            .execute(createLoteDto!, undefined, undefined, idAlmacen)
+            .execute(createLoteDto!, undefined, undefined, idAlmacen, undefined, req.user.id_user)
             .then(lote => {
                 res.json(lote);
             })
             .catch(error => res.status(400).json({ error: error.message ?? error }));
     }
 
-    public createLoteRapido = (req: Request, res: Response) => {
-        const [error, createLoteRapidoDto] = CreateLoteRapidoDto.create(req.body);
-        if (error) {
-            return res.status(400).json({ error }); ``
-        }
 
-        new CreateLoteRapido(
-            this.loteRepository,
-            this.userRepository,
-            this.pedidoRepository
-        ).execute(createLoteRapidoDto!)
-            .then(lote => {
-                res.json(lote)
-            })
-            .catch(error => res.status(400).json({ error }));
-    }
 
     public updateLote = async (req: Request, res: Response) => {
         const id_lote = req.params.id;
@@ -138,30 +142,42 @@ export class LoteController {
     public createLoteFromMuestra = (req: Request, res: Response) => {
         const id_muestra = req.params.id;
 
-        // 1. Verifica que req.user esté presente
         if (!req.user?.id_user) {
             return res.status(401).json({ error: 'Usuario no autenticado' });
         }
 
-        // 2. Decide de dónde viene el id_user:
-        //    - Si el DTO entrante trae un id_user válido lo usamos.
-        //    - Si no lo trae, lo tomamos del token (req.user.id).
-        // Opcional: puedes añadir aquí lógica para que sólo ciertos roles
-        // (p. ej. 'admin') puedan sobreescribir el id_user en el body.
-        const idUserFromBody = req.body.id_user as string | undefined;
-        const effectiveUserId = idUserFromBody ?? req.user.id_user;
 
-        // 3. Arma el body final para el DTO
+        const idUserFromBody = req.body.id_user as string | undefined;
+        const ownedByStoreFromBody = req.body.owned_by_store === true;
+
+        let effectiveUserId: string | undefined;
+
+        if (ownedByStoreFromBody === true && idUserFromBody) {
+            return res.status(400).json({
+                error: 'Un lote no puede ser de tienda y de cliente al mismo tiempo'
+            });
+        }
+        if (ownedByStoreFromBody) {
+            effectiveUserId = undefined;
+        } else if (idUserFromBody) {
+            effectiveUserId = idUserFromBody;
+        } else {
+            return res.status(400).json({
+                error: 'Debes indicar si el lote es de tienda (owned_by_store) o seleccionar un cliente (id_user)'
+            });
+        }
+
         const bodyWithUser = {
             ...req.body,
             id_user: effectiveUserId,
+            owned_by_store: ownedByStoreFromBody
         };
 
-        // 4. Crea el DTO y valida
         const [error, createLoteDto] = CreateLoteDto.create(bodyWithUser);
-        if (!createLoteDto) {
-            return res.status(400).json({ error });
-        }
+        if (!createLoteDto) return res.status(400).json({ error });
+
+        const idAlmacen = req.body.almacen as string | undefined;
+
         new CreateLoteFromMuestra(
             this.createLoteUseCase,
             this.loteAnalisisRepository,
@@ -172,16 +188,14 @@ export class LoteController {
             this.analisisDefectosRepository,
             this.loteRepository
         )
-            .execute(id_muestra, createLoteDto)
+            .execute(id_muestra, createLoteDto, req.user.id_user, idAlmacen)
             .then(lote => {
-                this.inventarioLoteRepository.createInventario({
-                    id_lote: lote.id_lote,
-                    id_almacen: req.body.almacen,
-                    cantidad_kg: lote.peso
-                })
-                res.json(lote)
+                res.json(lote);
             })
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => {
+                console.log('Error en createLoteFromMuestra:', error);
+                res.status(400).json({ error: error.message ?? String(error) });
+            });
     }
 
     public blendLotes = async (req: Request, res: Response) => {
@@ -221,11 +235,13 @@ export class LoteController {
             .catch(error => res.status(400).json({ error }));
     }
     public getLotesByUserId = (req: Request, res: Response) => {
-        new GetLotes(this.loteRepository)
-            .execute()
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetLotesByUserId(this.loteRepository)
+            .execute(req.params.id, incluirEliminados)
             .then(lotes => res.json(lotes))
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => res.status(400).json({ error: error?.message ?? String(error) }));
     }
+
     public getAllTostados = async (req: Request, res: Response) => {
         new GetALLLotesTostados(this.loteRepository)
             .execute()
@@ -281,6 +297,13 @@ export class LoteController {
             })
             .catch(error => res.status(400).json({ error })
             )
+    }
+    public getLotesOwnedByStore = async (req: Request, res: Response) => {
+        const incluirEliminados = req.query.incluirEliminados === 'true';
+        new GetLotesOwnedByStore(this.loteRepository)
+            .execute(incluirEliminados)
+            .then(lotes => res.json(lotes))
+            .catch(error => res.status(400).json({ error }));
     }
 
 }

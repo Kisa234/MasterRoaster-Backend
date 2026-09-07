@@ -688,7 +688,8 @@ export class CompletarPedido implements CompletarPedidoUseCase {
                 gramaje: item.gramaje,
                 molienda: item.molienda,
                 cantidad: item.cantidad,
-                id_user: pedido.id_user,
+                owned_by_store: pedido.owned_by_store,
+                id_user: pedido.owned_by_store ? undefined : pedido.id_user,
                 id_almacen: pedido.id_almacen,
             });
             if (errBolsa || !createBolsaDto) throw new Error(errBolsa ?? 'Error al crear DTO de bolsa');
@@ -794,12 +795,13 @@ export class CompletarPedido implements CompletarPedidoUseCase {
         return this.pedidoRepository.completarPedido(pedidoId, id_completado_por);
     }
 
-    async verifyIfUserHasLote(id_user: string, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
+    async verifyIfUserHasLote(id_user: string | undefined, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
+        if (!id_user) return null;
+
         const lotes = await this.loteRepository.getLotesByUserId(id_user);
         const loteRelacionado = lotes.find(
             l => l.id_lote.includes(id_lote_origen) && l.tipo_lote === tipo_lote
         );
-
 
         return loteRelacionado?.id_lote ?? null;
     }

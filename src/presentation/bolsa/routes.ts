@@ -28,6 +28,8 @@ export class BolsaRoutes {
         router.delete('/:id', authMiddleware, bolsaController.deleteBolsa);
 
         // Consultas simples
+        router.get('/owned-by-store', bolsaController.getBolsasOwnedByStore);
+        router.get('/user/:id', bolsaController.getBolsasByUserId);
         router.get('/', bolsaController.getBolsas);
         router.get('/inventario', bolsaController.getBolsaInventario);
         router.get('/inventario/:id', bolsaController.getBolsaInventarioById);

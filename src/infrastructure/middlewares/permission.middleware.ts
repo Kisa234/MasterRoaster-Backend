@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../data/postgres';
+import { envs } from '../../config/envs';
 
 export const checkPermission = (permissionCode: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -11,6 +12,11 @@ export const checkPermission = (permissionCode: string) => {
         return res.status(401).json({
           message: 'No autenticado',
         });
+      }
+
+      // 🔓 Super admin: bypass total por id_rol, no consulta RolPermiso
+      if (envs.SUPER_ADMIN_ROL_ID && user.id_rol === envs.SUPER_ADMIN_ROL_ID) {
+        return next();
       }
 
       // 2️⃣ Sin rol

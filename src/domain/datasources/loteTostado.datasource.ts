@@ -11,5 +11,7 @@ export abstract class LoteTostadoDataSource {
     abstract getLotesTostadoByLoteId(id: string): Promise<LoteTostadoEntity[]>;
     abstract GetLotesTostadoandLote(): Promise<LoteTostadoConLoteEntity[]>;
     abstract GetLoteTostadoConInventario(id: string): Promise<LoteTostadoConInventarioEntity>;
-    abstract getLotesTostadosConInventario(incluirEliminados?: boolean): Promise<LoteTostadoConInventarioEntity[]>; // 👈 nuevo parámetro
+    abstract getLotesTostadosConInventario(incluirEliminados?: boolean): Promise<LoteTostadoConInventarioEntity[]>;
+    abstract getLoteTostadoByUser(id_user: string, incluirEliminados?: boolean): Promise<LoteTostadoEntity[]>;
+    abstract getLotesTostadosOwnedByStore(incluirEliminados?: boolean): Promise<LoteTostadoEntity[]>;
 }

@@ -78,7 +78,7 @@ export class CreatePedido implements CreatePedidoUseCase {
         }
 
 
-        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        const cliente = await this.clienteRepository.getUserById(dto.id_user!);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
 
         return this.pedidoRepository.createPedido(dto);
@@ -97,7 +97,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             throw new Error("Stock insuficiente en el almacén");
         }
 
-        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        const cliente = await this.clienteRepository.getUserById(dto.id_user!);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
 
         return this.pedidoRepository.createPedido(dto);
@@ -105,12 +105,13 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     async ordenTueste(dto: CreatePedidoDto): Promise<PedidoEntity> {
 
-        // 1. Validar cliente
-        const user = await this.clienteRepository.getUserById(dto.id_user);
-        if (!user || user.eliminado) {
-            throw new Error('El cliente no existe o está eliminado');
+        // 1. Validar cliente — solo si el pedido NO es de tienda
+        if (!dto.owned_by_store) {
+            const user = await this.clienteRepository.getUserById(dto.id_user!);
+            if (!user || user.eliminado) {
+                throw new Error('El cliente no existe o está eliminado');
+            }
         }
-
 
         // 2. Validar lote
         if (!dto.id_lote) {
@@ -218,6 +219,7 @@ export class CreatePedido implements CreatePedidoUseCase {
                 fecha_tueste: dto.fecha_tueste,
                 tostadora: dto.tostadora,
                 id_cliente: dto.id_user,
+                owned_by_store: dto.owned_by_store,
                 densidad: density,
                 humedad: humidity,
                 peso_entrada: peso,
@@ -239,9 +241,11 @@ export class CreatePedido implements CreatePedidoUseCase {
 
     async maquilaValidations(dto: CreateMaquilaDto): Promise<PedidoEntity> {
 
-        // 1. Validar cliente
-        const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user);
-        if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
+        // 1. Validar cliente — solo si el pedido NO es de tienda
+        if (!dto.pedido.owned_by_store) {
+            const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user!);
+            if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
+        }
 
         // 2. Validar lote tostado
         const loteTostado = await this.loteTostadoRepository.getLoteTostadoById(dto.pedido.id_lote_tostado!);
@@ -283,7 +287,7 @@ export class CreatePedido implements CreatePedidoUseCase {
     async suscripcionValidations(dto: CreatePedidoDto, id_completado_por: string): Promise<PedidoEntity> {
 
         // Validar cliente
-        const cliente = await this.clienteRepository.getUserById(dto.id_user);
+        const cliente = await this.clienteRepository.getUserById(dto.id_user!);
         if (!cliente || cliente.eliminado) {
             throw new Error("Cliente no válido");
         }
@@ -291,7 +295,7 @@ export class CreatePedido implements CreatePedidoUseCase {
             suscripcion: true,
             cant_suscripcion: dto.cantidad
         });
-        await this.clienteRepository.updateUser(dto.id_user, usdto!);
+        await this.clienteRepository.updateUser(dto.id_user!, usdto!);
 
         // Crear pedido de suscripción
         const pedido = await this.pedidoRepository.createPedido(dto);
@@ -304,7 +308,7 @@ export class CreatePedido implements CreatePedidoUseCase {
     }
 
     async ordenDespachoValidations(dto: CreateOrdenDespachoDto): Promise<PedidoEntity> {
-        const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user);
+        const cliente = await this.clienteRepository.getUserById(dto.pedido.id_user!);
         if (!cliente || cliente.eliminado) throw new Error("Cliente no válido");
 
         if (!dto.pedido.id_almacen) throw new Error('El almacén es requerido para una Orden de Despacho');
