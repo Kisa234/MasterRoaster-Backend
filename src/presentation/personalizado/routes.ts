@@ -1,23 +1,23 @@
-import { LoteDataSourceImpl } from './../../infrastructure/datasources/lote.datasource.impl';
 import { Router } from "express";
 import { PersonalizadoController } from "./controller";
 import { PedidoDataSourceImpl } from "../../infrastructure/datasources/pedido.datasource.impl";
 import PedidoRepositoryImpl from "../../infrastructure/repositories/pedido.repository.impl";
 import { TuesteDataSourceImpl } from "../../infrastructure/datasources/tueste.datasource.impl";
 import { TuesteRepositoryImpl } from "../../infrastructure/repositories/tueste.repository.impl";
+import { LoteDataSourceImpl } from "../../infrastructure/datasources/lote.datasource.impl";
 import { LoteRepositoryImpl } from '../../infrastructure/repositories/lote.repository.impl';
 import { UserDataSourceImpl } from '../../infrastructure/datasources/user.datasource.impl';
 import { UserRepositoryImpl } from '../../infrastructure/repositories/user.repository.impl';
+import { GetLoteInventario } from '../../domain/usecases/lote/lote/get-lote-inventario';
 
 export class PersonalizadoRoutes {
     static get routes() {
         const router = Router();
 
-
         // Pedido
         const PedidoDatasource = new PedidoDataSourceImpl();
         const PedidoRepository = new PedidoRepositoryImpl(PedidoDatasource);
-        
+
         // Tueste
         const TuesteDatasource = new TuesteDataSourceImpl();
         const TuesteRepository = new TuesteRepositoryImpl(TuesteDatasource);
@@ -29,16 +29,18 @@ export class PersonalizadoRoutes {
         // User
         const UserDatasource = new UserDataSourceImpl();
         const UserRepository = new UserRepositoryImpl(UserDatasource);
-        
-               
+
+        // Usecase compuesto, reutilizado del módulo de lote
+        const getLoteInventarioUseCase = new GetLoteInventario(LoteRepository);
 
         const controller = new PersonalizadoController(
             PedidoRepository,
             TuesteRepository,
             LoteRepository,
-            UserRepository
+            UserRepository,
+            getLoteInventarioUseCase,
         );
-        
+
         router.get('/', controller.getResumenTuesteLotePedido);
         router.get('/tueste/pendientes', controller.getTuestesPendientes);
         router.get('/pedidos/ultimos', controller.getUltimosPedidos);
