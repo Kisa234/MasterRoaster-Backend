@@ -796,12 +796,16 @@ export class CompletarPedido implements CompletarPedidoUseCase {
     }
 
     async verifyIfUserHasLote(id_user: string | undefined, id_lote_origen: string, tipo_lote: string): Promise<string | null> {
+       
         if (!id_user) return null;
 
-        const lotes = await this.loteRepository.getLotesByUserId(id_user);
+        const lotes = await this.loteRepository.getLotesByUserId(id_user,true);
+       
         const loteRelacionado = lotes.find(
             l => l.id_lote.includes(id_lote_origen) && l.tipo_lote === tipo_lote
         );
+
+
 
         return loteRelacionado?.id_lote ?? null;
     }
