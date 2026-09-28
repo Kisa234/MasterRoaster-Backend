@@ -1,3 +1,7 @@
+// '' / null / undefined → undefined ; cualquier otro valor → Number (puede dar NaN, se valida abajo)
+const toOptionalInt = (v: any): number | undefined =>
+    v === null || v === undefined || v === '' ? undefined : Number(v);
+
 export class CreateLoteDto {
     private constructor(
         public readonly id_lote: string,
@@ -16,13 +20,15 @@ export class CreateLoteDto {
         public readonly id_user?: string,
         public readonly peso_tostado?: number,
         public readonly proveedor?: string,
+        public readonly provincia?: string,
+        public readonly anio_cosecha?: number,
     ) { }
 
     static create(props: { [key: string]: any }): [string?, CreateLoteDto?] {
         let {
             id_lote, proveedor, productor, finca, distrito, departamento, peso,
             variedades, proceso, tipo_lote, owned_by_store, clasificacion,
-            costo, altura, id_user, peso_tostado,
+            costo, altura, id_user, peso_tostado, provincia, anio_cosecha,
         } = props;
 
         if (!productor) return ['El productor es requerido', undefined];
@@ -32,6 +38,17 @@ export class CreateLoteDto {
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
+
+        const alturaNum = toOptionalInt(altura);
+        if (alturaNum !== undefined && (!Number.isInteger(alturaNum) || alturaNum <= 0)) {
+            return ['La altitud debe ser un número entero mayor a 0', undefined];
+        }
+
+        const anioNum = toOptionalInt(anio_cosecha);
+        const anioMax = new Date().getFullYear() + 1;
+        if (anioNum !== undefined && (!Number.isInteger(anioNum) || anioNum < 2000 || anioNum > anioMax)) {
+            return [`El año de cosecha debe estar entre 2000 y ${anioMax}`, undefined];
+        }
 
         const esOwnedByStore = !!owned_by_store;
 
@@ -44,8 +61,9 @@ export class CreateLoteDto {
 
         return [undefined, new CreateLoteDto(
             id_lote, productor, finca, distrito, departamento, peso, variedades,
-            proceso, tipo_lote, esOwnedByStore, clasificacion, costo, altura,
+            proceso, tipo_lote, esOwnedByStore, clasificacion, costo, alturaNum,
             esOwnedByStore ? undefined : id_user, peso_tostado, proveedor,
+            provincia?.trim() || undefined, anioNum,
         )];
     }
 

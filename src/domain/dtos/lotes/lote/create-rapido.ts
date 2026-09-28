@@ -1,3 +1,7 @@
+// '' / null / undefined → undefined ; cualquier otro valor → Number (puede dar NaN, se valida abajo)
+const toOptionalInt = (v: any): number | undefined =>
+    v === null || v === undefined || v === '' ? undefined : Number(v);
+
 export class CreateLoteRapidoDto {
     private constructor(
         public readonly id_lote        : string,
@@ -13,7 +17,10 @@ export class CreateLoteRapidoDto {
         public readonly clasificacion? : string,
         public readonly id_user?       : string,
         public readonly peso_tostado?  : number,
-        public readonly id_analisis?   : string
+        public readonly id_analisis?   : string,
+        public readonly provincia?     : string,
+        public readonly anio_cosecha?  : number,
+        public readonly altura?        : number,
     ) {}
 
     static create(props: { [key: string]: any } ): [string?, CreateLoteRapidoDto?] {
@@ -32,6 +39,9 @@ export class CreateLoteRapidoDto {
             id_user,
             peso_tostado,
             id_analisis,
+            provincia,
+            anio_cosecha,
+            altura,
         } = props;
 
         // if (!id_lote) return ['El id_lote es requerido', undefined];
@@ -44,7 +54,16 @@ export class CreateLoteRapidoDto {
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
 
-            
+        const alturaNum = toOptionalInt(altura);
+        if (alturaNum !== undefined && (!Number.isInteger(alturaNum) || alturaNum <= 0)) {
+            return ['La altitud debe ser un número entero mayor a 0', undefined];
+        }
+
+        const anioNum = toOptionalInt(anio_cosecha);
+        const anioMax = new Date().getFullYear() + 1;
+        if (anioNum !== undefined && (!Number.isInteger(anioNum) || anioNum < 2000 || anioNum > anioMax)) {
+            return [`El año de cosecha debe estar entre 2000 y ${anioMax}`, undefined];
+        }
 
         return [undefined, new CreateLoteRapidoDto(
             id_lote,
@@ -61,6 +80,9 @@ export class CreateLoteRapidoDto {
             id_user,
             peso_tostado,
             id_analisis,
+            provincia?.trim() || undefined,
+            anioNum,
+            alturaNum,
         )];
     }
    

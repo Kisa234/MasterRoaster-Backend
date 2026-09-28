@@ -1,3 +1,6 @@
+const toOptionalNumber = (v: any): number | undefined =>
+    v === null || v === undefined || v === '' ? undefined : Number(v);
+
 export class LoteEntity {
     constructor(
         public id_lote: string,
@@ -19,7 +22,8 @@ export class LoteEntity {
         public id_user?: string,
         public id_analisis?: string,
         public peso_tostado?: number,
-
+        public provincia?: string,
+        public anio_cosecha?: number,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): LoteEntity {
@@ -42,7 +46,9 @@ export class LoteEntity {
             id_user,
             id_analisis,
             peso_tostado,
-            fecha_registro
+            fecha_registro,
+            provincia,
+            anio_cosecha,
         } = obj;
         if (!id_lote) throw new Error('id_lote property is required');
         // if (!productor) throw new Error('productor property is required');
@@ -73,10 +79,12 @@ export class LoteEntity {
             owned_by_store ?? false,
             clasificacion,
             costo,
-            altura,
+            toOptionalNumber(altura),
             id_user,
             id_analisis,
             peso_tostado,
+            provincia ?? undefined,
+            toOptionalNumber(anio_cosecha),
         );
     }
 }
@@ -112,16 +120,15 @@ export class LoteConInventarioEntity {
     public fecha_registro: Date,
     public eliminado: boolean,
     public owned_by_store: boolean,
-
-    // ✅ extra solo para estos casos
     public inventarioLotes: InventarioLoteMini[] = [],
-
     public clasificacion?: string,
     public costo?: number,
     public altura?: number,
     public id_user?: string,
     public id_analisis?: string,
-    public peso_tostado?: number
+    public peso_tostado?: number,
+    public provincia?: string,
+    public anio_cosecha?: number,
   ) {}
 
   static fromObject(obj: { [key: string]: any }): LoteConInventarioEntity {
@@ -146,6 +153,8 @@ export class LoteConInventarioEntity {
       peso_tostado,
       fecha_registro,
       inventarioLotes,
+      provincia,
+      anio_cosecha,
     } = obj;
 
     if (!id_lote) throw new Error('id_lote property is required');
@@ -187,10 +196,12 @@ export class LoteConInventarioEntity {
       invMapped,
       clasificacion,
       costo,
-      altura,
+      toOptionalNumber(altura),
       id_user,
       id_analisis,
       peso_tostado,
+      provincia ?? undefined,
+      toOptionalNumber(anio_cosecha),
     );
   }
 }

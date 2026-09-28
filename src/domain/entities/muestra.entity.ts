@@ -1,5 +1,8 @@
 import { InventarioMuestraEntity } from "./inventario-muestra.entity";
 
+const toOptionalNumber = (v: any): number | undefined =>
+    v === null || v === undefined || v === '' ? undefined : Number(v);
+
 export class MuestraEntity {
     constructor(
         public id_muestra: string,
@@ -17,7 +20,10 @@ export class MuestraEntity {
         public completado: boolean,
         public eliminado: boolean,
         public id_user?: string,
-        public id_analisis?: string
+        public id_analisis?: string,
+        public provincia?: string,
+        public anio_cosecha?: number,
+        public altura?: number,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): MuestraEntity {
@@ -37,7 +43,10 @@ export class MuestraEntity {
             completado = false,
             eliminado = false,
             id_user,
-            id_analisis
+            id_analisis,
+            provincia,
+            anio_cosecha,
+            altura,
         } = obj;
 
         if (peso === undefined || peso === null) throw new Error('peso property is required');
@@ -63,7 +72,10 @@ export class MuestraEntity {
             completado,
             eliminado,
             id_user,
-            id_analisis
+            id_analisis,
+            provincia ?? undefined,
+            toOptionalNumber(anio_cosecha),
+            toOptionalNumber(altura),
         );
     }
 }
@@ -86,7 +98,10 @@ export class MuestraConInventarioEntity {
         public eliminado: boolean,
         public inventarioMuestras: InventarioMuestraEntity[],
         public id_user?: string,
-        public id_analisis?: string
+        public id_analisis?: string,
+        public provincia?: string,
+        public anio_cosecha?: number,
+        public altura?: number,
     ) { }
 
     public static fromObject(obj: { [key: string]: any }): MuestraConInventarioEntity {
@@ -112,7 +127,10 @@ export class MuestraConInventarioEntity {
             muestra.eliminado,
             inventarioMuestras,
             muestra.id_user,
-            muestra.id_analisis
+            muestra.id_analisis,
+            muestra.provincia,
+            muestra.anio_cosecha,
+            muestra.altura,
         );
     }
 }

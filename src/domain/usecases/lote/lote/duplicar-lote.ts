@@ -57,6 +57,10 @@ export class DuplicateLote implements DuplicateLoteUseCase {
             tipo_lote: tipo_lote,
             clasificacion: lote.clasificacion,
             id_user: pedido.id_user,
+            // datos de origen para el rotulado — se heredan del lote padre
+            provincia: lote.provincia,
+            anio_cosecha: lote.anio_cosecha,
+            altura: lote.altura,
         });
 
         

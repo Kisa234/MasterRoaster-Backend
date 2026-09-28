@@ -142,6 +142,9 @@ model Muestra {
   finca              String?
   distrito           String?             @map("region")
   departamento       String?
+  provincia          String?
+  anio_cosecha       Int?
+  altura             Int?
   peso               Float
   variedades         String[]
   proceso            String
@@ -178,6 +181,9 @@ model Lote {
   finca            String?
   distrito         String?          @map("region")
   departamento     String?
+  provincia        String?
+  anio_cosecha     Int?
+  altura           Int?
   peso             Float
   peso_tostado     Float?
   variedades       String[]
@@ -189,7 +195,6 @@ model Lote {
   eliminado        Boolean          @default(false)
   proveedor        String?
   clasificacion    String?
-  altura           Int?
   costo            Float?
   alias            String?
   boxOpcions       BoxOpcion[]

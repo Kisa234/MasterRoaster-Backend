@@ -1,3 +1,7 @@
+// '' / null / undefined → undefined ; cualquier otro valor → Number (puede dar NaN, se valida abajo)
+const toOptionalInt = (v: any): number | undefined =>
+    v === null || v === undefined || v === '' ? undefined : Number(v);
+
 export class CreateMuestraDto {
     private constructor(
         public readonly id_muestra: string,
@@ -13,21 +17,36 @@ export class CreateMuestraDto {
         public readonly proceso: string,
         public readonly id_user?: string,
         public readonly id_analisis?: string,
+        public readonly provincia?: string,
+        public readonly anio_cosecha?: number,
+        public readonly altura?: number,
     ) { }
 
     static create(props: { [key: string]: any }): [string?, CreateMuestraDto?] {
         let {
             id_muestra, owned_by_store, proveedor, nombre_muestra, productor,
             finca, distrito, departamento, peso, variedades, proceso, id_user, id_analisis,
+            provincia, anio_cosecha, altura,
         } = props;
 
         if (!productor) return ['El productor es requerido', undefined];
         if (!finca) return ['La finca es requerida', undefined];
-        if (!distrito) return ['La provincia es requerida', undefined];
+        if (!distrito) return ['El distrito es requerido', undefined];
         if (!departamento) return ['El departamento es requerido', undefined];
         if (!peso || peso <= 0) return ['El peso debe ser mayor a 0', undefined];
         if (!variedades) return ['Las variedades son requeridas', undefined];
         if (!proceso) return ['El proceso es requerido', undefined];
+
+        const alturaNum = toOptionalInt(altura);
+        if (alturaNum !== undefined && (!Number.isInteger(alturaNum) || alturaNum <= 0)) {
+            return ['La altitud debe ser un número entero mayor a 0', undefined];
+        }
+
+        const anioNum = toOptionalInt(anio_cosecha);
+        const anioMax = new Date().getFullYear() + 1;
+        if (anioNum !== undefined && (!Number.isInteger(anioNum) || anioNum < 2000 || anioNum > anioMax)) {
+            return [`El año de cosecha debe estar entre 2000 y ${anioMax}`, undefined];
+        }
 
         const esOwnedByStore = !!owned_by_store;
 
@@ -53,6 +72,9 @@ export class CreateMuestraDto {
             proceso,
             esOwnedByStore ? undefined : id_user,
             id_analisis,
+            provincia?.trim() || undefined,
+            anioNum,
+            alturaNum,
         )];
     }
 }

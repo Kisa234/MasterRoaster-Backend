@@ -1,3 +1,7 @@
+// undefined → no se toca ; '' / null → se limpia (null) ; otro → Number (puede dar NaN, se valida abajo)
+const toNullableInt = (v: any): number | null | undefined =>
+    v === undefined ? undefined : v === null || v === '' ? null : Number(v);
+
 export class UpdateLoteDto {
     private constructor(
         public readonly proveedor?: string,
@@ -11,10 +15,12 @@ export class UpdateLoteDto {
         public readonly tipo_lote?: string,
         public readonly clasificacion?: string,
         public readonly costo?: number,
-        public readonly altura?: number,
+        public readonly altura?: number | null,
         public readonly id_user?: string,
         public readonly id_analisis?: string,
         public readonly peso_tostado?: number,
+        public readonly provincia?: string | null,
+        public readonly anio_cosecha?: number | null,
     ) { }
 
     get values() {
@@ -32,6 +38,8 @@ export class UpdateLoteDto {
         if (this.clasificacion) returnObj.clasificacion = this.clasificacion;
         if (this.costo !== undefined) returnObj.costo = this.costo;
         if (this.altura !== undefined) returnObj.altura = this.altura;
+        if (this.provincia !== undefined) returnObj.provincia = this.provincia;
+        if (this.anio_cosecha !== undefined) returnObj.anio_cosecha = this.anio_cosecha;
 
         return returnObj;
     }
@@ -54,9 +62,25 @@ export class UpdateLoteDto {
             id_user,
             id_analisis,
             peso_tostado,
+            provincia,
+            anio_cosecha,
         } = props;
 
+        const alturaNum = toNullableInt(altura);
+        if (typeof alturaNum === 'number' && (!Number.isInteger(alturaNum) || alturaNum <= 0)) {
+            return ['La altitud debe ser un número entero mayor a 0', undefined];
+        }
 
+        const anioNum = toNullableInt(anio_cosecha);
+        const anioMax = new Date().getFullYear() + 1;
+        if (typeof anioNum === 'number' && (!Number.isInteger(anioNum) || anioNum < 2000 || anioNum > anioMax)) {
+            return [`El año de cosecha debe estar entre 2000 y ${anioMax}`, undefined];
+        }
+
+        // provincia: undefined = no se toca, '' o null = se limpia
+        const provinciaFinal = provincia === undefined
+            ? undefined
+            : (typeof provincia === 'string' && provincia.trim()) ? provincia.trim() : null;
 
         return [undefined,
             new UpdateLoteDto(
@@ -71,10 +95,12 @@ export class UpdateLoteDto {
                 tipo_lote,
                 clasificacion,
                 costo,
-                altura,
+                alturaNum,
                 id_user,
                 id_analisis,
                 peso_tostado,
+                provinciaFinal,
+                anioNum,
             )];
     }
 }
