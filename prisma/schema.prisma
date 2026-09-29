@@ -196,6 +196,9 @@ model Lote {
   proveedor        String?
   clasificacion    String?
   costo            Float?
+  precio_1        Float?
+  escala_2        Float?
+  escala_3        Float?
   alias            String?
   boxOpcions       BoxOpcion[]
   boxRespuestas    BoxRespuesta[]

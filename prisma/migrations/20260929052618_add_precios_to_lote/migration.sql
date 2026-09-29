@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Lote" ADD COLUMN     "escala_2" DOUBLE PRECISION,
+ADD COLUMN     "escala_3" DOUBLE PRECISION,
+ADD COLUMN     "precio_1" DOUBLE PRECISION;

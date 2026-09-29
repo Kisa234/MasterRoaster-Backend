@@ -1,4 +1,3 @@
-// undefined → no se toca ; '' / null → se limpia (null) ; otro → Number (puede dar NaN, se valida abajo)
 const toNullableInt = (v: any): number | null | undefined =>
     v === undefined ? undefined : v === null || v === '' ? null : Number(v);
 
@@ -21,6 +20,9 @@ export class UpdateLoteDto {
         public readonly peso_tostado?: number,
         public readonly provincia?: string | null,
         public readonly anio_cosecha?: number | null,
+        public readonly precio_1?: number | null,
+        public readonly escala_2?: number | null,
+        public readonly escala_3?: number | null,
     ) { }
 
     get values() {
@@ -40,6 +42,10 @@ export class UpdateLoteDto {
         if (this.altura !== undefined) returnObj.altura = this.altura;
         if (this.provincia !== undefined) returnObj.provincia = this.provincia;
         if (this.anio_cosecha !== undefined) returnObj.anio_cosecha = this.anio_cosecha;
+
+        if (this.precio_1 !== undefined) returnObj.precio_1 = this.precio_1;
+        if (this.escala_2 !== undefined) returnObj.escala_2 = this.escala_2;
+        if (this.escala_3 !== undefined) returnObj.escala_3 = this.escala_3;
 
         return returnObj;
     }
@@ -64,6 +70,9 @@ export class UpdateLoteDto {
             peso_tostado,
             provincia,
             anio_cosecha,
+            precio_1,
+            escala_2,
+            escala_3,
         } = props;
 
         const alturaNum = toNullableInt(altura);
@@ -77,10 +86,23 @@ export class UpdateLoteDto {
             return [`El año de cosecha debe estar entre 2000 y ${anioMax}`, undefined];
         }
 
-        // provincia: undefined = no se toca, '' o null = se limpia
         const provinciaFinal = provincia === undefined
             ? undefined
             : (typeof provincia === 'string' && provincia.trim()) ? provincia.trim() : null;
+
+        const precio1Num = toNullableInt(precio_1);
+        const escala2Num = toNullableInt(escala_2);
+        const escala3Num = toNullableInt(escala_3);
+        const precios: [string, number | null | undefined][] = [
+            ['Precio 1', precio1Num],
+            ['Escala 2', escala2Num],
+            ['Escala 3', escala3Num],
+        ];
+        for (const [nombre, valor] of precios) {
+            if (typeof valor === 'number' && (isNaN(valor) || valor <= 0)) {
+                return [`${nombre} debe ser un número mayor a 0`, undefined];
+            }
+        }
 
         return [undefined,
             new UpdateLoteDto(
@@ -101,6 +123,9 @@ export class UpdateLoteDto {
                 peso_tostado,
                 provinciaFinal,
                 anioNum,
+                precio1Num,
+                escala2Num,
+                escala3Num,
             )];
     }
 }

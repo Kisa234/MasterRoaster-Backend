@@ -22,6 +22,9 @@ export class LoteEntity {
         public id_user?: string,
         public id_analisis?: string,
         public peso_tostado?: number,
+        public precio_1?: number,
+        public escala_2?: number,
+        public escala_3?: number,
         public provincia?: string,
         public anio_cosecha?: number,
     ) { }
@@ -47,14 +50,11 @@ export class LoteEntity {
             id_analisis,
             peso_tostado,
             fecha_registro,
-            provincia,
-            anio_cosecha,
+            precio_1, escala_2, escala_3,
+            provincia, anio_cosecha,
         } = obj;
+
         if (!id_lote) throw new Error('id_lote property is required');
-        // if (!productor) throw new Error('productor property is required');
-        // if (!finca) throw new Error('finca property is required');
-        // if (!provincia) throw new Error('provincia property is required');
-        // if (!departamento) throw new Error('departamento property is required');
         if (!variedades) throw new Error('variedades property is required');
         if (!proceso) throw new Error('proceso property is required');
 
@@ -79,17 +79,16 @@ export class LoteEntity {
             owned_by_store ?? false,
             clasificacion,
             costo,
-            toOptionalNumber(altura),
+            altura,
             id_user,
             id_analisis,
             peso_tostado,
-            provincia ?? undefined,
-            toOptionalNumber(anio_cosecha),
+            precio_1 ?? undefined, escala_2 ?? undefined, escala_3 ?? undefined,
+            provincia ?? undefined, anio_cosecha ?? undefined,
         );
     }
 }
 
-//Entity con inventario incluido para casos específicos
 
 export interface InventarioLoteMini {
   id_inventario: string;
@@ -120,13 +119,18 @@ export class LoteConInventarioEntity {
     public fecha_registro: Date,
     public eliminado: boolean,
     public owned_by_store: boolean,
+
     public inventarioLotes: InventarioLoteMini[] = [],
+
     public clasificacion?: string,
     public costo?: number,
     public altura?: number,
     public id_user?: string,
     public id_analisis?: string,
     public peso_tostado?: number,
+    public precio_1?: number,
+    public escala_2?: number,
+    public escala_3?: number,
     public provincia?: string,
     public anio_cosecha?: number,
   ) {}
@@ -153,8 +157,8 @@ export class LoteConInventarioEntity {
       peso_tostado,
       fecha_registro,
       inventarioLotes,
-      provincia,
-      anio_cosecha,
+      precio_1, escala_2, escala_3,
+      provincia, anio_cosecha,
     } = obj;
 
     if (!id_lote) throw new Error('id_lote property is required');
@@ -196,12 +200,12 @@ export class LoteConInventarioEntity {
       invMapped,
       clasificacion,
       costo,
-      toOptionalNumber(altura),
+      altura,
       id_user,
       id_analisis,
       peso_tostado,
-      provincia ?? undefined,
-      toOptionalNumber(anio_cosecha),
+      precio_1 ?? undefined, escala_2 ?? undefined, escala_3 ?? undefined,
+      provincia ?? undefined, anio_cosecha ?? undefined,
     );
   }
 }
